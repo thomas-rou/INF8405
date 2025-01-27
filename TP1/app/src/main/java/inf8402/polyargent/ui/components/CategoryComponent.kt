@@ -18,12 +18,13 @@ import inf8402.polyargent.model.Category
 import inf8402.polyargent.model.CategoryNameDisplay
 import androidx.compose.ui.Alignment
 
-@Preview()
 @Composable
 fun CategoryComponent(
     category: Category =  Category(
         stringResource(R.string.default_category_name),
-        R.drawable.ic_launcher_foreground, R.color.grey),
+        R.drawable.ic_launcher_foreground,
+        R.color.grey
+    ),
     displayName : CategoryNameDisplay = CategoryNameDisplay.NONE
 )
 {
@@ -55,7 +56,7 @@ fun CategoryComponent(
 }
 
 @Composable
-fun DrawCategory(category :Category) {
+private fun DrawCategory(category :Category) {
     Box(
         modifier = Modifier.size(100.dp),
         contentAlignment = Alignment.Center
