@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">PolyArgent</string>
     <string name="roll">Roll</string>
+    <string name="default_category_name">Catégorie</string>
 </resources>
