@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="16dp"
     android:background="?attr/selectableItemBackground"
     android:elevation="2dp"
@@ -10,8 +10,9 @@
 
     <TextView
         android:id="@+id/textTitle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="@string/expense_title"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -19,8 +20,9 @@
 
     <TextView
         android:id="@+id/textAmount"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="@string/_0_00"
         android:textSize="16sp"
         android:textColor="@color/teal_700"
@@ -28,10 +30,22 @@
 
     <TextView
         android:id="@+id/textDate"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="@string/date"
         android:textSize="14sp"
         android:textColor="@color/black"
         android:paddingTop="2dp" />
+
+    <TextView
+        android:id="@+id/textType"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/expense_type"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:gravity="end" />
+
 </LinearLayout>

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
 import inf8402.polyargent.model.expense.Expense
 import inf8402.polyargent.databinding.ActivityAddExpenseBinding
+import inf8402.polyargent.model.expense.ExpenseType
 import inf8402.polyargent.viewmodel.ExpenseViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,8 +41,14 @@ class AddExpenseFragment : AppCompatActivity() {
             return
         }
 
+        val expenseType : ExpenseType
+        = if(binding.spinnerExpenseType.selectedItem.toString()=="Dépense")
+            ExpenseType.EXPENSE
+        else
+            ExpenseType.INCOME
+
         val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val expense = Expense(title = title, amount = amount, date = currentDate)
+        val expense = Expense(title = title, amount = amount, date = currentDate, type = expenseType)
         expenseViewModel.insert(expense)
 
         Toast.makeText(this, "Expense added", Toast.LENGTH_SHORT).show()
