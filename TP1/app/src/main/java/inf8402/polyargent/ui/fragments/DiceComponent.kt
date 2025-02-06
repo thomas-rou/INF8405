@@ -1,4 +1,4 @@
-package inf8402.polyargent.ui.components
+package inf8402.polyargent.ui.fragments
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

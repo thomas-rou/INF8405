@@ -5,8 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import inf8402.polyargent.R
-import inf8402.polyargent.ui.components.DiceWithButtonAndImage
+import inf8402.polyargent.ui.fragments.DiceWithButtonAndImage
 
 @Preview
 @Composable
