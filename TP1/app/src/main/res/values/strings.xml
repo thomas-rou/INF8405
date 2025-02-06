@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">PolyArgent</string>
     <string name="roll">Roll</string>
+    <string name="add_expense">Add Expense</string>
+    <string name="expense_title">Expense Title</string>
+    <string name="amount">Amount</string>
+    <string name="save_expense">Save Expense</string>
+    <string name="_0_00">$0.00</string>
+    <string name="date">Date</string>
 </resources>

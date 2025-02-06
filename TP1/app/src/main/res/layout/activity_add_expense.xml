@@ -9,7 +9,8 @@
         android:id="@+id/editTextTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Expense Title"
+        android:autofillHints="Food"
+        android:hint="@string/expense_title"
         android:inputType="text"
         android:padding="12dp"
         android:background="@drawable/edit_text_bg"/>
@@ -18,7 +19,8 @@
         android:id="@+id/editTextAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Amount"
+        android:autofillHints="15"
+        android:hint="@string/amount"
         android:inputType="numberDecimal"
         android:padding="12dp"
         android:background="@drawable/edit_text_bg"
@@ -28,7 +30,7 @@
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save Expense"
+        android:text="@string/save_expense"
         android:layout_marginTop="24dp"
         android:backgroundTint="@color/teal_700"
         android:textColor="@android:color/white"/>
