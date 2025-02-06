@@ -10,6 +10,7 @@ import inf8402.polyargent.ui.theme.PolyArgentTheme
 
 import android.content.Intent
 import androidx.activity.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import inf8402.polyargent.ui.screens.ExpenseScreen
 import inf8402.polyargent.databinding.ExpenseBinding
@@ -31,13 +32,16 @@ import inf8402.polyargent.viewmodel.ExpenseViewModel
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ExpenseBinding
-    private val expenseViewModel: ExpenseViewModel by viewModels()
+    private val expenseViewModel: ExpenseViewModel by viewModels {
+        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+    }
     private lateinit var adapter: ExpenseScreen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExpenseBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
 
         adapter = ExpenseScreen { expense -> expenseViewModel.delete(expense) }
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
