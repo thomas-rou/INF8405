@@ -11,6 +11,6 @@ interface ExpenseDao {
     @Delete
     suspend fun delete(expense: Expense)
 
-    @Query("SELECT * FROM expenses ORDER BY date DESC")
+    @Query("SELECT * FROM expense ORDER BY date DESC")
     fun getAllExpenses(): LiveData<List<Expense>>
 }

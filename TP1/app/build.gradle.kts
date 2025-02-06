@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt")
+    alias(libs.plugins.kotlin.android) version "2.1.0"
+    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+    alias(libs.plugins.compose.compiler) version "2.0.0"
 }
 
 android {
@@ -52,7 +53,7 @@ android {
 }
 
 dependencies {
-
+    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
