@@ -1,6 +1,8 @@
 package inf8402.polyargent.ui.fragments
 
+import android.app.DatePickerDialog
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
@@ -20,10 +22,32 @@ class AddExpenseFragment : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddExpenseBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.dateEditText.setOnClickListener {
+            showDatePicker()
+        }
+        binding.dateEditText.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
         binding.btnSave.setOnClickListener {
             saveExpense()
         }
+
+        binding.btnCancel.setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+            val formattedDate = "${selectedDay}/${selectedMonth + 1}/$selectedYear"
+            binding.dateEditText.text = formattedDate
+        }, year, month, day)
+
+        datePickerDialog.show()
     }
 
     private fun saveExpense() {
@@ -47,8 +71,9 @@ class AddExpenseFragment : AppCompatActivity() {
         else
             ExpenseType.INCOME
 
-        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val expense = Expense(title = title, amount = amount, date = currentDate, type = expenseType)
+        val date = binding.dateEditText.text.toString().trim()
+
+        val expense = Expense(title = title, amount = amount, date = date, type = expenseType)
         expenseViewModel.insert(expense)
 
         Toast.makeText(this, "Expense added", Toast.LENGTH_SHORT).show()
