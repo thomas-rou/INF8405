@@ -67,12 +67,6 @@ class ExpenseScreen(
     }
 }
 
- fun AppCompatActivity.onCreateOptionsMenu(menu: Menu?): Boolean {
-    val inflater: MenuInflater = menuInflater
-    inflater.inflate(R.menu.navigation_menu, menu)
-    return true
-}
-
 fun AppCompatActivity.setupExpenseScreen(
     expenseViewModel: ExpenseViewModel,
     adapter: ExpenseScreen,
