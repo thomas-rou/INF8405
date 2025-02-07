@@ -10,4 +10,7 @@
     <string name="cancel">Annuler</string>
     <string name="expense_date">date au moment du changement</string>
     <string name="expense_type">Dépense</string>
+    <string name="Rapport">Rapport</string>
+    <string name="Accueil">Accueil</string>
+    <string name="Catégorie">Catégorie</string>
 </resources>

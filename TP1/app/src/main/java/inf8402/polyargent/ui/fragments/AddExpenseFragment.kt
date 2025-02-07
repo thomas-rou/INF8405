@@ -2,10 +2,13 @@ package inf8402.polyargent.ui.fragments
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
+import inf8402.polyargent.R
 import inf8402.polyargent.model.expense.Expense
 import inf8402.polyargent.databinding.ActivityAddExpenseBinding
 import inf8402.polyargent.model.expense.ExpenseType
@@ -34,6 +37,12 @@ class AddExpenseFragment : AppCompatActivity() {
         binding.btnCancel.setOnClickListener {
             finish()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.navigation_menu, menu)
+        return true
     }
 
     private fun showDatePicker() {

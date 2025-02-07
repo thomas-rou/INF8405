@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -65,6 +67,11 @@ class ExpenseScreen(
     }
 }
 
+ fun AppCompatActivity.onCreateOptionsMenu(menu: Menu?): Boolean {
+    val inflater: MenuInflater = menuInflater
+    inflater.inflate(R.menu.navigation_menu, menu)
+    return true
+}
 
 fun AppCompatActivity.setupExpenseScreen(
     expenseViewModel: ExpenseViewModel,
