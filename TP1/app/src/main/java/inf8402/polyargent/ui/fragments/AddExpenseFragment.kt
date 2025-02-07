@@ -39,11 +39,12 @@ class AddExpenseFragment : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.navigation_menu, menu)
-        return true
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        val inflater: MenuInflater = menuInflater
+//        inflater.inflate(R.menu.navigation_menu, menu)
+//        return true
+//    }
+
 
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
