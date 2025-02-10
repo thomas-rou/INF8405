@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="expense_types">
+        <item>Dépense</item>
+        <item>Revenu</item>
+    </string-array>
+</resources>

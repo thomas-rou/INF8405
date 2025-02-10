@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">PolyArgent</string>
     <string name="roll">Roll</string>
+    <string name="add_expense">Add Expense</string>
+    <string name="add_category">Add Category</string>
+    <string name="expense_title">Titre</string>
+    <string name="amount">Montant</string>
+    <string name="save_expense">Enregistrer</string>
+    <string name="_0_00">$0.00</string>
+    <string name="date">Date</string>
+    <string name="cancel">Annuler</string>
+    <string name="expense_date">date au moment du changement</string>
+    <string name="expense_type">Dépense</string>
+    <string name="Rapport">Rapport</string>
+    <string name="Accueil">Accueil</string>
+    <string name="Catégorie">Catégorie</string>
 </resources>
