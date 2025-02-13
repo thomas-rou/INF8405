@@ -2,28 +2,24 @@ package inf8402.polyargent.ui.fragments
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
-import inf8402.polyargent.R
-import inf8402.polyargent.model.expense.Expense
-import inf8402.polyargent.databinding.ActivityAddExpenseBinding
-import inf8402.polyargent.model.expense.ExpenseType
-import inf8402.polyargent.viewmodel.ExpenseViewModel
+import inf8402.polyargent.model.transaction.Transaction
+import inf8402.polyargent.databinding.ActivityAddTransactionBinding
+import inf8402.polyargent.model.transaction.TransactionType
+import inf8402.polyargent.viewmodel.TransactionViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AddExpenseFragment : AppCompatActivity() {
+class AddTransactionFragment : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAddExpenseBinding
-    private val expenseViewModel: ExpenseViewModel by viewModels()
+    private lateinit var binding: ActivityAddTransactionBinding
+    private val transactionViewModel: TransactionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddExpenseBinding.inflate(layoutInflater)
+        binding = ActivityAddTransactionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.dateEditText.setOnClickListener {
             showDatePicker()
@@ -31,7 +27,7 @@ class AddExpenseFragment : AppCompatActivity() {
         binding.dateEditText.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
         binding.btnSave.setOnClickListener {
-            saveExpense()
+            saveTransaction()
         }
 
         binding.btnCancel.setOnClickListener {
@@ -60,7 +56,7 @@ class AddExpenseFragment : AppCompatActivity() {
         datePickerDialog.show()
     }
 
-    private fun saveExpense() {
+    private fun saveTransaction() {
         val title = binding.editTextTitle.text.toString().trim()
         val amountText = binding.editTextAmount.text.toString().trim()
 
@@ -75,18 +71,18 @@ class AddExpenseFragment : AppCompatActivity() {
             return
         }
 
-        val expenseType : ExpenseType
-        = if(binding.spinnerExpenseType.selectedItem.toString()=="Dépense")
-            ExpenseType.EXPENSE
+        val transactionType : TransactionType
+        = if(binding.spinnerTransactionType.selectedItem.toString()=="Dépense")
+            TransactionType.EXPENSE
         else
-            ExpenseType.INCOME
+            TransactionType.INCOME
 
         val date = binding.dateEditText.text.toString().trim()
 
-        val expense = Expense(title = title, amount = amount, date = date, type = expenseType)
-        expenseViewModel.insert(expense)
+        val transaction = Transaction(title = title, amount = amount, date = date, type = transactionType)
+        transactionViewModel.insert(transaction)
 
-        Toast.makeText(this, "Expense added", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Transaction added", Toast.LENGTH_SHORT).show()
         finish() // Close the activity and go back to the main screen
     }
 }

@@ -1,24 +1,24 @@
-package inf8402.polyargent.model.expense
+package inf8402.polyargent.model.transaction
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Expense::class], version = 1)
-abstract class ExpenseDatabase : RoomDatabase() {
-    abstract fun expenseDao(): ExpenseDao
+@Database(entities = [Transaction::class], version = 1)
+abstract class TransactionDatabase : RoomDatabase() {
+    abstract fun transactionDao(): TransactionDao
 
     companion object {
         @Volatile
-        private var INSTANCE: ExpenseDatabase? = null
+        private var INSTANCE: TransactionDatabase? = null
 
-        fun getDatabase(context: Context): ExpenseDatabase {
+        fun getDatabase(context: Context): TransactionDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    ExpenseDatabase::class.java,
-                    "expense"
+                    TransactionDatabase::class.java,
+                    "transaction"
                 ).build()
                 INSTANCE = instance
                 instance
