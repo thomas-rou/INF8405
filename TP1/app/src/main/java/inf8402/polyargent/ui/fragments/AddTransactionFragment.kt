@@ -2,6 +2,7 @@ package inf8402.polyargent.ui.fragments
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
@@ -16,27 +17,16 @@ class AddTransactionFragment : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddTransactionBinding
     private val transactionViewModel: TransactionViewModel by viewModels()
+    private lateinit var categoryAdapter: ArrayAdapter<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddTransactionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.dateEditText.setOnClickListener {
-            showDatePicker()
-        }
-        binding.dateEditText.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
-        binding.btnSave.setOnClickListener {
-            saveTransaction()
-        }
-
-        binding.btnCancel.setOnClickListener {
-            finish()
-        }
-
-        binding.addCategoryButton.setOnClickListener {
-            // TODO: Add functionality
-        }
+        setupDatePicker()
+        setupSpinners()
+        setupButtons()
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -45,6 +35,12 @@ class AddTransactionFragment : AppCompatActivity() {
 //        return true
 //    }
 
+    private fun setupDatePicker() {
+        binding.dateEditText.setOnClickListener {
+            showDatePicker()
+        }
+        binding.dateEditText.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+    }
 
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
@@ -58,6 +54,30 @@ class AddTransactionFragment : AppCompatActivity() {
         }, year, month, day)
 
         datePickerDialog.show()
+    }
+
+    private fun setupSpinners() {
+        // Populate category spinner
+        transactionViewModel.allCategories.observe(this) { categories ->
+            val categoryNames = categories.map { it.name }
+            categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryNames)
+            categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.categorySpinner.adapter = categoryAdapter
+        }
+    }
+
+    private fun setupButtons() {
+        binding.btnSave.setOnClickListener {
+            saveTransaction()
+        }
+
+        binding.btnCancel.setOnClickListener {
+            finish()
+        }
+
+        binding.addCategoryButton.setOnClickListener {
+            // TODO: Add functionality to add a new category
+        }
     }
 
     private fun saveTransaction() {
@@ -75,6 +95,14 @@ class AddTransactionFragment : AppCompatActivity() {
             return
         }
 
+        // Bind to spinner categories and get the selected category
+        val selectedCategoryName = binding.categorySpinner.selectedItem.toString()
+        val selectedCategory = transactionViewModel.allCategories.value?.find { it.name == selectedCategoryName }
+        if (selectedCategory == null) {
+            Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val transactionType : TransactionType
         = if(binding.spinnerTransactionType.selectedItem.toString()=="Dépense")
             TransactionType.EXPENSE
@@ -83,7 +111,7 @@ class AddTransactionFragment : AppCompatActivity() {
 
         val date = binding.dateEditText.text.toString().trim()
 
-        val transaction = Transaction(title = title, amount = amount, date = date, type = transactionType, categoryId = 1)
+        val transaction = Transaction(title = title, amount = amount, date = date, type = transactionType, categoryId = selectedCategory.id)
         transactionViewModel.insert(transaction)
 
         Toast.makeText(this, "Transaction added", Toast.LENGTH_SHORT).show()
