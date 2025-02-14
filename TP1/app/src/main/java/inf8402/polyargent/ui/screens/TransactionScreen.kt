@@ -7,9 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.result.launch
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.semantics.text
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -57,7 +55,7 @@ class TransactionScreen(
         private val titleTextView: TextView = itemView.findViewById(R.id.textTitle)
         private val amountTextView: TextView = itemView.findViewById(R.id.textAmount)
         private val dateTextView: TextView = itemView.findViewById(R.id.textDate)
-        private val typeTextView: TextView = itemView.findViewById(R.id.textType)
+        //private val typeTextView: TextView = itemView.findViewById(R.id.textType)
         private val categoryTextView: TextView = itemView.findViewById(R.id.textCategory)
 
         @SuppressLint("SetTextI18n")
@@ -65,8 +63,17 @@ class TransactionScreen(
             titleTextView.text = transaction.title
             amountTextView.text = "$${transaction.amount}"
             dateTextView.text = transaction.date
-            typeTextView.text = if (transaction.type == TransactionType.EXPENSE) "Dépense" else "Revenu"
+            //typeTextView.text = if (transaction.type == TransactionType.EXPENSE) "Dépense" else "Revenu"
             categoryTextView.text = transaction.categoryName ?: "Catégorie Inconnue"
+
+            val context = itemView.context
+            if (transaction.type == TransactionType.EXPENSE) {
+                //typeTextView.setTextColor(context.resources.getColor(R.color.red, context.theme))
+                amountTextView.setTextColor(context.resources.getColor(R.color.red, context.theme))
+            } else if (transaction.type == TransactionType.INCOME) {
+                //typeTextView.setTextColor(context.resources.getColor(R.color.teal_200, context.theme))
+                amountTextView.setTextColor(context.resources.getColor(R.color.teal_200, context.theme))
+            }
         }
     }
 

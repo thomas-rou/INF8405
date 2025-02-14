@@ -16,4 +16,9 @@
     <string name="Category">Catégorie</string>
     <string name="enter_category_name">Entrér le nom de la catégorie</string>
     <string name="save">Enregistrer</string>
+    <string name="title_label">Transaction</string>
+    <string name="amount_label">Montant</string>
+    <string name="date_label">Date</string>
+    <string name="type_label">Type</string>
+    <string name="category_label">Catégorie</string>
 </resources>
