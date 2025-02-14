@@ -2,16 +2,28 @@ package inf8402.polyargent.ui.fragments
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.text
+import inf8402.polyargent.R
 import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.databinding.ActivityAddTransactionBinding
+import inf8402.polyargent.model.transaction.Category
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.viewmodel.TransactionViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.text.isNotEmpty
+import kotlin.text.trim
+import android.app.AlertDialog
 
 class AddTransactionFragment : AppCompatActivity() {
 
@@ -76,7 +88,7 @@ class AddTransactionFragment : AppCompatActivity() {
         }
 
         binding.addCategoryButton.setOnClickListener {
-            // TODO: Add functionality to add a new category
+            createCategoryDialog()
         }
     }
 
@@ -116,5 +128,41 @@ class AddTransactionFragment : AppCompatActivity() {
 
         Toast.makeText(this, "Transaction added", Toast.LENGTH_SHORT).show()
         finish() // Close the activity and go back to the main screen
+    }
+
+    private fun createCategoryDialog() {
+        val builder = android.app.AlertDialog.Builder(this)
+        val inflater = LayoutInflater.from(this)
+        val dialogView = inflater.inflate(R.layout.dialog_add_category, null)
+        val categoryNameEditText = dialogView.findViewById<EditText>(R.id.editTextNewCategoryName)
+
+        builder.setView(dialogView)
+            .setTitle(R.string.add_category)
+            .setPositiveButton(R.string.save) { dialog, _ ->
+                val newCategoryName = categoryNameEditText.text.toString().trim()
+                if (newCategoryName.isNotEmpty()) {
+                    val newCategory = Category(name = newCategoryName)
+                    transactionViewModel.insertCategory(newCategory)
+                    // Refresh the spinner
+                    refreshCategorySpinner()
+                } else {
+                    Toast.makeText(this, "Category name cannot be empty", Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.cancel()
+            }
+
+        builder.create().show()
+    }
+
+    private fun refreshCategorySpinner() {
+        transactionViewModel.allCategories.observe(this) { categories ->
+            val categoryNames = categories.map { it.name }
+            categoryAdapter.clear()
+            categoryAdapter.addAll(categoryNames)
+            categoryAdapter.notifyDataSetChanged()
+        }
     }
 }
