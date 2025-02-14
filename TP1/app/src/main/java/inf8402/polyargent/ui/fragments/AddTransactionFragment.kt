@@ -8,11 +8,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
-import androidx.compose.material3.AlertDialog
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.semantics.dismiss
-import androidx.compose.ui.semantics.text
 import inf8402.polyargent.R
 import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.databinding.ActivityAddTransactionBinding
@@ -24,6 +19,7 @@ import java.util.*
 import kotlin.text.isNotEmpty
 import kotlin.text.trim
 import android.app.AlertDialog
+import android.widget.Button
 
 class AddTransactionFragment : AppCompatActivity() {
 
@@ -131,30 +127,36 @@ class AddTransactionFragment : AppCompatActivity() {
     }
 
     private fun createCategoryDialog() {
-        val builder = android.app.AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
         val inflater = LayoutInflater.from(this)
         val dialogView = inflater.inflate(R.layout.dialog_add_category, null)
         val categoryNameEditText = dialogView.findViewById<EditText>(R.id.editTextNewCategoryName)
+        val btnSaveCategory = dialogView.findViewById<Button>(R.id.btnSaveCategory)
+        val btnCancelCategory = dialogView.findViewById<Button>(R.id.btnCancelCategory)
 
         builder.setView(dialogView)
             .setTitle(R.string.add_category)
-            .setPositiveButton(R.string.save) { dialog, _ ->
-                val newCategoryName = categoryNameEditText.text.toString().trim()
-                if (newCategoryName.isNotEmpty()) {
-                    val newCategory = Category(name = newCategoryName)
-                    transactionViewModel.insertCategory(newCategory)
-                    // Refresh the spinner
-                    refreshCategorySpinner()
-                } else {
-                    Toast.makeText(this, "Category name cannot be empty", Toast.LENGTH_SHORT).show()
-                }
-                dialog.dismiss()
-            }
-            .setNegativeButton(R.string.cancel) { dialog, _ ->
-                dialog.cancel()
-            }
 
-        builder.create().show()
+        val dialog = builder.create()
+
+        btnSaveCategory.setOnClickListener {
+            val newCategoryName = categoryNameEditText.text.toString().trim()
+            if (newCategoryName.isNotEmpty()) {
+                val newCategory = Category(name = newCategoryName)
+                transactionViewModel.insertCategory(newCategory)
+                // Refresh the spinner
+                refreshCategorySpinner()
+                dialog.dismiss()
+            } else {
+                Toast.makeText(this, "Category name cannot be empty", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnCancelCategory.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun refreshCategorySpinner() {
