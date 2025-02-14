@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.launch
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.semantics.text
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,9 +21,14 @@ import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.fragments.AddTransactionFragment
 import inf8402.polyargent.viewmodel.TransactionViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TransactionScreen(
-    private val onDeleteClick: (Transaction) -> Unit
+    private val onDeleteClick: (Transaction) -> Unit,
+    private val transactionViewModel: TransactionViewModel
 ) : ListAdapter<Transaction, TransactionScreen.TransactionViewHolder>(TransactionDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -33,9 +40,16 @@ class TransactionScreen(
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         val transaction = getItem(position)
         holder.bind(transaction)
-        holder.itemView.setOnLongClickListener {
-            onDeleteClick(transaction)  // Long press to delete
-            true
+        CoroutineScope(Dispatchers.Main).launch {
+            val categoryName = withContext(Dispatchers.IO) {
+                transactionViewModel.getCategoryName(transaction.categoryId)
+            }
+            transaction.categoryName = categoryName.toString()
+            holder.bind(transaction)
+            holder.itemView.setOnLongClickListener {
+                onDeleteClick(transaction)  // Long press to delete
+                true
+            }
         }
     }
 
@@ -44,6 +58,7 @@ class TransactionScreen(
         private val amountTextView: TextView = itemView.findViewById(R.id.textAmount)
         private val dateTextView: TextView = itemView.findViewById(R.id.textDate)
         private val typeTextView: TextView = itemView.findViewById(R.id.textType)
+        private val categoryTextView: TextView = itemView.findViewById(R.id.textCategory)
 
         @SuppressLint("SetTextI18n")
         fun bind(transaction: Transaction) {
@@ -51,6 +66,7 @@ class TransactionScreen(
             amountTextView.text = "$${transaction.amount}"
             dateTextView.text = transaction.date
             typeTextView.text = if (transaction.type == TransactionType.EXPENSE) "Dépense" else "Revenu"
+            categoryTextView.text = transaction.categoryName ?: "Catégorie Inconnue"
         }
     }
 

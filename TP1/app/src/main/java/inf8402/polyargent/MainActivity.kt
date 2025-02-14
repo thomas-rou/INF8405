@@ -27,7 +27,12 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.navigation_home -> {
                 setContentView(R.layout.transaction);
-                adapter = TransactionScreen { transaction -> transactionViewModel.delete(transaction) }
+                adapter = TransactionScreen(
+                    onDeleteClick = { transaction ->
+                        transactionViewModel.delete(transaction)
+                    },
+                    transactionViewModel = transactionViewModel
+                )
                 setupTransactionScreen(transactionViewModel, adapter, this)
                 return true
             }
@@ -49,7 +54,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.transaction)
-        adapter = TransactionScreen { transaction -> transactionViewModel.delete(transaction) }
+        adapter = TransactionScreen(
+            onDeleteClick = { transaction ->
+                transactionViewModel.delete(transaction)
+            },
+            transactionViewModel = transactionViewModel
+        )
         setupTransactionScreen(transactionViewModel, adapter, this)
     }
 }

@@ -13,7 +13,7 @@
     <string name="expense_type">Dépense</string>
     <string name="Rapport">Rapport</string>
     <string name="Accueil">Accueil</string>
-    <string name="Catégorie">Catégorie</string>
+    <string name="Category">Catégorie</string>
     <string name="enter_category_name">Entrér le nom de la catégorie</string>
     <string name="save">Enregistrer</string>
 </resources>

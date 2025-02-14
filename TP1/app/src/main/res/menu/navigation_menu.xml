@@ -5,7 +5,7 @@
         android:title="@string/Accueil" />
     <item
         android:id="@+id/navigation_category"
-        android:title="@string/Catégorie" />
+        android:title="@string/Category" />
     <item
         android:id="@+id/navigation_report"
         android:title="@string/Rapport" />

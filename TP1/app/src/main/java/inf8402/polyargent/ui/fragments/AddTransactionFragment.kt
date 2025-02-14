@@ -67,7 +67,7 @@ class AddTransactionFragment : AppCompatActivity() {
     private fun setupSpinners() {
         // Populate category spinner
         transactionViewModel.allCategories.observe(this) { categories ->
-            val categoryNames = categories.map { it.name }
+            val categoryNames = categories.map { it.categoryName }
             categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryNames)
             categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.categorySpinner.adapter = categoryAdapter
@@ -105,7 +105,7 @@ class AddTransactionFragment : AppCompatActivity() {
 
         // Bind to spinner categories and get the selected category
         val selectedCategoryName = binding.categorySpinner.selectedItem.toString()
-        val selectedCategory = transactionViewModel.allCategories.value?.find { it.name == selectedCategoryName }
+        val selectedCategory = transactionViewModel.allCategories.value?.find { it.categoryName == selectedCategoryName }
         if (selectedCategory == null) {
             Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
             return
@@ -142,7 +142,7 @@ class AddTransactionFragment : AppCompatActivity() {
         btnSaveCategory.setOnClickListener {
             val newCategoryName = categoryNameEditText.text.toString().trim()
             if (newCategoryName.isNotEmpty()) {
-                val newCategory = Category(name = newCategoryName)
+                val newCategory = Category(categoryName = newCategoryName)
                 transactionViewModel.insertCategory(newCategory)
                 // Refresh the spinner
                 refreshCategorySpinner()
@@ -161,7 +161,7 @@ class AddTransactionFragment : AppCompatActivity() {
 
     private fun refreshCategorySpinner() {
         transactionViewModel.allCategories.observe(this) { categories ->
-            val categoryNames = categories.map { it.name }
+            val categoryNames = categories.map { it.categoryName }
             categoryAdapter.clear()
             categoryAdapter.addAll(categoryNames)
             categoryAdapter.notifyDataSetChanged()

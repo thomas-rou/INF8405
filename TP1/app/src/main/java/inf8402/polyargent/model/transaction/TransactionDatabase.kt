@@ -1,8 +1,6 @@
 package inf8402.polyargent.model.transaction
 
 import android.content.Context
-import androidx.activity.addCallback
-import androidx.activity.result.launch
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -47,12 +45,12 @@ abstract class TransactionDatabase : RoomDatabase() {
         }
 
         suspend fun populateDatabase(categoryDao: CategoryDao) {
-            categoryDao.insert(Category(name = "Autres", isDefault = true))
-            categoryDao.insert(Category(name = "Salaire", isDefault = true))
-            categoryDao.insert(Category(name = "Bonus", isDefault = true))
-            categoryDao.insert(Category(name = "Loyer", isDefault = true))
-            categoryDao.insert(Category(name = "Épiceries", isDefault = true))
-            categoryDao.insert(Category(name = "Loisirs", isDefault = true))
+            categoryDao.insert(Category(categoryName = "Autres", isDefault = true))
+            categoryDao.insert(Category(categoryName = "Salaire", isDefault = true))
+            categoryDao.insert(Category(categoryName = "Bonus", isDefault = true))
+            categoryDao.insert(Category(categoryName = "Loyer", isDefault = true))
+            categoryDao.insert(Category(categoryName = "Épiceries", isDefault = true))
+            categoryDao.insert(Category(categoryName = "Loisirs", isDefault = true))
         }
     }
 

@@ -2,6 +2,7 @@ package inf8402.polyargent.model.transaction
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 
 
 @Entity(tableName = "transactions",
@@ -18,5 +19,7 @@ data class Transaction(
     val amount: Double,
     val date: String,
     val type: TransactionType,
-    val categoryId: Int
-)
+    val categoryId: Int,
+){
+    @Ignore var categoryName: String? = null
+}

@@ -28,4 +28,8 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     fun insertCategory(category: Category) = viewModelScope.launch(Dispatchers.IO) {
         categoryDao.insert(category)
     }
+
+    suspend fun getCategoryName(categoryId: Int): String? {
+        return transactionDao.getCategoryName(categoryId)
+    }
 }
