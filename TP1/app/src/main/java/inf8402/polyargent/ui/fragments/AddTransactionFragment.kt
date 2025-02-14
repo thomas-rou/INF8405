@@ -33,6 +33,10 @@ class AddTransactionFragment : AppCompatActivity() {
         binding.btnCancel.setOnClickListener {
             finish()
         }
+
+        binding.addCategoryButton.setOnClickListener {
+            // TODO: Add functionality
+        }
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -79,7 +83,7 @@ class AddTransactionFragment : AppCompatActivity() {
 
         val date = binding.dateEditText.text.toString().trim()
 
-        val transaction = Transaction(title = title, amount = amount, date = date, type = transactionType)
+        val transaction = Transaction(title = title, amount = amount, date = date, type = transactionType, categoryId = 1)
         transactionViewModel.insert(transaction)
 
         Toast.makeText(this, "Transaction added", Toast.LENGTH_SHORT).show()

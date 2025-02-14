@@ -10,7 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class TransactionViewModel(application: Application) : AndroidViewModel(application) {
-    private val transactionDao = TransactionDatabase.getDatabase(application).transactionDao()
+    private val transactionDao = TransactionDatabase.getDatabase(application, viewModelScope).transactionDao()
+    private val categoryDao = TransactionDatabase.getDatabase(application, viewModelScope).categoryDao()
+
     val allTransactions: LiveData<List<Transaction>> = transactionDao.getAllExpenses()
 
     fun insert(transaction: Transaction) = viewModelScope.launch(Dispatchers.IO) {
