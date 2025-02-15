@@ -22,6 +22,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        pageSetup()
+    }
+
+    private fun pageSetup() {
         setContentView(R.layout.main_page)
 
         val pieChart: PieChart = findViewById(R.id.chart)
@@ -62,9 +67,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.navigation_home -> {
-                setContentView(R.layout.main_page)
-                adapter = ExpenseScreen { expense -> expenseViewModel.delete(expense) }
-                setupExpenseScreen(expenseViewModel, adapter, this)
+                pageSetup()
                 return true
             }
             R.id.navigation_category -> {
