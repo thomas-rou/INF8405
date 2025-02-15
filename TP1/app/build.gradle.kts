@@ -67,6 +67,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
