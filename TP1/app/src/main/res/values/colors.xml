@@ -10,6 +10,11 @@
     <color name="gray">#FF888888</color>
     <color name="light_gray">#F0F0F0</color>
     <color name="red">#E63A3A</color>
+    <color name="Brunswick_green">#344E3F</color>
+    <color name="Cambridge_blue">#759F85</color>
+    <color name="Saffron">#EEC000</color>
+    <color name="Ash_gray">#A9B7B1</color>
+    <color name="Dark_gray">#363737</color>
     <color name="green">#799e88</color>
     <color name="yellow">#F4C451</color>
 </resources>

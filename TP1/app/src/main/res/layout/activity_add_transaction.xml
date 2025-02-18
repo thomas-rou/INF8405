@@ -3,29 +3,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:gravity="end"
+    android:padding="16dp"
+    android:background="@color/Dark_gray">
 
     <EditText
         android:id="@+id/editTextTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints="Food"
         android:hint="@string/expense_title"
         android:inputType="text"
         android:padding="12dp"
-        android:layout_marginTop="150dp"
-        android:background="@drawable/edit_text_bg"/>
+        android:layout_marginTop="16dp"
+        android:background="@drawable/edit_text_bg"
+        android:autofillHints="Food"/>
 
     <EditText
         android:id="@+id/editTextAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints="15"
         android:hint="@string/amount"
         android:inputType="numberDecimal"
         android:padding="12dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/edit_text_bg"
-        android:layout_marginTop="16dp"/>
+        android:autofillHints="15"/>
+
+    <Spinner
+        android:id="@+id/categorySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:minHeight="48dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/edit_text_bg"
+        />
+
+    <Button
+        android:id="@+id/addCategoryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_category"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/Cambridge_blue"
+        android:textColor="@android:color/black"/>
 
     <Button
         android:id="@+id/dateEditText"
@@ -37,7 +58,7 @@
         android:textColor="@android:color/black"/>
 
     <Spinner
-        android:id="@+id/spinnerExpenseType"
+        android:id="@+id/spinner_transaction_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="12dp"
@@ -52,7 +73,7 @@
         android:layout_height="wrap_content"
         android:text="@string/save_expense"
         android:layout_marginTop="24dp"
-        android:backgroundTint="@color/teal_700"
+        android:backgroundTint="@color/Cambridge_blue"
         android:textColor="@android:color/white"/>
 
     <Button
@@ -63,4 +84,5 @@
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/red"
         android:textColor="@android:color/white"/>
+
 </LinearLayout>

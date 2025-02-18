@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">PolyArgent</string>
     <string name="roll">Roll</string>
-    <string name="add_expense">Add Expense</string>
-    <string name="add_category">Add Category</string>
-    <string name="expense_title">Titre</string>
+    <string name="add_expense">Ajouter une dépense</string>
+    <string name="add_category">Ajouter une catégorie</string>
+    <string name="expense_title">Nom de la transaction</string>
     <string name="amount">Montant</string>
     <string name="save_expense">Enregistrer</string>
     <string name="_0_00">$0.00</string>
@@ -13,5 +13,12 @@
     <string name="expense_type">Dépense</string>
     <string name="Rapport">Rapport</string>
     <string name="Accueil">Accueil</string>
-    <string name="Catégorie">Catégorie</string>
+    <string name="Category">Catégorie</string>
+    <string name="enter_category_name">Entré le nom de la catégorie</string>
+    <string name="save">Enregistrer</string>
+    <string name="title_label">Transaction</string>
+    <string name="amount_label">Montant</string>
+    <string name="date_label">Date</string>
+    <string name="type_label">Type</string>
+    <string name="category_label">Catégorie</string>
 </resources>
