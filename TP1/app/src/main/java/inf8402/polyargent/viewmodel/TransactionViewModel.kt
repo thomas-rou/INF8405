@@ -19,6 +19,22 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     val allIncomes: LiveData<List<Transaction>> = transactionDao.getAllIncomes()
     val allExpenses: LiveData<List<Transaction>> = transactionDao.getAllExpenses()
 
+    fun getIncomeTransactionsByDay(date: String): LiveData<List<Transaction>> {
+        return transactionDao.getIncomeTransactionsByDay(date)
+    }
+
+    fun getExpenseTransactionsByDay(date: String): LiveData<List<Transaction>> {
+        return transactionDao.getExpenseTransactionsByDay(date)
+    }
+
+    fun getIncomeTransactionsBDateInterval(startDate: String, endDate: String): LiveData<List<Transaction>> {
+        return transactionDao.getIncomeTransactionsBDateInterval(startDate, endDate)
+    }
+
+    fun getExpenseTransactionsByDateInterval(startDate: String, endDate: String): LiveData<List<Transaction>> {
+        return transactionDao.getExpenseTransactionsByDateInterval(startDate, endDate)
+    }
+
     fun insert(transaction: Transaction) = viewModelScope.launch(Dispatchers.IO) {
         transactionDao.insert(transaction)
     }

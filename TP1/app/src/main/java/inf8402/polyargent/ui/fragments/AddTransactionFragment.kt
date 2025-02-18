@@ -93,13 +93,13 @@ class AddTransactionFragment : AppCompatActivity() {
         val amountText = binding.editTextAmount.text.toString().trim()
 
         if (title.isEmpty() || amountText.isEmpty()) {
-            Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
             return
         }
 
         val amount = amountText.toDoubleOrNull()
         if (amount == null) {
-            Toast.makeText(this, "Enter a valid amount", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Entrez un montant valide", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -107,7 +107,7 @@ class AddTransactionFragment : AppCompatActivity() {
         val selectedCategoryName = binding.categorySpinner.selectedItem.toString()
         val selectedCategory = transactionViewModel.allCategories.value?.find { it.categoryName == selectedCategoryName }
         if (selectedCategory == null) {
-            Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Veuillez sélectionner une catégorie", Toast.LENGTH_SHORT).show()
             return
         }
 
