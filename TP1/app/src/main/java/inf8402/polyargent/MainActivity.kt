@@ -8,11 +8,15 @@ import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import inf8402.polyargent.model.DateTabViewModel
 import inf8402.polyargent.model.PieChartViewModel
 import com.github.mikephil.charting.charts.PieChart
 import com.google.android.material.tabs.TabLayout
+import inf8402.polyargent.model.transaction.Transaction
+import inf8402.polyargent.model.transaction.TransactionDatabase
 import inf8402.polyargent.ui.screens.TransactionScreen
 import inf8402.polyargent.ui.screens.setupTransactionScreen
 import inf8402.polyargent.viewmodel.TransactionViewModel
@@ -20,7 +24,6 @@ import inf8402.polyargent.viewmodel.TransactionViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: TransactionScreen
-
     private val transactionViewModel: TransactionViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
@@ -39,12 +42,36 @@ class MainActivity : AppCompatActivity() {
             },
             transactionViewModel = transactionViewModel
         )
-            setupTransactionScreen(transactionViewModel, adapter, this)
+            setupTransactionScreen(transactionViewModel.allExpenses, adapter, this)
     }
 
     private fun manageSelectedDateRange() {
         val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
         val dateRangeText: TextView = findViewById(R.id.date_range_text)
+        val transactionTab : TabLayout = findViewById(R.id.tabs)
+
+        transactionTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> {
+                        transactionViewModel.allExpenses.observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                            adapter.submitList(transactionsGot)
+                        }
+
+                    }
+
+                    1 -> {
+                        transactionViewModel.allIncomes.observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                            adapter.submitList(transactionsGot)
+                        }
+
+                    }
+                }
+
+        }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {

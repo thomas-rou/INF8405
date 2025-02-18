@@ -16,6 +16,8 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
 
     val allTransactions: LiveData<List<Transaction>> = transactionDao.getAllTransactions()
     val allCategories: LiveData<List<Category>> = categoryDao.getAllCategories()
+    val allIncomes: LiveData<List<Transaction>> = transactionDao.getAllIncomes()
+    val allExpenses: LiveData<List<Transaction>> = transactionDao.getAllExpenses()
 
     fun insert(transaction: Transaction) = viewModelScope.launch(Dispatchers.IO) {
         transactionDao.insert(transaction)

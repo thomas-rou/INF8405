@@ -9,11 +9,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import inf8402.polyargent.MainActivity
 import inf8402.polyargent.R
 import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.model.transaction.TransactionType
@@ -88,8 +90,8 @@ class TransactionScreen(
     }
 }
 
-fun AppCompatActivity.setupTransactionScreen(
-    transactionViewModel: TransactionViewModel,
+fun MainActivity.setupTransactionScreen(
+    transactions: LiveData<List<Transaction>>,
     adapter: TransactionScreen,
     context: Context
 ) {
@@ -98,8 +100,8 @@ fun AppCompatActivity.setupTransactionScreen(
     recyclerView.adapter = adapter
 
     // Observe the expenses LiveData
-    transactionViewModel.allTransactions.observe(context as LifecycleOwner) { transactions ->
-        adapter.submitList(transactions)
+    transactions.observe(context as LifecycleOwner) { transactionsGot ->
+        adapter.submitList(transactionsGot)
     }
 
     // FloatingActionButton click listener
