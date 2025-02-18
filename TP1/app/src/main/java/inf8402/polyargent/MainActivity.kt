@@ -9,22 +9,19 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import inf8402.polyargent.model.DateTabViewModel
 import inf8402.polyargent.model.PieChartViewModel
 import com.github.mikephil.charting.charts.PieChart
 import com.google.android.material.tabs.TabLayout
-import inf8402.polyargent.model.transaction.Transaction
-import inf8402.polyargent.model.transaction.TransactionDatabase
 import inf8402.polyargent.ui.screens.TransactionScreen
 import inf8402.polyargent.ui.screens.setupTransactionScreen
 import inf8402.polyargent.viewmodel.TransactionViewModel
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var adapter: TransactionScreen
-    private val transactionViewModel: TransactionViewModel by viewModels {
+    lateinit var adapter: TransactionScreen
+    val transactionViewModel: TransactionViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
 
@@ -42,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             },
             transactionViewModel = transactionViewModel
         )
-            setupTransactionScreen(transactionViewModel.allExpenses, adapter, this)
+            setupTransactionScreen()
     }
 
     private fun manageSelectedDateRange() {

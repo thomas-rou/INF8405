@@ -1,15 +1,12 @@
 package inf8402.polyargent.ui.screens
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -90,23 +87,19 @@ class TransactionScreen(
     }
 }
 
-fun MainActivity.setupTransactionScreen(
-    transactions: LiveData<List<Transaction>>,
-    adapter: TransactionScreen,
-    context: Context
-) {
+fun MainActivity.setupTransactionScreen() {
     val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-    recyclerView.layoutManager = LinearLayoutManager(context)
-    recyclerView.adapter = adapter
+    recyclerView.layoutManager = LinearLayoutManager(this)
+    recyclerView.adapter = this.adapter
 
     // Observe the expenses LiveData
-    transactions.observe(context as LifecycleOwner) { transactionsGot ->
-        adapter.submitList(transactionsGot)
+    this.transactionViewModel.allExpenses.observe(this as LifecycleOwner) { transactionsGot ->
+        this.adapter.submitList(transactionsGot)
     }
 
     // FloatingActionButton click listener
     val fabAddTransaction = findViewById<FloatingActionButton>(R.id.fabAddTransaction)
     fabAddTransaction.setOnClickListener {
-        startActivity(Intent(context, AddTransactionFragment::class.java))
+        startActivity(Intent(this, AddTransactionFragment::class.java))
     }
 }
