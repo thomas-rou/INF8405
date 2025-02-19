@@ -32,7 +32,7 @@ class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
         }
     }
 
-    fun addCategory(category: Category) {
+    fun insertCategory(category: Category) {
         uiScope.launch {
             try {
                 withContext(Dispatchers.IO) {
