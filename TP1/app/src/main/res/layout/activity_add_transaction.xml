@@ -5,29 +5,40 @@
     android:orientation="vertical"
     android:gravity="end"
     android:padding="16dp"
-    android:background="@color/Dark_gray">
+    android:background="@color/white">
 
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/editTextTitle"
+        style="@style/EditTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/expense_title"
-        android:inputType="text"
-        android:padding="12dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/edit_text_bg"
-        android:autofillHints="Food"/>
+        android:hint="@string/expense_title">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textInputEditTextTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_bg"
+            android:autofillHints="Food"
+            android:inputType="text"
+            android:padding="12dp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/editTextAmount"
+        style="@style/EditTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/amount"
-        android:inputType="numberDecimal"
-        android:padding="12dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/edit_text_bg"
-        android:autofillHints="15"/>
+        android:hint="@string/amount">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_bg"
+            android:autofillHints="15"
+            android:inputType="numberDecimal"
+            android:padding="12dp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
         android:id="@+id/categorySpinner"
@@ -73,7 +84,7 @@
         android:layout_height="wrap_content"
         android:text="@string/save_expense"
         android:layout_marginTop="24dp"
-        android:backgroundTint="@color/Cambridge_blue"
+        android:backgroundTint="@color/yellow"
         android:textColor="@android:color/white"/>
 
     <Button
