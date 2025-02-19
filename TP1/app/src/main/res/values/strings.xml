@@ -24,4 +24,6 @@
     <string name="icon_label">Icone</string>
     <string name="select_icon">Icone</string>
     <string name="select_color">Couleur</string>
+    <string name="income">Revenu</string>
+    <string name="expense">Dépense</string>
 </resources>
