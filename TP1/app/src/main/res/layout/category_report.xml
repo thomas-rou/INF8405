@@ -50,7 +50,6 @@
                 android:layout_weight="1"
                 android:text="@string/_0_00"
                 android:textSize="16sp"
-                android:textColor="@color/teal_700"
                 android:paddingTop="4dp"
                 android:gravity="end"/>
 
