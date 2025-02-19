@@ -45,12 +45,13 @@ abstract class TransactionDatabase : RoomDatabase() {
         }
 
         suspend fun populateDatabase(categoryDao: CategoryDao) {
-            categoryDao.insert(Category(categoryName = "Autres", isDefault = true))
-            categoryDao.insert(Category(categoryName = "Salaire", isDefault = true))
-            categoryDao.insert(Category(categoryName = "Bonus", isDefault = true))
-            categoryDao.insert(Category(categoryName = "Loyer", isDefault = true))
-            categoryDao.insert(Category(categoryName = "Épiceries", isDefault = true))
-            categoryDao.insert(Category(categoryName = "Loisirs", isDefault = true))
+            categoryDao.insert(Category(categoryName = "Autres", isDefault = true, type = TransactionType.EXPENSE, icon = "ic_circle_help", colorHex = "#FF0000"))
+            categoryDao.insert(Category(categoryName = "Autres", isDefault = true, type = TransactionType.INCOME, icon = "ic_circle_help", colorHex = "#00FF00"))
+            categoryDao.insert(Category(categoryName = "Salaire", isDefault = true, type = TransactionType.INCOME, icon = "ic_wallet", colorHex = "#00FF00"))
+            categoryDao.insert(Category(categoryName = "Bonus", isDefault = true, type = TransactionType.INCOME, icon = "ic_badge_dollar_sign", colorHex = "#00FF00"))
+            categoryDao.insert(Category(categoryName = "Loyer", isDefault = true, type = TransactionType.EXPENSE, icon = "ic_house", colorHex = "#FF0000"))
+            categoryDao.insert(Category(categoryName = "Épiceries", isDefault = true, type = TransactionType.EXPENSE, icon = "ic_shopping_basket", colorHex = "#FF0000"))
+            categoryDao.insert(Category(categoryName = "Loisirs", isDefault = true, type = TransactionType.EXPENSE, icon = "ic_dribble", colorHex = "#FF0000"))
         }
     }
 
