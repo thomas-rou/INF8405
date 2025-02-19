@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -31,6 +33,8 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.math.roundToInt
 
 
@@ -100,68 +104,82 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
     val colors = mutableListOf<Int>()
     val reports = mutableListOf<CategoryReport>()
 
-    for (i in 5 downTo 0) {
-        val endDate = calendar.time
+    // Using coroutine scope tied to lifecycle
+    lifecycleScope.launch(Dispatchers.Main) {
+        for (i in 5 downTo 0) {
+            val endDate = calendar.time
 
-        when (timeFrequency){
-            TimeFrequency.DAILY -> {
-                calendar.add(Calendar.DAY_OF_YEAR, -1)
+            when (timeFrequency) {
+                TimeFrequency.DAILY -> {
+                    calendar.add(Calendar.DAY_OF_YEAR, -1)
+                }
+                TimeFrequency.WEEKLY -> {
+                    calendar.add(Calendar.WEEK_OF_YEAR, -1)
+                }
+                TimeFrequency.MONTHLY -> {
+                    calendar.add(Calendar.MONTH, -1)
+                }
+                TimeFrequency.YEARLY -> {
+                    calendar.add(Calendar.YEAR, -1)
+                }
             }
-            TimeFrequency.WEEKLY -> {
-                calendar.add(Calendar.WEEK_OF_YEAR, -1)
-            }
-            TimeFrequency.MONTHLY -> {
-                calendar.add(Calendar.MONTH, -1)
-            }
-            TimeFrequency.YEARLY -> {
-                calendar.add(Calendar.YEAR, -1)
-            }
+
+            val startDate = calendar.time
+
+            // Fetch the report data before continuing
+            val reportData = fetchReportData(startDate, endDate, transactionType)
+            reports.addAll(reportData)
+
+            dateList.add(dateFormat.format(endDate))
+            colors.add(mockedColors[i])
+
+            val values = reports.map { it.totalAmount.toFloat() }.toFloatArray()
+            reports.clear()
+            entries.add(BarEntry(i.toFloat(), values))
         }
 
-        val startDate = calendar.time
+        // Update the chart after the loop is done
+        val dataSet = BarDataSet(entries, "")
+        dataSet.colors = colors
 
+        val barData = BarData(dataSet)
+        barChart.data = barData
+        barChart.description.isEnabled = false
+        dataSet.setDrawValues(false) // Remove value labels
+        barChart.legend.isEnabled = false // Remove legend
+        barChart.setFitBars(true)
+        barChart.invalidate()
+
+        val xAxis = barChart.xAxis
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(false)
+        xAxis.valueFormatter = IndexAxisValueFormatter(dateList)
+
+        val yAxis = barChart.axisLeft
+        yAxis.setDrawLabels(false) // Remove vertical axis legend
+        yAxis.setDrawGridLines(false)
+        yAxis.setDrawAxisLine(false)
+        barChart.axisRight.isEnabled = false // Remove right Y axis
+    }
+}
+
+// Suspend function to fetch report data
+suspend fun MainActivity.fetchReportData(startDate: Date, endDate: Date, transactionType: TransactionType): List<CategoryReport> {
+    return suspendCoroutine { continuation ->
+        val observer = Observer<List<CategoryReport>> { reports ->
+            continuation.resume(reports)
+        }
+
+        // Observe the report based on transaction type
         if (transactionType == TransactionType.EXPENSE) {
             reportViewModel.getExpenseReport(startDate, endDate)
-                .observe(this as LifecycleOwner) {
-                    reports.addAll(it)
-                }
-        }
-        else {
+                .observeForever(observer)
+        } else {
             reportViewModel.getIncomeReport(startDate, endDate)
-                .observe(this as LifecycleOwner) {
-                    reports.addAll(it)
-                }
+                .observeForever(observer)
         }
-        dateList.add(dateFormat.format(endDate))
-        colors.add(mockedColors[i])
-
-        val values = reports.map { it.totalAmount.toFloat() }.toFloatArray()
-        entries.add(BarEntry(i.toFloat(), values))
     }
-
-    val dataSet = BarDataSet(entries, "")
-    dataSet.colors = colors
-
-    val barData = BarData(dataSet)
-    barChart.data = barData
-    barChart.description.isEnabled = false
-    dataSet.setDrawValues(false) // Remove value labels
-    barChart.legend.isEnabled = false // Remove legend
-    barChart.setFitBars(true)
-    barChart.invalidate()
-
-    val xAxis = barChart.xAxis
-    xAxis.position = XAxis.XAxisPosition.BOTTOM
-    xAxis.setDrawGridLines(false)
-    xAxis.setDrawAxisLine(false)
-    xAxis.valueFormatter = IndexAxisValueFormatter(dateList)
-
-    val yAxis = barChart.axisLeft
-    yAxis.setDrawLabels(false) // Remove vertical axis legend
-    yAxis.setDrawGridLines(false)
-    yAxis.setDrawAxisLine(false)
-    barChart.axisRight.isEnabled = false // Remove right Y axis
-
 }
 
 fun MainActivity.setupReportScreen() {
