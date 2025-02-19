@@ -37,6 +37,7 @@ class AddTransactionFragment : AppCompatActivity() {
         setupDatePicker()
         setupSpinners()
         setupButtons()
+        observeErrorMessage()
     }
 
     private fun setupDatePicker() {
@@ -246,6 +247,14 @@ class AddTransactionFragment : AppCompatActivity() {
             categoryAdapter.clear()
             categoryAdapter.addAll(categoryNames)
             categoryAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun observeErrorMessage() {
+        transactionViewModel.errorMessage.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

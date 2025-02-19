@@ -1,5 +1,7 @@
 package inf8402.polyargent.viewmodel
 
+import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.LiveData
@@ -15,6 +17,8 @@ class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
 
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val _categoryAdded = MutableLiveData<Boolean>()
+    private val _errorMessage = MutableLiveData<String?>()
 
     init {
         loadCategories()
@@ -30,10 +34,19 @@ class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
 
     fun addCategory(category: Category) {
         uiScope.launch {
-            withContext(Dispatchers.IO) {
-                categoryDao.insert(category)
+            try {
+                withContext(Dispatchers.IO) {
+                    categoryDao.insert(category)
+                }
+                loadCategories()
+                _categoryAdded.postValue(true)
+            } catch (e: SQLiteConstraintException) {
+                Log.e("CategoryViewModel", "Error adding category: ${e.message}")
+                _errorMessage.postValue("Une catégorie avec ce nom et ce type existe déjà.")
+            } catch (e: Exception) {
+                Log.e("CategoryViewModel", "Error adding category: ${e.message}")
+                _errorMessage.postValue("Une erreur est survenue.")
             }
-            loadCategories()
         }
     }
 
