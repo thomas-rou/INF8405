@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -10,7 +11,57 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/enter_category_name"
-        android:inputType="text" />
+        android:inputType="text"
+        android:autofillHints="Food"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnSelectColor"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_color" />
+
+        <View
+            android:id="@+id/colorPreview"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/square" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnSelectIcon"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_icon" />
+        <ImageView
+            android:id="@+id/iconPreview"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_circle_help"
+            android:contentDescription="@string/icon_label"
+            app:tint="@android:color/black"/>
+    </LinearLayout>
+
+
+    <Spinner
+        android:id="@+id/spinnerCategoryType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,6 +71,7 @@
         android:orientation="horizontal">
 
         <Button
+            style="?android:attr/buttonStyle"
             android:id="@+id/btnCancelCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,6 +79,7 @@
             android:text="@string/cancel" />
 
         <Button
+            style="?android:attr/buttonStyle"
             android:id="@+id/btnSaveCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
