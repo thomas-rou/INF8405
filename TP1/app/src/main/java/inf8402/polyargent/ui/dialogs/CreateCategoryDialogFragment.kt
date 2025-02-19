@@ -20,7 +20,7 @@ class CreateCategoryDialogFragment : DialogFragment() {
 
     var listener: OnCategoryCreatedListener? = null
 
-    private var selectedColor: String = "#FFFFFF"
+    private var selectedColor: String = "#344E3F"
     private var selectedIcon: String = "ic_circle_help"
     private var selectedTransactionType: TransactionType = TransactionType.EXPENSE
 
@@ -50,10 +50,10 @@ class CreateCategoryDialogFragment : DialogFragment() {
             }
         }
 
+        colorPreview.setBackgroundColor(android.graphics.Color.parseColor(selectedColor))
         btnSelectColor.setOnClickListener {
             showColorPickerDialog { color ->
                 selectedColor = color
-                btnSelectColor.background = android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor(selectedColor))
                 colorPreview.setBackgroundColor(android.graphics.Color.parseColor(selectedColor))
             }
         }
