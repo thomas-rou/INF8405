@@ -129,6 +129,8 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
                 fetchReportData(startDate, endDate, transactionType)
             }
             if(i==0) {
+                val currentDateTimeTextView: TextView = findViewById(R.id.currentTime)
+                currentDateTimeTextView.text = "Date: " + dateFormat.format(endDate)
                 reportsOfCurrenTime.addAll(reportData)
             }
 
@@ -164,6 +166,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
         yAxis.setDrawLabels(false) // Remove vertical axis legend
         yAxis.setDrawGridLines(false)
         yAxis.setDrawAxisLine(false)
+        barChart.setTouchEnabled(false)
         barChart.axisRight.isEnabled = false // Remove right Y axis
 
         reportScreenAdapter = ReportScreen(reportViewModel)
