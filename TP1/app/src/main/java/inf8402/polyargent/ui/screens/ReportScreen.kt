@@ -132,7 +132,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
                     reports.addAll(it)
                 }
         }
-        dateList.add(dateFormat.format(startDate))
+        dateList.add(dateFormat.format(endDate))
         colors.add(mockedColors[i])
 
         val values = reports.map { it.totalAmount.toFloat() }.toFloatArray()
