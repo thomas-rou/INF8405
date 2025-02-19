@@ -44,8 +44,8 @@ interface TransactionDao {
     JOIN categories c ON t.categoryId = c.id 
     CROSS JOIN (SELECT SUM(amount) as totalAmount 
                 FROM transactions 
-                WHERE type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate) as grandTotal
-    WHERE t.type = 'EXPENSE' AND t.date BETWEEN :startDate AND :endDate 
+                WHERE type = 'EXPENSE' AND date >= :startDate AND date < :endDate) as grandTotal
+    WHERE t.type = 'EXPENSE' AND t.date >= :startDate AND t.date < :endDate 
     GROUP BY c.categoryName, grandTotal.totalAmount 
     ORDER BY totalAmount DESC
 """)
@@ -60,8 +60,8 @@ interface TransactionDao {
     JOIN categories c ON t.categoryId = c.id 
     CROSS JOIN (SELECT SUM(amount) as totalAmount 
                 FROM transactions 
-                WHERE type = 'INCOME' AND date BETWEEN :startDate AND :endDate) as grandTotal
-    WHERE t.type = 'INCOME' AND t.date BETWEEN :startDate AND :endDate 
+                WHERE type = 'INCOME' AND date >= :startDate AND date < :endDate) as grandTotal
+    WHERE t.type = 'INCOME' AND t.date AND t.date >= :startDate AND t.date < :endDate 
     GROUP BY c.categoryName, grandTotal.totalAmount 
     ORDER BY totalAmount DESC
 """)

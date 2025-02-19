@@ -13,24 +13,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
 import inf8402.polyargent.MainActivity
 import inf8402.polyargent.R
-import inf8402.polyargent.model.PieChartViewModel
 import inf8402.polyargent.model.transaction.CategoryReport
 import inf8402.polyargent.model.transaction.TimeFrequency
-import inf8402.polyargent.ui.fragments.AddTransactionFragment
+import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.viewmodel.ReportViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -85,35 +82,60 @@ class ReportScreen(
 fun MainActivity.reportPageSetup(activity: MainActivity) {
     setContentView(R.layout.report)
     val barChart: BarChart = findViewById(R.id.reportChart)
-    setupStackedBarChart(TimeFrequency.WEEKLY)
+    setupStackedBarChart(TimeFrequency.WEEKLY, TransactionType.EXPENSE)
 //    manageSelectedTab(activity)
 
     reportScreenAdapter = ReportScreen(reportViewModel)
     setupReportScreen()
 }
 
-fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency) {
+fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionType: TransactionType) {
     val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
     val barChart: BarChart = findViewById(R.id.reportChart)
-
+    val mockedColors = listOf(Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.CYAN)
     val calendar = Calendar.getInstance()
     val entries = mutableListOf<BarEntry>()
     val dateList = mutableListOf<String>()
-//    val colors = mutableListOf<String>()
-    val colors = listOf(Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA)
+    val colors = mutableListOf<Int>()
+    val reports = mutableListOf<CategoryReport>()
 
     for (i in 5 downTo 0) {
-        val reports = listOf(
-            CategoryReport("Home", 50.0, 5000.0),
-            CategoryReport("Cafe", 20.0, 2000.0),
-            CategoryReport("Gifts", 15.0, 1500.0),
-            CategoryReport("Health", 15.0, 1500.0),
-            CategoryReport("Transport", 0.0, 0.0)
-        )
+        val startDate = calendar.time
+
+        when (timeFrequency){
+            TimeFrequency.DAILY -> {
+                calendar.add(Calendar.DAY_OF_YEAR, -1)
+            }
+            TimeFrequency.WEEKLY -> {
+                calendar.add(Calendar.WEEK_OF_YEAR, -1)
+            }
+            TimeFrequency.MONTHLY -> {
+                calendar.add(Calendar.MONTH, -1)
+            }
+            TimeFrequency.YEARLY -> {
+                calendar.add(Calendar.YEAR, -1)
+            }
+        }
+
+        val endDate = calendar.time
+
+        if (transactionType == TransactionType.EXPENSE) {
+            reportViewModel.getExpenseReport(startDate, endDate)
+                .observe(this as LifecycleOwner) {
+                    reports.addAll(it)
+                }
+        }
+        else {
+            reportViewModel.getIncomeReport(startDate, endDate)
+                .observe(this as LifecycleOwner) {
+                    reports.addAll(it)
+                }
+        }
+        dateList.add(dateFormat.format(startDate))
+        colors.add(mockedColors[i])
+
         val values = reports.map { it.totalAmount.toFloat() }.toFloatArray()
         entries.add(BarEntry(i.toFloat(), values))
-        dateList.add(dateFormat.format(calendar.time))
-        calendar.add(Calendar.DAY_OF_YEAR, -1)
     }
 
     val dataSet = BarDataSet(entries, "")
@@ -143,6 +165,8 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency) {
 
 fun MainActivity.setupReportScreen() {
     val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+    val tabLayout: TabLayout = findViewById(R.id.tabTimePeriodReport)
+    tabLayout.getTabAt(1)?.select()
     recyclerView.layoutManager = LinearLayoutManager(this)
     recyclerView.adapter = this.reportScreenAdapter
 

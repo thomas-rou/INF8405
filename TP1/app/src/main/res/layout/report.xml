@@ -69,7 +69,7 @@
 
             <!-- Barre de Navigation Horizontale -->
             <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabTimePeriod"
+                android:id="@+id/tabTimePeriodReport"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:tabTextColor="@color/black"
