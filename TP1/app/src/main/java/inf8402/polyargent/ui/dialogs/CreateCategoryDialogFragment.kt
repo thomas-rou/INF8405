@@ -34,7 +34,7 @@ class CreateCategoryDialogFragment : DialogFragment() {
         val btnCancelCategory = dialogView.findViewById<Button>(R.id.btnCancelCategory)
         val btnSelectColor = dialogView.findViewById<Button>(R.id.btnSelectColor)
         val btnSelectIcon = dialogView.findViewById<Button>(R.id.btnSelectIcon)
-        val spinnerCategoryType = dialogView.findViewById<Spinner>(R.id.spinnerCategoryType)
+        val radioGroup = dialogView.findViewById<RadioGroup>(R.id.category_type_rdgroup)
         val iconPreview = dialogView.findViewById<ImageView>(R.id.iconPreview)
         val colorPreview = dialogView.findViewById<View>(R.id.colorPreview)
 
@@ -42,12 +42,12 @@ class CreateCategoryDialogFragment : DialogFragment() {
         val categoryTypes = listOf(TransactionType.EXPENSE, TransactionType.INCOME)
         val categoryTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryTypes)
         categoryTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerCategoryType.adapter = categoryTypeAdapter
-        spinnerCategoryType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedTransactionType = if (position == 0) TransactionType.EXPENSE else TransactionType.INCOME
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            selectedTransactionType = when (checkedId) {
+                R.id.category_rdbExpense -> TransactionType.EXPENSE
+                R.id.category_rdbincome -> TransactionType.INCOME
+                else -> TransactionType.EXPENSE
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
         btnSelectColor.setOnClickListener {
