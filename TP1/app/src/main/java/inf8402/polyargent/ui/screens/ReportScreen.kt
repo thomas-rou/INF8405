@@ -106,7 +106,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
 
     // Using coroutine scope tied to lifecycle
     lifecycleScope.launch(Dispatchers.Main) {
-        for (i in 5 downTo 0) {
+        for (i in 0..5) {
             val endDate = calendar.time
 
             when (timeFrequency) {
@@ -125,6 +125,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
             }
 
             val startDate = calendar.time
+            reports.clear()
 
             // Fetch the report data before continuing
             val reportData = fetchReportData(startDate, endDate, transactionType)
@@ -134,8 +135,8 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
             colors.add(mockedColors[i])
 
             val values = reports.map { it.totalAmount.toFloat() }.toFloatArray()
-            reports.clear()
             entries.add(BarEntry(i.toFloat(), values))
+            reports.clear()
         }
 
         // Update the chart after the loop is done
@@ -154,7 +155,16 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
         xAxis.setDrawAxisLine(false)
-        xAxis.valueFormatter = IndexAxisValueFormatter(dateList)
+        xAxis.valueFormatter = object : IndexAxisValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                // Ensure we are not trying to access an index beyond the size of dateList
+                return if (value.toInt() in 0 until dateList.size) {
+                    dateList[value.toInt()]
+                } else {
+                    ""  // Return an empty string if the index is out of bounds
+                }
+            }
+        }
 
         val yAxis = barChart.axisLeft
         yAxis.setDrawLabels(false) // Remove vertical axis legend
