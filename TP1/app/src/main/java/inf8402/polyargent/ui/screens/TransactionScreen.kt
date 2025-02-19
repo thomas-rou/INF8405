@@ -41,10 +41,10 @@ class TransactionScreen(
             val categoryName = withContext(Dispatchers.IO) {
                 transactionViewModel.getCategoryName(transaction.categoryId)
             }
-            transaction.categoryName = categoryName.toString()
+            transaction.categoryName = categoryName ?: "Catégorie Inconnue"
             holder.bind(transaction)
             holder.itemView.setOnLongClickListener {
-                onDeleteClick(transaction)  // Long press to delete
+                onDeleteClick(transaction)
                 true
             }
         }
@@ -54,7 +54,6 @@ class TransactionScreen(
         private val titleTextView: TextView = itemView.findViewById(R.id.textTitle)
         private val amountTextView: TextView = itemView.findViewById(R.id.textAmount)
         private val dateTextView: TextView = itemView.findViewById(R.id.textDate)
-        //private val typeTextView: TextView = itemView.findViewById(R.id.textType)
         private val categoryTextView: TextView = itemView.findViewById(R.id.textCategory)
 
         @SuppressLint("SetTextI18n")
@@ -62,42 +61,38 @@ class TransactionScreen(
             titleTextView.text = transaction.title
             amountTextView.text = "$${transaction.amount}"
             dateTextView.text = transaction.date
-            //typeTextView.text = if (transaction.type == TransactionType.EXPENSE) "Dépense" else "Revenu"
             categoryTextView.text = transaction.categoryName ?: "Catégorie Inconnue"
 
             val context = itemView.context
             if (transaction.type == TransactionType.EXPENSE) {
-                //typeTextView.setTextColor(context.resources.getColor(R.color.red, context.theme))
                 amountTextView.setTextColor(context.resources.getColor(R.color.red, context.theme))
             } else if (transaction.type == TransactionType.INCOME) {
-                //typeTextView.setTextColor(context.resources.getColor(R.color.teal_200, context.theme))
                 amountTextView.setTextColor(context.resources.getColor(R.color.teal_200, context.theme))
             }
         }
     }
 
     class TransactionDiffCallback : DiffUtil.ItemCallback<Transaction>() {
-        override fun areItemsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
-            return oldItem.id == newItem.id
-        }
+        override fun areItemsTheSame(oldItem: Transaction, newItem: Transaction): Boolean =
+            oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
-            return oldItem == newItem
-        }
+        override fun areContentsTheSame(oldItem: Transaction, newItem: Transaction): Boolean =
+            oldItem == newItem
     }
 }
 
+// Extension function to set up the transaction screen in MainActivity.
 fun MainActivity.setupTransactionScreen() {
     val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
     recyclerView.layoutManager = LinearLayoutManager(this)
     recyclerView.adapter = this.adapter
 
-    // Observe the expenses LiveData
+    // Observe the expenses LiveData.
     this.transactionViewModel.allExpenses.observe(this as LifecycleOwner) { transactionsGot ->
         this.adapter.submitList(transactionsGot)
     }
 
-    // FloatingActionButton click listener
+    // FloatingActionButton click listener to open AddTransactionActivity.
     val fabAddTransaction = findViewById<FloatingActionButton>(R.id.fabAddTransaction)
     fabAddTransaction.setOnClickListener {
         startActivity(Intent(this, AddTransactionFragment::class.java))
