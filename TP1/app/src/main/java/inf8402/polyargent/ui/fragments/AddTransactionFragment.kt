@@ -19,13 +19,27 @@ import java.util.*
 import kotlin.text.isNotEmpty
 import kotlin.text.trim
 import android.app.AlertDialog
+import android.graphics.drawable.ColorDrawable
+import android.util.Log
+import android.view.View
+import android.widget.AdapterView
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.Spinner
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.GridView
+import androidx.core.content.res.ResourcesCompat
 
 class AddTransactionFragment : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddTransactionBinding
     private val transactionViewModel: TransactionViewModel by viewModels()
     private lateinit var categoryAdapter: ArrayAdapter<String>
+    private var selectedColor: String = "#FFFFFF"
+    private var selectedIcon: String = "ic_circle_help"
+    private var selectedTransactionType: TransactionType = TransactionType.EXPENSE
+    private lateinit var colorPreview: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,12 +50,6 @@ class AddTransactionFragment : AppCompatActivity() {
         setupSpinners()
         setupButtons()
     }
-
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        val inflater: MenuInflater = menuInflater
-//        inflater.inflate(R.menu.navigation_menu, menu)
-//        return true
-//    }
 
     private fun setupDatePicker() {
         binding.dateEditText.setOnClickListener {
@@ -89,8 +97,8 @@ class AddTransactionFragment : AppCompatActivity() {
     }
 
     private fun saveTransaction() {
-        val title = binding.editTextTitle.text.toString().trim()
-        val amountText = binding.editTextAmount.text.toString().trim()
+        val title = binding.editTextTitle.editText?.text.toString().trim()
+        val amountText = binding.editTextAmount.editText?.text.toString().trim()
 
         if (title.isEmpty() || amountText.isEmpty()) {
             Toast.makeText(this, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
@@ -133,6 +141,39 @@ class AddTransactionFragment : AppCompatActivity() {
         val categoryNameEditText = dialogView.findViewById<EditText>(R.id.editTextNewCategoryName)
         val btnSaveCategory = dialogView.findViewById<Button>(R.id.btnSaveCategory)
         val btnCancelCategory = dialogView.findViewById<Button>(R.id.btnCancelCategory)
+        val btnSelectColor = dialogView.findViewById<Button>(R.id.btnSelectColor)
+        val btnSelectIcon = dialogView.findViewById<Button>(R.id.btnSelectIcon)
+        val spinnerCategoryType = dialogView.findViewById<Spinner>(R.id.spinnerCategoryType)
+        val iconPreview = dialogView.findViewById<ImageView>(R.id.iconPreview)
+        val colorPreview = dialogView.findViewById<View>(R.id.colorPreview)
+
+        val categoryTypes = listOf(TransactionType.EXPENSE, TransactionType.INCOME)
+        val categoryTypeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryTypes)
+        categoryTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategoryType.adapter = categoryTypeAdapter
+        spinnerCategoryType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedTransactionType = if (position == 0) TransactionType.EXPENSE else TransactionType.INCOME
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        btnSelectColor.setOnClickListener {
+            showColorPickerDialog { color ->
+                selectedColor = color
+                btnSelectColor.background = ColorDrawable(android.graphics.Color.parseColor(selectedColor))
+                colorPreview.setBackgroundColor(android.graphics.Color.parseColor(selectedColor))
+            }
+        }
+
+        // Set up icon selection
+        btnSelectIcon.setOnClickListener {
+            showIconPickerDialog { icon ->
+                selectedIcon = resources.getResourceEntryName(icon)
+                iconPreview.setImageResource(icon)
+            }
+        }
 
         builder.setView(dialogView)
             .setTitle(R.string.add_category)
@@ -142,17 +183,96 @@ class AddTransactionFragment : AppCompatActivity() {
         btnSaveCategory.setOnClickListener {
             val newCategoryName = categoryNameEditText.text.toString().trim()
             if (newCategoryName.isNotEmpty()) {
-                val newCategory = Category(categoryName = newCategoryName)
+                val newCategory = Category(categoryName = newCategoryName, isDefault = false, type = selectedTransactionType, icon = selectedIcon, colorHex = selectedColor)
                 transactionViewModel.insertCategory(newCategory)
-                // Refresh the spinner
                 refreshCategorySpinner()
                 dialog.dismiss()
             } else {
-                Toast.makeText(this, "Category name cannot be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Le nom de la catégorie ne peut pas être vide", Toast.LENGTH_SHORT).show()
             }
         }
 
         btnCancelCategory.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun showColorPickerDialog(onColorSelected: (String) -> Unit) {
+        // Inflate the dialog layout
+        val dialogView = layoutInflater.inflate(R.layout.dialog_color_picker, null)
+        val gridView = dialogView.findViewById<GridView>(R.id.gridViewColors)
+
+        // Retrieve colors from string-array
+        val colors = resources.getStringArray(R.array.color_choices).toList()
+
+        // Create a simple adapter for the grid
+        gridView.adapter = object : BaseAdapter() {
+            override fun getCount(): Int = colors.size
+            override fun getItem(position: Int): Any = colors[position]
+            override fun getItemId(position: Int): Long = position.toLong()
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                val view = convertView ?: layoutInflater.inflate(R.layout.grid_item_color, parent, false)
+                val colorView = view.findViewById<View>(R.id.colorView)
+                colorView.setBackgroundColor(android.graphics.Color.parseColor(colors[position]))
+                return view
+            }
+        }
+
+        // Build and show the dialog
+        val alertDialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        // When a color is tapped, call the callback and dismiss the dialog
+        gridView.setOnItemClickListener { _, _, position, _ ->
+            onColorSelected(colors[position])
+            alertDialog.dismiss()
+        }
+        alertDialog.show()
+    }
+
+    private fun showIconPickerDialog(onIconSelected: (Int) -> Unit) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_icon_picker, null)
+        val gridView = dialogView.findViewById<GridView>(R.id.gridViewIcons)
+        val iconNames = resources.getStringArray(R.array.icon_names)
+
+        val iconMap: Map<String, Int> = iconNames.associateWith { iconName ->
+                val resId = try {
+                val field = R.drawable::class.java.getDeclaredField(iconName)
+                field.getInt(null)
+            } catch (e: Exception) {
+                Log.e("IconPicker", "Icon not found: $iconName", e)
+                0
+            }
+                resId
+            }.filterValues { it != 0 }
+
+        // Set up an adapter for the grid of icons
+        gridView.adapter = object : BaseAdapter() {
+            override fun getCount(): Int = iconMap.size
+            override fun getItem(position: Int): Any = iconMap.keys.toList()[position]
+            override fun getItemId(position: Int): Long = position.toLong()
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                val view = convertView ?: layoutInflater.inflate(R.layout.grid_item_icon, parent, false)
+                val imageView = view.findViewById<ImageView>(R.id.iconImageView)
+                val iconName = iconMap.keys.toList()[position]
+                val resId = iconMap[iconName] ?: 0
+                imageView.setImageResource(resId)
+                return view
+            }
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Choisir une icone")
+            .setView(dialogView)
+            .setNegativeButton("Annuler", null)
+            .create()
+
+        gridView.setOnItemClickListener { _, _, position, _ ->
+            val selectedIconResId = iconMap.values.toList()[position]
+            onIconSelected(selectedIconResId)
             dialog.dismiss()
         }
 
