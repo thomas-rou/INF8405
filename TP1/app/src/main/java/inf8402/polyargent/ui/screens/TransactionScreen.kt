@@ -11,9 +11,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.github.mikephil.charting.charts.PieChart
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
 import inf8402.polyargent.MainActivity
 import inf8402.polyargent.R
+import inf8402.polyargent.model.DateTabViewModel
+import inf8402.polyargent.model.PieChartViewModel
 import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.fragments.AddTransactionFragment
@@ -54,7 +58,6 @@ class TransactionScreen(
         private val titleTextView: TextView = itemView.findViewById(R.id.textTitle)
         private val amountTextView: TextView = itemView.findViewById(R.id.textAmount)
         private val dateTextView: TextView = itemView.findViewById(R.id.textDate)
-        //private val typeTextView: TextView = itemView.findViewById(R.id.textType)
         private val categoryTextView: TextView = itemView.findViewById(R.id.textCategory)
 
         @SuppressLint("SetTextI18n")
@@ -62,15 +65,12 @@ class TransactionScreen(
             titleTextView.text = transaction.title
             amountTextView.text = "$${transaction.amount}"
             dateTextView.text = transaction.date
-            //typeTextView.text = if (transaction.type == TransactionType.EXPENSE) "Dépense" else "Revenu"
             categoryTextView.text = transaction.categoryName ?: "Catégorie Inconnue"
 
             val context = itemView.context
             if (transaction.type == TransactionType.EXPENSE) {
-                //typeTextView.setTextColor(context.resources.getColor(R.color.red, context.theme))
                 amountTextView.setTextColor(context.resources.getColor(R.color.red, context.theme))
             } else if (transaction.type == TransactionType.INCOME) {
-                //typeTextView.setTextColor(context.resources.getColor(R.color.teal_200, context.theme))
                 amountTextView.setTextColor(context.resources.getColor(R.color.teal_200, context.theme))
             }
         }
@@ -85,6 +85,22 @@ class TransactionScreen(
             return oldItem == newItem
         }
     }
+}
+
+fun MainActivity.homePageSetup(activity: MainActivity) {
+    setContentView(R.layout.main_page)
+    val pieChart: PieChart = findViewById(R.id.chart)
+    val pieChartView = PieChartViewModel()
+    pieChartView.setupPieChart(pieChart)
+    manageSelectedTab(activity)
+
+    adapter = TransactionScreen(
+        onDeleteClick = { transaction ->
+            transactionViewModel.delete(transaction)
+        },
+        transactionViewModel = transactionViewModel
+    )
+    setupTransactionScreen()
 }
 
 fun MainActivity.setupTransactionScreen() {
@@ -102,4 +118,43 @@ fun MainActivity.setupTransactionScreen() {
     fabAddTransaction.setOnClickListener {
         startActivity(Intent(this, AddTransactionFragment::class.java))
     }
+}
+
+fun MainActivity.manageSelectedTab(activity: MainActivity) {
+    val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
+    val dateRangeText: TextView = findViewById(R.id.date_range_text)
+    val transactionTab : TabLayout = findViewById(R.id.tabs)
+
+    transactionTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+            when (tab?.position) {
+                0 -> {
+                    transactionViewModel.allExpenses.observe(activity as LifecycleOwner) { transactionsGot ->
+                        adapter.submitList(transactionsGot)
+                    }
+
+                }
+
+                1 -> {
+                    transactionViewModel.allIncomes.observe(activity as LifecycleOwner) { transactionsGot ->
+                        adapter.submitList(transactionsGot)
+                    }
+
+                }
+            }
+
+        }
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+    })
+
+    tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+            val dateTab = DateTabViewModel()
+            val dateRange = dateTab.getDateRangeForTab(tab?.position ?: 0)
+            dateRangeText.text = dateRange
+        }
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+    })
 }
