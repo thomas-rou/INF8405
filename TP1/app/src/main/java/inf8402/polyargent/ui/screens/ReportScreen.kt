@@ -1,6 +1,5 @@
 package inf8402.polyargent.ui.screens
 
-import android.content.Intent
 import java.util.Calendar
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -30,11 +29,10 @@ import inf8402.polyargent.viewmodel.ReportViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.math.roundToInt
 
 
@@ -53,11 +51,6 @@ class ReportScreen(
         val categoryReport = getItem(position)
         holder.bind(categoryReport)
         CoroutineScope(Dispatchers.Main).launch {
-//            val categoryName = withContext(Dispatchers.IO) {
-//                reportViewModel.getCategoryName(transaction.categoryId)
-//            }
-//            transaction.categoryName = categoryName.toString()
-//            holder.bind(transaction)
         }
     }
 
@@ -86,12 +79,61 @@ class ReportScreen(
 
 fun MainActivity.reportPageSetup(activity: MainActivity) {
     setContentView(R.layout.report)
-    setupStackedBarChart(TimeFrequency.WEEKLY, TransactionType.EXPENSE)
-//    manageSelectedTab(activity)
+    val tabLayout: TabLayout = findViewById(R.id.timePeriodReportTab)
+    tabLayout.getTabAt(1)?.select()
+//    setupStackedBarChart(TimeFrequency.WEEKLY, TransactionType.EXPENSE)
+    setupStackedBarChart(frequency, type)
+    manageSelectedTabInReportView()
+}
+
+fun MainActivity.manageSelectedTabInReportView() {
+    val timeTab: TabLayout = findViewById(R.id.timePeriodReportTab)
+    val transactionTab : TabLayout = findViewById(R.id.reportTabs)
+
+    transactionTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+            when (tab?.position) {
+                0 -> {
+                        type = TransactionType.EXPENSE
+                    }
+
+                1 -> {
+                        type = TransactionType.INCOME
+                }
+            }
+            setupStackedBarChart(frequency, type)
+        }
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+    })
+
+    timeTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+            when (tab?.position) {
+                0 -> {
+                    frequency = TimeFrequency.DAILY
+                }
+
+                1 -> {
+                    frequency = TimeFrequency.WEEKLY
+                }
+                2 -> {
+                    frequency = TimeFrequency.MONTHLY
+                }
+                3 -> {
+                    frequency = TimeFrequency.YEARLY
+                }
+            }
+            setupStackedBarChart(frequency, type)
+        }
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+    })
+
 }
 
 fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionType: TransactionType) {
-    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
+    val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
     val barChart: BarChart = findViewById(R.id.reportChart)
     val mockedColors = listOf(Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.CYAN)
     val calendar = Calendar.getInstance()
@@ -176,26 +218,32 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
 
 // Suspend function to fetch report data
 suspend fun MainActivity.fetchReportData(startDate: Date, endDate: Date, transactionType: TransactionType): List<CategoryReport> {
-    return suspendCoroutine { continuation ->
-        val observer = Observer<List<CategoryReport>> { reports ->
-            continuation.resume(reports)
-        }
-
-        // Observe the report based on transaction type
-        if (transactionType == TransactionType.EXPENSE) {
+    return suspendCancellableCoroutine { continuation ->
+        val liveData = if (transactionType == TransactionType.EXPENSE) {
             reportViewModel.getExpenseReport(startDate, endDate)
-                .observeForever(observer)
         } else {
             reportViewModel.getIncomeReport(startDate, endDate)
-                .observeForever(observer)
+        }
+        lateinit var observer: Observer<List<CategoryReport>>
+        observer = Observer<List<CategoryReport>> { reports ->
+            if (reports != null) {
+                continuation.resume(reports) {} // Résolution de la coroutine
+                liveData.removeObserver(observer)  // Suppression de l'observateur pour éviter les fuites mémoire
+            }
+        }
+
+        liveData.observeForever(observer)
+
+        // En cas d'annulation de la coroutine, retirer l'observateur
+        continuation.invokeOnCancellation {
+            liveData.removeObserver(observer)
         }
     }
 }
 
+
 fun MainActivity.setupReportScreen(categoryReports: List<CategoryReport>) {
     val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-    val tabLayout: TabLayout = findViewById(R.id.tabTimePeriodReport)
-    tabLayout.getTabAt(1)?.select()
     recyclerView.layoutManager = LinearLayoutManager(this)
     recyclerView.adapter = this.reportScreenAdapter
 

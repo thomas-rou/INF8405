@@ -7,6 +7,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
+import inf8402.polyargent.model.transaction.TimeFrequency
+import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.screens.ReportScreen
 import inf8402.polyargent.ui.screens.TransactionScreen
 import inf8402.polyargent.ui.screens.homePageSetup
@@ -16,6 +18,8 @@ import inf8402.polyargent.viewmodel.TransactionViewModel
 
 
 class MainActivity : AppCompatActivity() {
+    var frequency : TimeFrequency = TimeFrequency.WEEKLY
+    var type : TransactionType = TransactionType.EXPENSE
     lateinit var adapter: TransactionScreen
     lateinit var reportScreenAdapter: ReportScreen
     val transactionViewModel: TransactionViewModel by viewModels {
