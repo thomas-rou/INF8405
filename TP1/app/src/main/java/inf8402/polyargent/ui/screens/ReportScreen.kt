@@ -86,7 +86,6 @@ class ReportScreen(
 
 fun MainActivity.reportPageSetup(activity: MainActivity) {
     setContentView(R.layout.report)
-    val barChart: BarChart = findViewById(R.id.reportChart)
     setupStackedBarChart(TimeFrequency.WEEKLY, TransactionType.EXPENSE)
 //    manageSelectedTab(activity)
 }
@@ -156,16 +155,10 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
         xAxis.setDrawAxisLine(false)
-        xAxis.valueFormatter = object : IndexAxisValueFormatter() {
-            override fun getFormattedValue(value: Float): String {
-                // Ensure we are not trying to access an index beyond the size of dateList
-                return if (value.toInt() in 0 until dateList.size) {
-                    dateList[value.toInt()]
-                } else {
-                    ""  // Return an empty string if the index is out of bounds
-                }
-            }
-        }
+        xAxis.setLabelCount(dateList.count(), true)
+        xAxis.valueFormatter = IndexAxisValueFormatter(dateList)
+        xAxis.axisMinimum = 0f
+        xAxis.axisMaximum = (dateList.size - 1).toFloat()
 
         val yAxis = barChart.axisLeft
         yAxis.setDrawLabels(false) // Remove vertical axis legend
