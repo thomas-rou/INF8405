@@ -35,6 +35,38 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate ORDER BY date DESC")
     fun getExpenseTransactionsByDateInterval(startDate: String, endDate: String): LiveData<List<Transaction>>
 
+    @Query("""
+    SELECT c.categoryName as categoryName, 
+           (SUM(t.amount) / grandTotal.totalAmount) * 100 as percentage,
+           SUM(t.amount) as totalAmount
+           
+    FROM transactions t 
+    JOIN categories c ON t.categoryId = c.id 
+    CROSS JOIN (SELECT SUM(amount) as totalAmount 
+                FROM transactions 
+                WHERE type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate) as grandTotal
+    WHERE t.type = 'EXPENSE' AND t.date BETWEEN :startDate AND :endDate 
+    GROUP BY c.categoryName, grandTotal.totalAmount 
+    ORDER BY totalAmount DESC
+""")
+    fun getExpenseTransactionsByDateIntervalGroupByCategory(startDate: String, endDate: String): LiveData<List<CategoryReport>>
+
+    @Query("""
+    SELECT c.categoryName as categoryName, 
+           (SUM(t.amount) / grandTotal.totalAmount) * 100 as percentage,
+           SUM(t.amount) as totalAmount
+           
+    FROM transactions t 
+    JOIN categories c ON t.categoryId = c.id 
+    CROSS JOIN (SELECT SUM(amount) as totalAmount 
+                FROM transactions 
+                WHERE type = 'INCOME' AND date BETWEEN :startDate AND :endDate) as grandTotal
+    WHERE t.type = 'INCOME' AND t.date BETWEEN :startDate AND :endDate 
+    GROUP BY c.categoryName, grandTotal.totalAmount 
+    ORDER BY totalAmount DESC
+""")
+    fun getIncomeTransactionsByDateIntervalGroupByCategory(startDate: String, endDate: String): LiveData<List<CategoryReport>>
+
     @Query("SELECT categoryName FROM categories WHERE id = :categoryId")
     suspend fun getCategoryName(categoryId: Int): String?
 

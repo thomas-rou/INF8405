@@ -7,20 +7,23 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
+import inf8402.polyargent.ui.screens.ReportScreen
 import inf8402.polyargent.ui.screens.TransactionScreen
 import inf8402.polyargent.ui.screens.homePageSetup
-import inf8402.polyargent.ui.screens.manageSelectedTab
-import inf8402.polyargent.ui.screens.setupTransactionScreen
+import inf8402.polyargent.ui.screens.reportPageSetup
+import inf8402.polyargent.viewmodel.ReportViewModel
 import inf8402.polyargent.viewmodel.TransactionViewModel
 
 
 class MainActivity : AppCompatActivity() {
     lateinit var adapter: TransactionScreen
+    lateinit var reportScreenAdapter: ReportScreen
     val transactionViewModel: TransactionViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
-
-
+    val reportViewModel: ReportViewModel by viewModels {
+        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -39,7 +42,8 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.navigation_report -> {
-                setContentView(R.layout.repport)
+                setContentView(R.layout.report)
+                reportPageSetup(this@MainActivity)
                 return true
             }
         }

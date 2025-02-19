@@ -60,7 +60,6 @@ class TransactionScreen(
         private val dateTextView: TextView = itemView.findViewById(R.id.textDate)
         private val categoryTextView: TextView = itemView.findViewById(R.id.textCategory)
 
-        @SuppressLint("SetTextI18n")
         fun bind(transaction: Transaction) {
             titleTextView.text = transaction.title
             amountTextView.text = "$${transaction.amount}"
