@@ -29,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -100,7 +101,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
     val reports = mutableListOf<CategoryReport>()
 
     for (i in 5 downTo 0) {
-        val startDate = calendar.time
+        val endDate = calendar.time
 
         when (timeFrequency){
             TimeFrequency.DAILY -> {
@@ -117,7 +118,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
             }
         }
 
-        val endDate = calendar.time
+        val startDate = calendar.time
 
         if (transactionType == TransactionType.EXPENSE) {
             reportViewModel.getExpenseReport(startDate, endDate)
@@ -171,7 +172,10 @@ fun MainActivity.setupReportScreen() {
     recyclerView.adapter = this.reportScreenAdapter
 
     // Observe the expenses LiveData
-    this.reportViewModel.ExpenseReportOfToday.observe(this as LifecycleOwner) { categoryReportsGot ->
+    val calendar = Calendar.getInstance()
+    calendar.time = Date()
+    calendar.add(Calendar.WEEK_OF_YEAR, -1)
+    this.reportViewModel.getExpenseReport(calendar.time, Date()).observe(this as LifecycleOwner) { categoryReportsGot ->
         this.reportScreenAdapter.submitList(categoryReportsGot)
     }
 
