@@ -89,9 +89,6 @@ fun MainActivity.reportPageSetup(activity: MainActivity) {
     val barChart: BarChart = findViewById(R.id.reportChart)
     setupStackedBarChart(TimeFrequency.WEEKLY, TransactionType.EXPENSE)
 //    manageSelectedTab(activity)
-
-    reportScreenAdapter = ReportScreen(reportViewModel)
-    setupReportScreen()
 }
 
 fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionType: TransactionType) {
@@ -102,7 +99,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
     val entries = mutableListOf<BarEntry>()
     val dateList = mutableListOf<String>()
     val colors = mutableListOf<Int>()
-    val reports = mutableListOf<CategoryReport>()
+    val reportsOfCurrenTime = mutableListOf<CategoryReport>()
 
     // Using coroutine scope tied to lifecycle
     lifecycleScope.launch(Dispatchers.Main) {
@@ -125,18 +122,22 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
             }
 
             val startDate = calendar.time
-            reports.clear()
 
             // Fetch the report data before continuing
-            val reportData = fetchReportData(startDate, endDate, transactionType)
-            reports.addAll(reportData)
+            val reportData = if(timeFrequency == TimeFrequency.DAILY) {
+                fetchReportData(endDate, endDate, transactionType)
+            } else {
+                fetchReportData(startDate, endDate, transactionType)
+            }
+            if(i==0) {
+                reportsOfCurrenTime.addAll(reportData)
+            }
 
             dateList.add(dateFormat.format(endDate))
             colors.add(mockedColors[i])
 
-            val values = reports.map { it.totalAmount.toFloat() }.toFloatArray()
+            val values = reportData.map { it.totalAmount.toFloat() }.toFloatArray()
             entries.add(BarEntry(i.toFloat(), values))
-            reports.clear()
         }
 
         // Update the chart after the loop is done
@@ -171,6 +172,9 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
         yAxis.setDrawGridLines(false)
         yAxis.setDrawAxisLine(false)
         barChart.axisRight.isEnabled = false // Remove right Y axis
+
+        reportScreenAdapter = ReportScreen(reportViewModel)
+        setupReportScreen(reportsOfCurrenTime)
     }
 }
 
@@ -192,7 +196,7 @@ suspend fun MainActivity.fetchReportData(startDate: Date, endDate: Date, transac
     }
 }
 
-fun MainActivity.setupReportScreen() {
+fun MainActivity.setupReportScreen(categoryReports: List<CategoryReport>) {
     val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
     val tabLayout: TabLayout = findViewById(R.id.tabTimePeriodReport)
     tabLayout.getTabAt(1)?.select()
@@ -203,8 +207,5 @@ fun MainActivity.setupReportScreen() {
     val calendar = Calendar.getInstance()
     calendar.time = Date()
     calendar.add(Calendar.WEEK_OF_YEAR, -1)
-    this.reportViewModel.getExpenseReport(calendar.time, Date()).observe(this as LifecycleOwner) { categoryReportsGot ->
-        this.reportScreenAdapter.submitList(categoryReportsGot)
-    }
-
+    this.reportScreenAdapter.submitList(categoryReports)
 }
