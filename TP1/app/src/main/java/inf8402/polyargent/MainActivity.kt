@@ -14,6 +14,7 @@ import inf8402.polyargent.model.DateTabViewModel
 import inf8402.polyargent.model.PieChartViewModel
 import com.github.mikephil.charting.charts.PieChart
 import com.google.android.material.tabs.TabLayout
+import inf8402.polyargent.ui.fragments.CategoryFragment
 import inf8402.polyargent.ui.screens.TransactionScreen
 import inf8402.polyargent.ui.screens.setupTransactionScreen
 import inf8402.polyargent.viewmodel.TransactionViewModel
@@ -94,7 +95,10 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.navigation_category -> {
-                setContentView(R.layout.category)
+                supportFragmentManager.beginTransaction()
+                    .replace(android.R.id.content, CategoryFragment())
+                    .addToBackStack(null)
+                    .commit()
                 return true
             }
             R.id.navigation_report -> {
