@@ -10,8 +10,8 @@ import inf8402.polyargent.model.transaction.TransactionType
 import kotlinx.coroutines.*
 
 class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
-    private val _categories = MutableLiveData<List<Category>>()
-    val categories: LiveData<List<Category>> get() = _categories
+    private val _categories = MutableLiveData<List<Category>?>()
+    val categories: MutableLiveData<List<Category>?> get() = _categories
 
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
