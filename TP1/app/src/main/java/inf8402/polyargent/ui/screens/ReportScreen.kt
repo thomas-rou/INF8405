@@ -209,9 +209,9 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
         xAxis.axisMaximum = (dateList.size - 1).toFloat()
 
         val yAxis = barChart.axisLeft
-        yAxis.setDrawLabels(false) // Remove vertical axis legend
-        yAxis.setDrawGridLines(false)
-        yAxis.setDrawAxisLine(false)
+//        yAxis.setDrawLabels(false) // Remove vertical axis legend
+//        yAxis.setDrawGridLines(false)
+//        yAxis.setDrawAxisLine(false)
         barChart.setTouchEnabled(false)
         barChart.axisRight.isEnabled = false // Remove right Y axis
 
