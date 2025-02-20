@@ -177,6 +177,9 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
             if(i==0) {
                 val currentDateTimeTextView: TextView = findViewById(R.id.currentTime)
                 currentDateTimeTextView.text = "Date: " + dateFormat.format(endDate)
+            }
+
+            if(reportsOfCurrenTime.isEmpty()){
                 reportsOfCurrenTime.addAll(reportData)
             }
 
