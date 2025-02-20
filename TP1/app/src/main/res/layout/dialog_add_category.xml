@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -12,66 +12,75 @@
         android:layout_height="wrap_content"
         android:hint="@string/enter_category_name"
         android:inputType="text"
-        android:autofillHints="Food"/>
+        android:autofillHints="Food" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_marginTop="8dp">
 
         <Button
             android:id="@+id/btnSelectColor"
-            style="?android:attr/buttonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/select_color" />
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:text="@string/select_color"
+            app:layout_constraintEnd_toStartOf="@id/colorPreview"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.4" />
 
         <View
             android:id="@+id/colorPreview"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/square" />
-    </LinearLayout>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/square"
+            android:layout_marginStart="12dp"
+            app:layout_constraintBottom_toBottomOf="@id/btnSelectColor"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@id/btnSelectColor"
+            app:layout_constraintTop_toTopOf="@id/btnSelectColor" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
         <Button
             android:id="@+id/btnSelectIcon"
-            style="?android:attr/buttonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/select_icon" />
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:text="@string/select_icon"
+            app:layout_constraintEnd_toStartOf="@id/iconPreview"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnSelectColor"
+            app:layout_constraintWidth_percent="0.4" />
+
         <ImageView
             android:id="@+id/iconPreview"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="8dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_circle_help"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:contentDescription="@string/icon_label"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_circle_help"
+            android:layout_marginStart="12dp"
+            app:layout_constraintBottom_toBottomOf="@id/btnSelectIcon"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@id/btnSelectIcon"
+            app:layout_constraintTop_toTopOf="@id/btnSelectIcon"
             app:tint="@android:color/black"/>
-    </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <RadioGroup
         android:id="@+id/category_type_rdgroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="16dp"
+        android:checkedButton="@id/category_rdbExpense"
         android:gravity="start"
-        android:checkedButton="@id/category_rdbExpense">
+        android:orientation="horizontal">
 
         <RadioButton
             android:id="@+id/category_rdbExpense"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/expense"
-            android:checked="true"/>
+            android:checked="true"
+            android:text="@string/expense" />
 
         <RadioButton
             android:id="@+id/category_rdbincome"
@@ -88,16 +97,16 @@
         android:orientation="horizontal">
 
         <Button
-            style="?android:attr/buttonStyle"
             android:id="@+id/btnCancelCategory"
+            style="?android:attr/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text="@string/cancel" />
 
         <Button
-            style="?android:attr/buttonStyle"
             android:id="@+id/btnSaveCategory"
+            style="?android:attr/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save" />
