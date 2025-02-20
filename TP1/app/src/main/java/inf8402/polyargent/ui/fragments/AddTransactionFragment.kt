@@ -58,7 +58,7 @@ class AddTransactionFragment : AppCompatActivity() {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-            val formattedDate = "${selectedDay}/${selectedMonth + 1}/$selectedYear"
+            val formattedDate = String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear)
             binding.dateEditText.text = formattedDate
         }, year, month, day)
 
