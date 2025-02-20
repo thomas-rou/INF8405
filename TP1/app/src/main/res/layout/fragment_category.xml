@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <!-- Onglets en haut -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabsCategory"
         android:layout_width="0dp"
@@ -17,21 +16,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- GridView pour afficher les catégories -->
     <GridView
         android:id="@+id/gridViewCategories"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:numColumns="3"
-        android:verticalSpacing="8dp"
-        android:horizontalSpacing="8dp"
         android:padding="16dp"
+        android:horizontalSpacing="8dp"
+        android:verticalSpacing="8dp"
+        android:numColumns="3"
+        android:stretchMode="columnWidth"
         app:layout_constraintTop_toBottomOf="@id/tabsCategory"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/fabAddCategory" />
 
-    <!-- Bouton d'ajout de catégorie -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddCategory"
         android:layout_width="wrap_content"

@@ -87,10 +87,6 @@ class CategoryFragment : Fragment() {
         }
     }
 
-    /**
-     * Affiche un AlertDialog simple pour ajouter une nouvelle catégorie.
-     * Vous pouvez bien entendu le remplacer par un fragment ou une activité dédiée.
-     */
     private fun createCategoryDialog() {
         val dialogFragment = CreateCategoryDialogFragment()
         dialogFragment.listener = object : CreateCategoryDialogFragment.OnCategoryCreatedListener {
