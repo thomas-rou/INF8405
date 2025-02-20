@@ -45,6 +45,11 @@ class DateTabViewModel() {
         return "$startOfYear - $endOfYear"
     }
 
+    fun extractDates(input: String): List<String> {
+        val regex = "\\d{1,2}/\\d{1,2}/\\d{4}".toRegex()
+        return regex.findAll(input).map { it.value }.toList()
+    }
+
     fun adjustBaseDate(days: Int) {
         baseDate.add(Calendar.DAY_OF_YEAR, days)
     }

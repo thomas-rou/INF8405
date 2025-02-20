@@ -22,6 +22,9 @@ import inf8402.polyargent.viewmodel.TransactionViewModel
 
 
 class MainActivity : AppCompatActivity() {
+    private var currentTransactionTab : Int = 0
+    private val dateTab = DateTabViewModel()
+
     lateinit var adapter: TransactionScreen
     val transactionViewModel: TransactionViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
@@ -55,17 +58,17 @@ class MainActivity : AppCompatActivity() {
                         transactionViewModel.allExpenses.observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
                             adapter.submitList(transactionsGot)
                         }
-
+                        currentTransactionTab = 0
                     }
 
                     1 -> {
                         transactionViewModel.allIncomes.observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
                             adapter.submitList(transactionsGot)
                         }
-
+                        currentTransactionTab = 1
                     }
                 }
-
+                manageSelectedDateRange()
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -75,7 +78,6 @@ class MainActivity : AppCompatActivity() {
     private fun manageSelectedDateRange() {
         val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
         val dateRangeText: TextView = findViewById(R.id.date_range_text)
-        val dateTab = DateTabViewModel()
 
         tabLayout.getTabAt(1)?.select()
         dateRangeText.text = dateTab.getDateRangeForTab(1)
@@ -93,13 +95,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun filterTransactionsByDate(tabPos: Int?, date: String) {
         if (tabPos == 0) {
-            transactionViewModel.getExpenseTransactionsByDay(date.substring(6, 15)).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
-                adapter.submitList(transactionsGot)
+            if (currentTransactionTab == 0) {
+                transactionViewModel.getExpenseTransactionsByDay(dateTab.extractDates(date)[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                    adapter.submitList(transactionsGot)
+                }
+            } else {
+                transactionViewModel.getIncomeTransactionsByDay(dateTab.extractDates(date)[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                    adapter.submitList(transactionsGot)
+                }
             }
         }
         else {
-            transactionViewModel.getExpenseTransactionsByDateInterval(date.substring(0, 9), date.substring(13, 22)).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
-                adapter.submitList(transactionsGot)
+            if (currentTransactionTab == 0) {
+                transactionViewModel.getExpenseTransactionsByDateInterval(dateTab.extractDates(date)[0], dateTab.extractDates(date)[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                    adapter.submitList(transactionsGot)
+                }
+            } else {
+                transactionViewModel.getIncomeTransactionsBDateInterval(dateTab.extractDates(date)[0], dateTab.extractDates(date)[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                    adapter.submitList(transactionsGot)
+                }
             }
         }
     }
