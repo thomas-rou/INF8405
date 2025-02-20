@@ -19,6 +19,7 @@ class AddTransactionFragment : AppCompatActivity() {
     private lateinit var binding: ActivityAddTransactionBinding
     private val transactionViewModel: TransactionViewModel by viewModels()
     private lateinit var categoryAdapter: ArrayAdapter<String>
+    private var currentTransactionType: TransactionType = TransactionType.EXPENSE // Default type
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,8 +54,41 @@ class AddTransactionFragment : AppCompatActivity() {
 
     private fun setupSpinners() {
         // Populate the category spinner.
+        setupTransactionTypeSpinner()
+        updateCategorySpinner()
+    }
+
+    private fun setupTransactionTypeSpinner() {
+        val transactionTypes = listOf("Dépense", "Revenu")
+        val transactionTypeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, transactionTypes)
+        transactionTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerTransactionType.adapter = transactionTypeAdapter
+
+        binding.spinnerTransactionType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
+                currentTransactionType = if (transactionTypes[position] == "Dépense") {
+                    TransactionType.EXPENSE
+                } else {
+                    TransactionType.INCOME
+                }
+                updateCategorySpinner()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing
+            }
+        }
+    }
+
+    private fun updateCategorySpinner() {
         transactionViewModel.allCategories.observe(this) { categories ->
-            val categoryNames = categories.map { it.categoryName }
+            val filteredCategories = categories.filter {
+                when (currentTransactionType) {
+                    TransactionType.EXPENSE -> it.type == TransactionType.EXPENSE
+                    TransactionType.INCOME -> it.type == TransactionType.INCOME
+                }
+            }
+            val categoryNames = filteredCategories.map { it.categoryName }
             categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryNames)
             categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.categorySpinner.adapter = categoryAdapter
@@ -89,15 +123,13 @@ class AddTransactionFragment : AppCompatActivity() {
             return
         }
 
-        val transactionType = if (binding.spinnerTransactionType.selectedItem.toString() == "Dépense")
-            TransactionType.EXPENSE else TransactionType.INCOME
         val date = binding.dateEditText.text.toString().trim()
 
         val transaction = Transaction(
             title = title,
             amount = amount,
             date = date,
-            type = transactionType,
+            type = currentTransactionType,
             categoryId = selectedCategory.id
         )
         transactionViewModel.insert(transaction)
@@ -118,7 +150,13 @@ class AddTransactionFragment : AppCompatActivity() {
 
     private fun refreshCategorySpinner() {
         transactionViewModel.allCategories.observe(this) { categories ->
-            val categoryNames = categories.map { it.categoryName }
+            val filteredCategories = categories.filter {
+                when (currentTransactionType) {
+                    TransactionType.EXPENSE -> it.type == TransactionType.EXPENSE
+                    TransactionType.INCOME -> it.type == TransactionType.INCOME
+                }
+            }
+            val categoryNames = filteredCategories.map { it.categoryName }
             categoryAdapter.clear()
             categoryAdapter.addAll(categoryNames)
             categoryAdapter.notifyDataSetChanged()
