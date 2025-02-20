@@ -98,18 +98,22 @@
                 app:tabIndicatorFullWidth="false"
                 app:layout_constraintTop_toBottomOf="@+id/dashboard">
                 <com.google.android.material.tabs.TabItem
+                    android:id="@+id/day"
                     android:text="Jour"
                     android:layout_height="0dp"
                     android:layout_width="0dp"/>
                 <com.google.android.material.tabs.TabItem
+                    android:id="@+id/week"
                     android:text="Semaine"
                     android:layout_height="0dp"
                     android:layout_width="0dp"/>
                 <com.google.android.material.tabs.TabItem
+                    android:id="@+id/month"
                     android:text="Mois"
                     android:layout_height="0dp"
                     android:layout_width="0dp"/>
                 <com.google.android.material.tabs.TabItem
+                    android:id="@+id/year"
                     android:text="Année"
                     android:layout_height="0dp"
                     android:layout_width="0dp"/>
@@ -132,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:gravity="start"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="25dp"
                     android:text="&lt;"
                     android:clickable="true"
                     app:layout_constraintTop_toTopOf="parent"
@@ -155,7 +159,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginRight="25dp"
                     android:text="&gt;"
                     android:clickable="true"
                     app:layout_constraintTop_toTopOf="parent"

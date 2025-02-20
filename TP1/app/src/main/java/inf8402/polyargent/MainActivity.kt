@@ -1,6 +1,7 @@
 package inf8402.polyargent
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import inf8402.polyargent.model.DateTabViewModel
 import inf8402.polyargent.model.PieChartViewModel
 import com.github.mikephil.charting.charts.PieChart
+import com.google.android.material.tabs.TabItem
 import com.google.android.material.tabs.TabLayout
 import inf8402.polyargent.ui.screens.TransactionScreen
 import inf8402.polyargent.ui.screens.setupTransactionScreen
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         val pieChartView = PieChartViewModel()
         pieChartView.setupPieChart(pieChart)
         manageSelectedDateRange()
+        manageSelectedExpenseType()
 
         adapter = TransactionScreen(
             onDeleteClick = { transaction ->
@@ -42,9 +45,7 @@ class MainActivity : AppCompatActivity() {
             setupTransactionScreen()
     }
 
-    private fun manageSelectedDateRange() {
-        val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
-        val dateRangeText: TextView = findViewById(R.id.date_range_text)
+    private fun manageSelectedExpenseType() {
         val transactionTab : TabLayout = findViewById(R.id.tabs)
 
         transactionTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
@@ -65,20 +66,42 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-        }
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
-
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                val dateTab = DateTabViewModel()
-                val dateRange = dateTab.getDateRangeForTab(tab?.position ?: 0)
-                dateRangeText.text = dateRange
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
+    }
+
+    private fun manageSelectedDateRange() {
+        val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
+        val dateRangeText: TextView = findViewById(R.id.date_range_text)
+        val dateTab = DateTabViewModel()
+
+        tabLayout.getTabAt(1)?.select()
+        dateRangeText.text = dateTab.getDateRangeForTab(1)
+        filterTransactionsByDate(1, dateRangeText.text.toString())
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                dateRangeText.text = dateTab.getDateRangeForTab(tab?.position ?: 1)
+                filterTransactionsByDate(tab?.position, dateRangeText.text.toString())
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    private fun filterTransactionsByDate(tabPos: Int?, date: String) {
+        if (tabPos == 0) {
+            transactionViewModel.getExpenseTransactionsByDay(date.substring(6, 15)).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                adapter.submitList(transactionsGot)
+            }
+        }
+        else {
+            transactionViewModel.getExpenseTransactionsByDateInterval(date.substring(0, 9), date.substring(13, 22)).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                adapter.submitList(transactionsGot)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
