@@ -48,6 +48,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     fun delete(transaction: Transaction) = viewModelScope.launch(Dispatchers.IO) {
         transactionDao.delete(transaction)
     }
+
     fun insertCategory(category: Category) {
         viewModelScope.launch {
             try {
