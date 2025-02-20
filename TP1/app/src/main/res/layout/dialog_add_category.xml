@@ -23,7 +23,9 @@
             android:id="@+id/btnSelectColor"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:maxWidth="320dp"
             android:text="@string/select_color"
+            style="?android:attr/buttonStyle"
             app:layout_constraintEnd_toStartOf="@id/colorPreview"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +46,9 @@
             android:id="@+id/btnSelectIcon"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:maxWidth="320dp"
             android:text="@string/select_icon"
+            style="?android:attr/buttonStyle"
             app:layout_constraintEnd_toStartOf="@id/iconPreview"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btnSelectColor"
@@ -99,16 +103,20 @@
         <Button
             android:id="@+id/btnCancelCategory"
             style="?android:attr/buttonStyle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:maxWidth="310dp"
             android:text="@string/cancel" />
 
         <Button
             android:id="@+id/btnSaveCategory"
             style="?android:attr/buttonStyle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxWidth="320dp"
             android:text="@string/save" />
     </LinearLayout>
 
