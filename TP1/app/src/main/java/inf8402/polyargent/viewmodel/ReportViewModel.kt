@@ -11,7 +11,7 @@ import java.util.Date
 import java.util.Locale
 
 class ReportViewModel(application: Application) : AndroidViewModel(application) {
-    private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val transactionDao = TransactionDatabase.getDatabase(application, viewModelScope).transactionDao()
     private val currentDate = dateFormat.format(Date())
     val ExpenseReportOfToday = transactionDao.getExpenseTransactionsByDateIntervalGroupByCategory(currentDate,currentDate)

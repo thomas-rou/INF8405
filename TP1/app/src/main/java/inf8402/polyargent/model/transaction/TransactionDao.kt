@@ -44,8 +44,10 @@ interface TransactionDao {
     JOIN categories c ON t.categoryId = c.id 
     CROSS JOIN (SELECT SUM(amount) as totalAmount 
                 FROM transactions 
-                WHERE type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate) as grandTotal
-    WHERE t.type = 'EXPENSE' AND t.date BETWEEN :startDate AND :endDate 
+                WHERE type = 'EXPENSE' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) 
+BETWEEN :startDate AND :endDate) as grandTotal
+    WHERE t.type = 'EXPENSE' AND strftime('%Y-%m-%d', substr(t.date, 7, 4) || '-' || substr(t.date, 4, 2) || '-' || substr(t.date, 1, 2)) 
+BETWEEN :startDate AND :endDate 
     GROUP BY c.categoryName, grandTotal.totalAmount 
     ORDER BY totalAmount DESC
 """)
@@ -60,8 +62,10 @@ interface TransactionDao {
     JOIN categories c ON t.categoryId = c.id 
     CROSS JOIN (SELECT SUM(amount) as totalAmount 
                 FROM transactions 
-                WHERE type = 'INCOME' AND date BETWEEN :startDate AND :endDate) as grandTotal
-    WHERE t.type = 'INCOME' AND t.date BETWEEN :startDate AND :endDate 
+                WHERE type = 'INCOME' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2))
+BETWEEN :startDate AND :endDate) as grandTotal
+    WHERE t.type = 'INCOME' AND strftime('%Y-%m-%d', substr(t.date, 7, 4) || '-' || substr(t.date, 4, 2) || '-' || substr(t.date, 1, 2))
+BETWEEN :startDate AND :endDate 
     GROUP BY c.categoryName, grandTotal.totalAmount 
     ORDER BY totalAmount DESC
 """)
