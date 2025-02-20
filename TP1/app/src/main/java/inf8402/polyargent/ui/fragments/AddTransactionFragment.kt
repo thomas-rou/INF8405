@@ -29,6 +29,7 @@ class AddTransactionFragment : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Montreal"))
         binding = ActivityAddTransactionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

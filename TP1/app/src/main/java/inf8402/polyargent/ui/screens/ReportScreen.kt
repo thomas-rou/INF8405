@@ -33,6 +33,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.roundToInt
 
 
@@ -134,9 +135,12 @@ fun MainActivity.manageSelectedTabInReportView() {
 
 fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionType: TransactionType) {
     val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+    dateFormat.timeZone = TimeZone.getTimeZone("America/Montreal")
     val barChart: BarChart = findViewById(R.id.reportChart)
     val mockedColors = listOf(Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.CYAN)
     val calendar = Calendar.getInstance()
+    calendar.timeZone = TimeZone.getTimeZone("America/Montreal")
+    calendar.time = Date()
     val entries = mutableListOf<BarEntry>()
     val dateList = mutableListOf<String>()
     val colors = mutableListOf<Int>()
@@ -247,9 +251,5 @@ fun MainActivity.setupReportScreen(categoryReports: List<CategoryReport>) {
     recyclerView.layoutManager = LinearLayoutManager(this)
     recyclerView.adapter = this.reportScreenAdapter
 
-    // Observe the expenses LiveData
-    val calendar = Calendar.getInstance()
-    calendar.time = Date()
-    calendar.add(Calendar.WEEK_OF_YEAR, -1)
     this.reportScreenAdapter.submitList(categoryReports)
 }

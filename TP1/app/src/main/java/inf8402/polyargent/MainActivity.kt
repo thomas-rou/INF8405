@@ -15,6 +15,7 @@ import inf8402.polyargent.ui.screens.homePageSetup
 import inf8402.polyargent.ui.screens.reportPageSetup
 import inf8402.polyargent.viewmodel.ReportViewModel
 import inf8402.polyargent.viewmodel.TransactionViewModel
+import java.util.TimeZone
 
 
 class MainActivity : AppCompatActivity() {
@@ -57,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Montreal"))
         homePageSetup(this@MainActivity)
     }
 }
