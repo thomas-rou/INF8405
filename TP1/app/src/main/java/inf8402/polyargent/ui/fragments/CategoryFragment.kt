@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
@@ -65,6 +66,8 @@ class CategoryFragment : Fragment() {
                 categoryAdapter.updateCategories(categories)
             }
 
+        observeErrorMessage()
+
         // Lors de la sélection d'un onglet, on observe les catégories correspondantes
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -95,5 +98,13 @@ class CategoryFragment : Fragment() {
             }
         }
         dialogFragment.show(childFragmentManager, "CreateCategoryDialog")
+    }
+
+    private fun observeErrorMessage() {
+        categoryViewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

@@ -14,11 +14,11 @@ import kotlinx.coroutines.*
 class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
     private val _categories = MutableLiveData<List<Category>?>()
     val categories: MutableLiveData<List<Category>?> get() = _categories
+    val errorMessage = MutableLiveData<String?>()
 
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private val _categoryAdded = MutableLiveData<Boolean>()
-    private val _errorMessage = MutableLiveData<String?>()
 
     init {
         loadCategories()
@@ -42,10 +42,10 @@ class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
                 _categoryAdded.postValue(true)
             } catch (e: SQLiteConstraintException) {
                 Log.e("CategoryViewModel", "Error adding category: ${e.message}")
-                _errorMessage.postValue("Une catégorie avec ce nom et ce type existe déjà.")
+                errorMessage.postValue("Une catégorie avec ce nom et ce type existe déjà.")
             } catch (e: Exception) {
                 Log.e("CategoryViewModel", "Error adding category: ${e.message}")
-                _errorMessage.postValue("Une erreur est survenue.")
+                errorMessage.postValue("Une erreur est survenue.")
             }
         }
     }
