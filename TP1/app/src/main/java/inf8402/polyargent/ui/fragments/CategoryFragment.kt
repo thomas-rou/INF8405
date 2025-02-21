@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -28,6 +29,7 @@ class CategoryFragment : Fragment() {
     private lateinit var fabAddCategory: FloatingActionButton
     private lateinit var categoryViewModel: CategoryViewModel
     private lateinit var categoryAdapter: CategoryAdapter
+    private var currentCategoriesLiveData: LiveData<List<Category>>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,12 +64,7 @@ class CategoryFragment : Fragment() {
             CategoryViewModel.Factory(database.categoryDao(), database.transactionDao())
         ).get(CategoryViewModel::class.java)
 
-        categoryViewModel.getCategoriesByType(TransactionType.EXPENSE)
-            .observe(viewLifecycleOwner) { categories ->
-                categoryAdapter.updateCategories(categories)
-            }
-
-        observeErrorMessage()
+        loadCategories(TransactionType.EXPENSE)
 
         // Lors de la sélection d'un onglet, on observe les catégories correspondantes
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
@@ -77,9 +74,7 @@ class CategoryFragment : Fragment() {
                 } else {
                     TransactionType.INCOME
                 }
-                categoryViewModel.getCategoriesByType(type).observe(viewLifecycleOwner) { categories ->
-                    categoryAdapter.updateCategories(categories)
-                }
+                loadCategories(type)
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -93,12 +88,24 @@ class CategoryFragment : Fragment() {
         categoryAdapter.categoryLongClickListener = { category ->
             deleteConfirmationDialog(category)
         }
+
+        observeErrorMessage()
     }
+
+    private fun loadCategories(transactionType: TransactionType) {
+        currentCategoriesLiveData?.removeObservers(viewLifecycleOwner)
+        currentCategoriesLiveData = categoryViewModel.getCategoriesByType(transactionType)
+        currentCategoriesLiveData?.observe(viewLifecycleOwner) { categories ->
+            categoryAdapter.updateCategories(categories)
+        }
+    }
+
 
     private fun createCategoryDialog() {
         val addCategoryDialog = CreateCategoryDialogFragment()
         addCategoryDialog.listener = object : CreateCategoryDialogFragment.OnCategoryCreatedListener {
             override fun onCategoryCreated(category: Category) {
+                updateCategoryTab(category)
                 categoryViewModel.insertCategory(category)
             }
         }
@@ -110,6 +117,7 @@ class CategoryFragment : Fragment() {
         deleteCategoryDialog.listener = object : DeleteCategoryDialogFragment.OnCategoryDeletedListener {
             override fun onCategoryDeleted(categoryId: Int) {
                 if (category.id == categoryId) {
+                    updateCategoryTab(category)
                     categoryViewModel.deleteCategory(category)
                 } else {
                     Toast.makeText(requireContext(), "Erreur lors de la suppression de la catégorie", Toast.LENGTH_SHORT).show()
@@ -117,6 +125,16 @@ class CategoryFragment : Fragment() {
             }
         }
         deleteCategoryDialog.show(childFragmentManager, "DeleteCategoryDialog")
+    }
+
+    private fun updateCategoryTab(category: Category) {
+        val currentTab = tabLayout.getTabAt(tabLayout.selectedTabPosition)?.text
+        val newType = category.type
+        if (newType == TransactionType.EXPENSE && currentTab != "Dépenses") {
+            tabLayout.getTabAt(0)?.select()
+        } else if (newType == TransactionType.INCOME && currentTab != "Revenus") {
+            tabLayout.getTabAt(1)?.select()
+        }
     }
 
     private fun observeErrorMessage() {
