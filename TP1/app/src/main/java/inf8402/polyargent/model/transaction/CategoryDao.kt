@@ -14,20 +14,11 @@ interface CategoryDao {
     @Delete
     suspend fun delete(category: Category)
 
-    @Query("DELETE FROM categories WHERE isDefault = 0")
-    suspend fun deleteAllUserCategories()
-
     @Query("DELETE FROM categories")
     suspend fun deleteAllCategories()
 
     @Query("SELECT * FROM categories")
     fun getAllCategories(): LiveData<List<Category>>
-
-    @Query("SELECT * FROM categories WHERE isDefault = 1")
-    fun getDefaultCategories(): LiveData<List<Category>>
-
-    @Query("SELECT * FROM categories WHERE isDefault = 0")
-    fun getUserCategories(): LiveData<List<Category>>
 
     @Query("SELECT * FROM categories WHERE id = :categoryId")
     suspend fun getCategoryById(categoryId: Int): Category?
@@ -35,11 +26,8 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE categoryName = :categoryName")
     suspend fun getCategoryByName(categoryName: String): Category?
 
-    @Query("SELECT * FROM categories WHERE isDefault = 1 AND categoryName = :categoryName")
+    @Query("SELECT * FROM categories WHERE categoryName = :categoryName")
     suspend fun getDefaultCategoryByName(categoryName: String): Category?
-
-    @Query("SELECT * FROM categories WHERE isDefault = 0 AND categoryName = :categoryName")
-    suspend fun getUserCategoryByName(categoryName: String): Category?
 
     @Query("SELECT * FROM categories WHERE type = :type")
     fun getCategoriesByType(type: TransactionType): LiveData<List<Category>>

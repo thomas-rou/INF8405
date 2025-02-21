@@ -9,7 +9,6 @@ import androidx.room.PrimaryKey
 data class Category(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val categoryName: String,
-    val isDefault: Boolean = false,
     val type: TransactionType,
     val icon: String,
     val colorHex: String

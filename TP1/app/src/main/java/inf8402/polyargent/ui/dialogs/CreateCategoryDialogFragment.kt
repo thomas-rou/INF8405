@@ -75,7 +75,6 @@ class CreateCategoryDialogFragment : DialogFragment() {
             if (newCategoryName.isNotEmpty()) {
                 val newCategory = Category(
                     categoryName = newCategoryName,
-                    isDefault = false,
                     type = selectedTransactionType,
                     icon = selectedIcon,
                     colorHex = selectedColor
