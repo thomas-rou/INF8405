@@ -19,6 +19,8 @@ class CategoryAdapter(
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
+    var categoryLongClickListener: ((Category) -> Unit)? = null
+
     override fun getCount(): Int = categories.size
 
     override fun getItem(position: Int): Any = categories[position]
@@ -41,6 +43,11 @@ class CategoryAdapter(
         val backgroundDrawable = DrawableCompat.wrap(imageView.background)
         DrawableCompat.setTint(backgroundDrawable, Color.parseColor(category.colorHex))
         imageView.background = backgroundDrawable
+
+        view.setOnLongClickListener {
+            categoryLongClickListener?.invoke(category)
+            true
+        }
 
         return view
     }

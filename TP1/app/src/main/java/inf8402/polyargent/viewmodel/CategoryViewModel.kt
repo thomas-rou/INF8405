@@ -8,10 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import inf8402.polyargent.model.transaction.Category
 import inf8402.polyargent.model.transaction.CategoryDao
+import inf8402.polyargent.model.transaction.TransactionDao
 import inf8402.polyargent.model.transaction.TransactionType
 import kotlinx.coroutines.*
 
-class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
+class CategoryViewModel(private val categoryDao: CategoryDao, private val transactionDao: TransactionDao) : ViewModel() {
     private val _categories = MutableLiveData<List<Category>?>()
     val categories: MutableLiveData<List<Category>?> get() = _categories
     val errorMessage = MutableLiveData<String?>()
@@ -52,10 +53,18 @@ class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
 
     fun deleteCategory(category: Category) {
         uiScope.launch {
-            withContext(Dispatchers.IO) {
-                categoryDao.delete(category)
+            try{
+                val transactionCount = transactionDao.getTransactionCountForCategory(category.id)
+                if (transactionCount > 0) {
+                    errorMessage.postValue("Cette catégorie est utilisée dans des transactions. Impossible de supprimer.")
+                } else {
+                    categoryDao.delete(category)
+                    loadCategories()
+                }
+            } catch (e: Exception) {
+                Log.e("CategoryViewModel", "Error deleting category: ${e.message}")
+                errorMessage.postValue("Une erreur est survenue.")
             }
-            loadCategories()
         }
     }
 
@@ -78,11 +87,11 @@ class CategoryViewModel(private val categoryDao: CategoryDao) : ViewModel() {
         viewModelJob.cancel()
     }
 
-    class Factory(private val categoryDao: CategoryDao) : ViewModelProvider.Factory {
+    class Factory(private val categoryDao: CategoryDao, private val transactionDao: TransactionDao) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(CategoryViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return CategoryViewModel(categoryDao) as T
+                return CategoryViewModel(categoryDao, transactionDao) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

@@ -16,6 +16,7 @@ import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.model.transaction.TransactionDatabase
 import inf8402.polyargent.ui.adapters.CategoryAdapter
 import inf8402.polyargent.ui.dialogs.CreateCategoryDialogFragment
+import inf8402.polyargent.ui.dialogs.DeleteCategoryDialogFragment
 import inf8402.polyargent.viewmodel.CategoryViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +59,7 @@ class CategoryFragment : Fragment() {
         // Création du ViewModel en utilisant la Factory avec le CategoryDao
         categoryViewModel = ViewModelProvider(
             this,
-            CategoryViewModel.Factory(database.categoryDao())
+            CategoryViewModel.Factory(database.categoryDao(), database.transactionDao())
         ).get(CategoryViewModel::class.java)
 
         categoryViewModel.getCategoriesByType(TransactionType.EXPENSE)
@@ -88,16 +89,34 @@ class CategoryFragment : Fragment() {
         fabAddCategory.setOnClickListener {
             createCategoryDialog()
         }
+
+        categoryAdapter.categoryLongClickListener = { category ->
+            deleteConfirmationDialog(category)
+        }
     }
 
     private fun createCategoryDialog() {
-        val dialogFragment = CreateCategoryDialogFragment()
-        dialogFragment.listener = object : CreateCategoryDialogFragment.OnCategoryCreatedListener {
+        val addCategoryDialog = CreateCategoryDialogFragment()
+        addCategoryDialog.listener = object : CreateCategoryDialogFragment.OnCategoryCreatedListener {
             override fun onCategoryCreated(category: Category) {
                 categoryViewModel.insertCategory(category)
             }
         }
-        dialogFragment.show(childFragmentManager, "CreateCategoryDialog")
+        addCategoryDialog.show(childFragmentManager, "CreateCategoryDialog")
+    }
+
+    private fun deleteConfirmationDialog(category: Category) {
+        val deleteCategoryDialog = DeleteCategoryDialogFragment.newInstance(category.id)
+        deleteCategoryDialog.listener = object : DeleteCategoryDialogFragment.OnCategoryDeletedListener {
+            override fun onCategoryDeleted(categoryId: Int) {
+                if (category.id == categoryId) {
+                    categoryViewModel.deleteCategory(category)
+                } else {
+                    Toast.makeText(requireContext(), "Erreur lors de la suppression de la catégorie", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        deleteCategoryDialog.show(childFragmentManager, "DeleteCategoryDialog")
     }
 
     private fun observeErrorMessage() {

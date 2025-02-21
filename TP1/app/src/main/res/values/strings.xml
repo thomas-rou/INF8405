@@ -3,6 +3,7 @@
     <string name="roll">Roll</string>
     <string name="add_expense">Ajouter une dépense</string>
     <string name="add_category">Ajouter une catégorie</string>
+    <string name="delete_category">Supprimer une catégorie</string>
     <string name="expense_title">Nom de la transaction</string>
     <string name="amount">Montant</string>
     <string name="save_expense">Enregistrer</string>
@@ -26,4 +27,5 @@
     <string name="select_color">Couleur</string>
     <string name="income">Revenu</string>
     <string name="expense">Dépense</string>
+    <string name="delete">Supprimer</string>
 </resources>
