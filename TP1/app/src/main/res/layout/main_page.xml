@@ -139,6 +139,7 @@
                     android:layout_marginLeft="25dp"
                     android:text="&lt;"
                     android:clickable="true"
+                    android:focusable="true"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
 
@@ -162,6 +163,7 @@
                     android:layout_marginRight="25dp"
                     android:text="&gt;"
                     android:clickable="true"
+                    android:focusable="true"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 

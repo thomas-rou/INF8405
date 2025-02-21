@@ -22,7 +22,7 @@ class DateTabViewModel() {
     private fun getWeekRange(calendar: Calendar): String {
         calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
         val startOfWeek = dateFormat.format(calendar.time)
-        calendar.add(Calendar.DAY_OF_WEEK, 6)
+        calendar.add(Calendar.WEEK_OF_MONTH, 1)
         val endOfWeek = dateFormat.format(calendar.time)
         return "$startOfWeek - $endOfWeek"
     }
@@ -50,7 +50,12 @@ class DateTabViewModel() {
         return regex.findAll(input).map { it.value }.toList()
     }
 
-    fun adjustBaseDate(days: Int) {
-        baseDate.add(Calendar.DAY_OF_YEAR, days)
+    fun adjustBaseDate(currentTab : Int, intToAdd: Int) {
+        when (currentTab) {
+            0 -> baseDate.add(Calendar.DAY_OF_YEAR, intToAdd)
+            1 -> baseDate.add(Calendar.WEEK_OF_MONTH, intToAdd)
+            2 -> baseDate.add(Calendar.MONTH, intToAdd)
+            3 -> baseDate.add(Calendar.YEAR, intToAdd)
+        }
     }
 }

@@ -78,10 +78,8 @@ class MainActivity : AppCompatActivity() {
     private fun manageSelectedDateRange() {
         val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
         val dateRangeText: TextView = findViewById(R.id.date_range_text)
-
-        tabLayout.getTabAt(1)?.select()
-        dateRangeText.text = dateTab.getDateRangeForTab(1)
-        filterTransactionsByDate(1, dateRangeText.text.toString())
+        val prevDate: TextView = findViewById(R.id.previous)
+        val nextDate: TextView = findViewById(R.id.next)
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -89,8 +87,23 @@ class MainActivity : AppCompatActivity() {
                 filterTransactionsByDate(tab?.position, dateRangeText.text.toString())
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                dateRangeText.text = dateTab.getDateRangeForTab(tab?.position ?: 1)
+                filterTransactionsByDate(tab?.position, dateRangeText.text.toString())
+            }
         })
+        tabLayout.getTabAt(1)?.select()
+        dateRangeText.text = dateTab.getDateRangeForTab(1)
+        filterTransactionsByDate(1, dateRangeText.text.toString())
+
+        prevDate.setOnClickListener {
+            dateTab.adjustBaseDate(tabLayout.selectedTabPosition, -1)
+            tabLayout.getTabAt(tabLayout.selectedTabPosition)?.select()
+        }
+        nextDate.setOnClickListener {
+            dateTab.adjustBaseDate(tabLayout.selectedTabPosition, 1)
+            tabLayout.getTabAt(tabLayout.selectedTabPosition)?.select()
+        }
     }
 
     private fun filterTransactionsByDate(tabPos: Int?, date: String) {
