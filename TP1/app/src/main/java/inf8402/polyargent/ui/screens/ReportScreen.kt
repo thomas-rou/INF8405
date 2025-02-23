@@ -167,7 +167,8 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
                 if (index in allReports.indices) {
                     reportsOfCurrenTime.clear()
                     reportsOfCurrenTime.addAll(allReports[index])
-                    setupReportScreen(reportsOfCurrenTime)
+                    if(reportsOfCurrenTime.isNotEmpty()){
+                    setupReportScreen(reportsOfCurrenTime)}
                 }
             }
         }
