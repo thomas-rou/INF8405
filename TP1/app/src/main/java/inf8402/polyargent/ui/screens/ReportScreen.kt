@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.LifecycleOwner
@@ -20,7 +21,10 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.google.android.material.tabs.TabLayout
 import inf8402.polyargent.MainActivity
 import inf8402.polyargent.R
@@ -147,7 +151,6 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
     val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
     dateFormat.timeZone = TimeZone.getTimeZone("America/Montreal")
     val barChart: BarChart = findViewById(R.id.reportChart)
-    val mockedColors = listOf(Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.CYAN)
     val calendar = Calendar.getInstance()
     calendar.timeZone = TimeZone.getTimeZone("America/Montreal")
     calendar.time = Date()
@@ -155,6 +158,24 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
     val dateList = mutableListOf<String>()
     val colors = mutableListOf<Int>()
     val reportsOfCurrenTime = mutableListOf<CategoryReport>()
+    val allReports = mutableListOf<List<CategoryReport>>()
+
+    barChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+        override fun onValueSelected(e: Entry?, h: Highlight?) {
+            if (e != null) {
+                val index = e.x.toInt()
+                if (index in allReports.indices) {
+                    reportsOfCurrenTime.clear()
+                    reportsOfCurrenTime.addAll(allReports[index])
+                    setupReportScreen(reportsOfCurrenTime)
+                }
+            }
+        }
+
+        override fun onNothingSelected() {
+            // Handle when nothing is selected
+        }
+    })
 
     // Using coroutine scope tied to lifecycle
     lifecycleScope.launch(Dispatchers.Main) {
@@ -184,6 +205,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
             } else {
                 fetchReportData(startDate, endDate, transactionType)
             }
+            allReports.add(reportData)
             if(i==0) {
                 val currentDateTimeTextView: TextView = findViewById(R.id.currentTime)
                 currentDateTimeTextView.text = "Date: " + dateFormat.format(endDate)
@@ -227,7 +249,7 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
 //        yAxis.setDrawLabels(false) // Remove vertical axis legend
 //        yAxis.setDrawGridLines(false)
 //        yAxis.setDrawAxisLine(false)
-        barChart.setTouchEnabled(false)
+        barChart.setTouchEnabled(true)
         barChart.axisRight.isEnabled = false // Remove right Y axis
 
         reportScreenAdapter = ReportScreen(reportViewModel)
