@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.tabs.TabLayout
+import inf8402.polyargent.R
 import inf8402.polyargent.databinding.ActivityAddTransactionBinding
 import inf8402.polyargent.model.transaction.Category
 import inf8402.polyargent.model.transaction.Transaction
@@ -134,6 +136,8 @@ class AddTransactionFragment : AppCompatActivity() {
         )
         transactionViewModel.insert(transaction)
         Toast.makeText(this, "Transaction added", Toast.LENGTH_SHORT).show()
+        val tabLayout: TabLayout = findViewById(R.id.tabs)
+        tabLayout.getTabAt(0)?.select()
         finish()
     }
 
