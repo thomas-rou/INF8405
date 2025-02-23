@@ -221,8 +221,10 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
                 colors.add(Color.parseColor(report.colorHex))
             }
 
-            val values = reportData.map { it.totalAmount.toFloat() }.toFloatArray()
-            entries.add(BarEntry(i.toFloat(), values))
+            val values = reportData.mapNotNull { it.totalAmount?.toFloat() }.toFloatArray()
+            if (values.isNotEmpty()) {
+                entries.add(BarEntry(i.toFloat(), values))
+            }
         }
 
         // Update the chart after the loop is done
