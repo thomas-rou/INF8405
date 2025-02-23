@@ -38,7 +38,9 @@ interface TransactionDao {
     @Query("""
     SELECT c.categoryName as categoryName, 
            (SUM(t.amount) / grandTotal.totalAmount) * 100 as percentage,
-           SUM(t.amount) as totalAmount
+           SUM(t.amount) as totalAmount,
+           c.icon as icon,
+           c.colorHex as colorHex
            
     FROM transactions t 
     JOIN categories c ON t.categoryId = c.id 
@@ -56,7 +58,9 @@ BETWEEN :startDate AND :endDate
     @Query("""
     SELECT c.categoryName as categoryName, 
            (SUM(t.amount) / grandTotal.totalAmount) * 100 as percentage,
-           SUM(t.amount) as totalAmount
+           SUM(t.amount) as totalAmount,
+           c.icon as icon,
+           c.colorHex as colorHex
            
     FROM transactions t 
     JOIN categories c ON t.categoryId = c.id 

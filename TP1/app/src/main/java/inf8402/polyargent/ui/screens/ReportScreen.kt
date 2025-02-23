@@ -5,7 +5,9 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -59,11 +61,19 @@ class ReportScreen(
         private val categoryNameTextView: TextView = itemView.findViewById(R.id.reportCategoryName)
         private val percentageTextView: TextView = itemView.findViewById(R.id.reportPercentage)
         private val amountTextView: TextView = itemView.findViewById(R.id.reportTextAmount)
+        val imageView = itemView.findViewById<ImageView>(R.id.reportIconImageView)
+
 
         fun bind(categoryReport: CategoryReport) {
             categoryNameTextView.text = categoryReport.categoryName
             percentageTextView.text = categoryReport.percentage.roundToInt().toString()+"%"
             amountTextView.text = "$"+categoryReport.totalAmount.toString()
+            val context = itemView.context
+            val iconResId = context.resources.getIdentifier(categoryReport.icon, "drawable", context.packageName)
+            imageView.setImageResource(iconResId)
+            val backgroundDrawable = DrawableCompat.wrap(imageView.background)
+            DrawableCompat.setTint(backgroundDrawable, Color.parseColor(categoryReport.colorHex))
+            imageView.background = backgroundDrawable
         }
     }
 
@@ -184,7 +194,9 @@ fun MainActivity.setupStackedBarChart(timeFrequency: TimeFrequency, transactionT
             }
 
             dateList.add(dateFormat.format(endDate))
-            colors.add(mockedColors[i])
+            for (report in reportData) {
+                colors.add(Color.parseColor(report.colorHex))
+            }
 
             val values = reportData.map { it.totalAmount.toFloat() }.toFloatArray()
             entries.add(BarEntry(i.toFloat(), values))
