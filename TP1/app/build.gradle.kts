@@ -53,6 +53,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.runtime.livedata)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -69,6 +70,7 @@ dependencies {
     implementation(libs.material)
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation ("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:v2.8.7")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

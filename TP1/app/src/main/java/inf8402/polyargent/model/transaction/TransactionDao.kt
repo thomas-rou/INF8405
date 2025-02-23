@@ -74,6 +74,7 @@ BETWEEN :startDate AND :endDate
     @Query("SELECT categoryName FROM categories WHERE id = :categoryId")
     suspend fun getCategoryName(categoryId: Int): String?
 
-
+    @Query("SELECT COUNT(*) FROM transactions WHERE categoryId = :categoryId")
+    suspend fun getTransactionCountForCategory(categoryId: Int): Int
 
 }

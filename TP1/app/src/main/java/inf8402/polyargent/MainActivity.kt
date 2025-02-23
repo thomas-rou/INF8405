@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import inf8402.polyargent.model.transaction.TimeFrequency
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.screens.ReportScreen
+import inf8402.polyargent.ui.fragments.CategoryFragment
 import inf8402.polyargent.ui.screens.TransactionScreen
 import inf8402.polyargent.ui.screens.homePageSetup
 import inf8402.polyargent.ui.screens.reportPageSetup
@@ -43,7 +44,10 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.navigation_category -> {
-                setContentView(R.layout.category)
+                supportFragmentManager.beginTransaction()
+                    .replace(android.R.id.content, CategoryFragment())
+                    .addToBackStack(null)
+                    .commit()
                 return true
             }
             R.id.navigation_report -> {

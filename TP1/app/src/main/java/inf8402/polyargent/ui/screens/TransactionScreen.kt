@@ -45,10 +45,10 @@ class TransactionScreen(
             val categoryName = withContext(Dispatchers.IO) {
                 transactionViewModel.getCategoryName(transaction.categoryId)
             }
-            transaction.categoryName = categoryName.toString()
+            transaction.categoryName = categoryName ?: "Catégorie Inconnue"
             holder.bind(transaction)
             holder.itemView.setOnLongClickListener {
-                onDeleteClick(transaction)  // Long press to delete
+                onDeleteClick(transaction)
                 true
             }
         }
@@ -76,9 +76,8 @@ class TransactionScreen(
     }
 
     class TransactionDiffCallback : DiffUtil.ItemCallback<Transaction>() {
-        override fun areItemsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
-            return oldItem.id == newItem.id
-        }
+        override fun areItemsTheSame(oldItem: Transaction, newItem: Transaction): Boolean =
+            oldItem.id == newItem.id
 
         override fun areContentsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
             return oldItem == newItem
@@ -102,17 +101,18 @@ fun MainActivity.homePageSetup(activity: MainActivity) {
     setupTransactionScreen()
 }
 
+// Extension function to set up the transaction screen in MainActivity.
 fun MainActivity.setupTransactionScreen() {
     val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
     recyclerView.layoutManager = LinearLayoutManager(this)
     recyclerView.adapter = this.adapter
 
-    // Observe the expenses LiveData
+    // Observe the expenses LiveData.
     this.transactionViewModel.allExpenses.observe(this as LifecycleOwner) { transactionsGot ->
         this.adapter.submitList(transactionsGot)
     }
 
-    // FloatingActionButton click listener
+    // FloatingActionButton click listener to open AddTransactionActivity.
     val fabAddTransaction = findViewById<FloatingActionButton>(R.id.fabAddTransaction)
     fabAddTransaction.setOnClickListener {
         startActivity(Intent(this, AddTransactionFragment::class.java))
