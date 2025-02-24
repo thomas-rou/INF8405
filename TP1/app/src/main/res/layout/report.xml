@@ -1,0 +1,144 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    tools:context=".MainActivity">
+
+    <!-- ScrollView wrapping everything inside -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Container for all your views -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <!-- First MaterialCardView (Balance Dashboard) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/balance_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="30dp"
+                app:cardBackgroundColor="@color/green">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <!-- Onglets Dépenses et Revenus -->
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/reportTabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="30dp"
+                        android:background="@color/green"
+                        app:tabTextColor="@color/white"
+                        app:tabIndicatorColor="@color/white"
+                        app:tabIndicatorFullWidth="false">
+                        <com.google.android.material.tabs.TabItem
+                            android:text="Dépenses"
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"/>
+                        <com.google.android.material.tabs.TabItem
+                            android:text="Revenus"
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"/>
+                    </com.google.android.material.tabs.TabLayout>
+
+                    <TextView
+                        android:id="@+id/currentTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="1dp"
+                        android:paddingBottom="10dp"
+                        android:textAlignment="textStart"
+                        android:text="Date"
+                        android:textColor="@color/white"
+                         />
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Second MaterialCardView (Chart Dashboard) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chart_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-5dp"
+                android:padding="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <!-- Horizontal Navigation Bar -->
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/timePeriodReportTab"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:tabTextColor="@color/black"
+                        app:tabIndicatorColor="@color/green"
+                        app:tabIndicatorFullWidth="false">
+                        <com.google.android.material.tabs.TabItem
+                            android:text="Jour"
+                            android:layout_height="0dp"
+                            android:layout_width="0dp"/>
+                        <com.google.android.material.tabs.TabItem
+                            android:text="Semaine"
+                            android:layout_height="0dp"
+                            android:layout_width="0dp"/>
+                        <com.google.android.material.tabs.TabItem
+                            android:text="Mois"
+                            android:layout_height="0dp"
+                            android:layout_width="0dp"/>
+                        <com.google.android.material.tabs.TabItem
+                            android:text="Année"
+                            android:layout_height="0dp"
+                            android:layout_width="0dp"/>
+                    </com.google.android.material.tabs.TabLayout>
+
+                    <!-- BarChart -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="291dp">
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/reportChart"
+                            android:layout_width="391dp"
+                            android:layout_height="283dp"
+                            android:layout_marginBottom="20dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- RecyclerView for displaying items -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
