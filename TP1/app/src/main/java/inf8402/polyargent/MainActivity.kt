@@ -16,66 +16,35 @@ import inf8402.polyargent.model.PieChartViewModel
 import com.github.mikephil.charting.charts.PieChart
 import com.google.android.material.tabs.TabItem
 import com.google.android.material.tabs.TabLayout
+import inf8402.polyargent.model.transaction.TimeFrequency
+import inf8402.polyargent.model.transaction.TransactionType
+import inf8402.polyargent.ui.screens.ReportScreen
+import inf8402.polyargent.ui.fragments.CategoryFragment
 import inf8402.polyargent.ui.screens.TransactionScreen
-import inf8402.polyargent.ui.screens.setupTransactionScreen
+import inf8402.polyargent.ui.screens.homePageSetup
+import inf8402.polyargent.ui.screens.reportPageSetup
+import inf8402.polyargent.viewmodel.ReportViewModel
 import inf8402.polyargent.viewmodel.TransactionViewModel
+import java.util.TimeZone
 
 
 class MainActivity : AppCompatActivity() {
-    private var currentTransactionTab : Int = 0
+    var currentTransactionTab : Int = 0
     private val dateTab = DateTabViewModel()
-
+    var frequency : TimeFrequency = TimeFrequency.WEEKLY
+    var type : TransactionType = TransactionType.EXPENSE
     lateinit var adapter: TransactionScreen
+    lateinit var reportScreenAdapter: ReportScreen
+
     val transactionViewModel: TransactionViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
 
-    @SuppressLint("SuspiciousIndentation")
-    private fun pageSetup() {
-        setContentView(R.layout.main_page)
-        val pieChart: PieChart = findViewById(R.id.chart)
-        val pieChartView = PieChartViewModel()
-        pieChartView.setupPieChart(pieChart)
-        manageSelectedDateRange()
-        manageSelectedExpenseType()
-
-        adapter = TransactionScreen(
-            onDeleteClick = { transaction ->
-                transactionViewModel.delete(transaction)
-            },
-            transactionViewModel = transactionViewModel
-        )
-            setupTransactionScreen()
+    val reportViewModel: ReportViewModel by viewModels {
+        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
 
-    private fun manageSelectedExpenseType() {
-        val transactionTab : TabLayout = findViewById(R.id.tabs)
-
-        transactionTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                when (tab?.position) {
-                    0 -> {
-                        transactionViewModel.allExpenses.observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
-                            adapter.submitList(transactionsGot)
-                        }
-                        currentTransactionTab = 0
-                    }
-
-                    1 -> {
-                        transactionViewModel.allIncomes.observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
-                            adapter.submitList(transactionsGot)
-                        }
-                        currentTransactionTab = 1
-                    }
-                }
-                manageSelectedDateRange()
-            }
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
-    }
-
-    private fun manageSelectedDateRange() {
+     fun manageSelectedDateRange() {
         val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
         val dateRangeText: TextView = findViewById(R.id.date_range_text)
         val prevDate: TextView = findViewById(R.id.previous)
@@ -140,15 +109,19 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.navigation_home -> {
-                pageSetup()
+                homePageSetup(this@MainActivity)
                 return true
             }
             R.id.navigation_category -> {
-                setContentView(R.layout.category)
+                supportFragmentManager.beginTransaction()
+                    .replace(android.R.id.content, CategoryFragment())
+                    .addToBackStack(null)
+                    .commit()
                 return true
             }
             R.id.navigation_report -> {
-                setContentView(R.layout.repport)
+                setContentView(R.layout.report)
+                reportPageSetup(this@MainActivity)
                 return true
             }
         }
@@ -157,6 +130,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pageSetup()
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Montreal"))
+        homePageSetup(this@MainActivity)
     }
 }

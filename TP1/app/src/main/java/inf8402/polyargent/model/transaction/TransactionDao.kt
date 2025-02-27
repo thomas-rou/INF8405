@@ -35,9 +35,50 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate ORDER BY date DESC")
     fun getExpenseTransactionsByDateInterval(startDate: String, endDate: String): LiveData<List<Transaction>>
 
+    @Query("""
+    SELECT c.categoryName as categoryName, 
+           (SUM(t.amount) / grandTotal.totalAmount) * 100 as percentage,
+           SUM(t.amount) as totalAmount,
+           c.icon as icon,
+           c.colorHex as colorHex
+           
+    FROM transactions t 
+    JOIN categories c ON t.categoryId = c.id 
+    CROSS JOIN (SELECT SUM(amount) as totalAmount 
+                FROM transactions 
+                WHERE type = 'EXPENSE' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) 
+BETWEEN :startDate AND :endDate) as grandTotal
+    WHERE t.type = 'EXPENSE' AND strftime('%Y-%m-%d', substr(t.date, 7, 4) || '-' || substr(t.date, 4, 2) || '-' || substr(t.date, 1, 2)) 
+BETWEEN :startDate AND :endDate 
+    GROUP BY c.categoryName, grandTotal.totalAmount 
+    ORDER BY totalAmount DESC
+""")
+    fun getExpenseTransactionsByDateIntervalGroupByCategory(startDate: String, endDate: String): LiveData<List<CategoryReport>>
+
+    @Query("""
+    SELECT c.categoryName as categoryName, 
+           (SUM(t.amount) / grandTotal.totalAmount) * 100 as percentage,
+           SUM(t.amount) as totalAmount,
+           c.icon as icon,
+           c.colorHex as colorHex
+           
+    FROM transactions t 
+    JOIN categories c ON t.categoryId = c.id 
+    CROSS JOIN (SELECT SUM(amount) as totalAmount 
+                FROM transactions 
+                WHERE type = 'INCOME' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2))
+BETWEEN :startDate AND :endDate) as grandTotal
+    WHERE t.type = 'INCOME' AND strftime('%Y-%m-%d', substr(t.date, 7, 4) || '-' || substr(t.date, 4, 2) || '-' || substr(t.date, 1, 2))
+BETWEEN :startDate AND :endDate 
+    GROUP BY c.categoryName, grandTotal.totalAmount 
+    ORDER BY totalAmount DESC
+""")
+    fun getIncomeTransactionsByDateIntervalGroupByCategory(startDate: String, endDate: String): LiveData<List<CategoryReport>>
+
     @Query("SELECT categoryName FROM categories WHERE id = :categoryId")
     suspend fun getCategoryName(categoryId: Int): String?
 
-
+    @Query("SELECT COUNT(*) FROM transactions WHERE categoryId = :categoryId")
+    suspend fun getTransactionCountForCategory(categoryId: Int): Int
 
 }

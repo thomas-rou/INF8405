@@ -2,51 +2,41 @@ package inf8402.polyargent.ui.fragments
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.*
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.tabs.TabLayout
 import inf8402.polyargent.R
-import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.databinding.ActivityAddTransactionBinding
 import inf8402.polyargent.model.transaction.Category
+import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.model.transaction.TransactionType
+import inf8402.polyargent.ui.dialogs.CreateCategoryDialogFragment
 import inf8402.polyargent.viewmodel.TransactionViewModel
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.text.isNotEmpty
-import kotlin.text.trim
-import android.app.AlertDialog
-import android.widget.Button
 
 class AddTransactionFragment : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddTransactionBinding
     private val transactionViewModel: TransactionViewModel by viewModels()
     private lateinit var categoryAdapter: ArrayAdapter<String>
+    private var currentTransactionType: TransactionType = TransactionType.EXPENSE // Default type
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Montreal"))
         binding = ActivityAddTransactionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupDatePicker()
         setupSpinners()
         setupButtons()
+        observeErrorMessage()
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        val inflater: MenuInflater = menuInflater
-//        inflater.inflate(R.menu.navigation_menu, menu)
-//        return true
-//    }
-
     private fun setupDatePicker() {
-        binding.dateEditText.setOnClickListener {
-            showDatePicker()
-        }
+        binding.dateEditText.setOnClickListener { showDatePicker() }
         binding.dateEditText.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
     }
 
@@ -57,7 +47,7 @@ class AddTransactionFragment : AppCompatActivity() {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-            val formattedDate = "${selectedDay}/${selectedMonth + 1}/$selectedYear"
+            val formattedDate = String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear)
             binding.dateEditText.text = formattedDate
         }, year, month, day)
 
@@ -65,9 +55,42 @@ class AddTransactionFragment : AppCompatActivity() {
     }
 
     private fun setupSpinners() {
-        // Populate category spinner
+        // Populate the category spinner.
+        setupTransactionTypeSpinner()
+        updateCategorySpinner()
+    }
+
+    private fun setupTransactionTypeSpinner() {
+        val transactionTypes = listOf("Dépense", "Revenu")
+        val transactionTypeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, transactionTypes)
+        transactionTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerTransactionType.adapter = transactionTypeAdapter
+
+        binding.spinnerTransactionType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
+                currentTransactionType = if (transactionTypes[position] == "Dépense") {
+                    TransactionType.EXPENSE
+                } else {
+                    TransactionType.INCOME
+                }
+                updateCategorySpinner()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing
+            }
+        }
+    }
+
+    private fun updateCategorySpinner() {
         transactionViewModel.allCategories.observe(this) { categories ->
-            val categoryNames = categories.map { it.categoryName }
+            val filteredCategories = categories.filter {
+                when (currentTransactionType) {
+                    TransactionType.EXPENSE -> it.type == TransactionType.EXPENSE
+                    TransactionType.INCOME -> it.type == TransactionType.INCOME
+                }
+            }
+            val categoryNames = filteredCategories.map { it.categoryName }
             categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryNames)
             categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.categorySpinner.adapter = categoryAdapter
@@ -75,22 +98,14 @@ class AddTransactionFragment : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        binding.btnSave.setOnClickListener {
-            saveTransaction()
-        }
-
-        binding.btnCancel.setOnClickListener {
-            finish()
-        }
-
-        binding.addCategoryButton.setOnClickListener {
-            createCategoryDialog()
-        }
+        binding.btnSave.setOnClickListener { saveTransaction() }
+        binding.btnCancel.setOnClickListener { finish() }
+        binding.addCategoryButton.setOnClickListener { createCategoryDialog() }
     }
 
     private fun saveTransaction() {
-        val title = binding.editTextTitle.text.toString().trim()
-        val amountText = binding.editTextAmount.text.toString().trim()
+        val title = binding.editTextTitle.editText?.text.toString().trim()
+        val amountText = binding.editTextAmount.editText?.text.toString().trim()
 
         if (title.isEmpty() || amountText.isEmpty()) {
             Toast.makeText(this, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
@@ -103,7 +118,6 @@ class AddTransactionFragment : AppCompatActivity() {
             return
         }
 
-        // Bind to spinner categories and get the selected category
         val selectedCategoryName = binding.categorySpinner.selectedItem.toString()
         val selectedCategory = transactionViewModel.allCategories.value?.find { it.categoryName == selectedCategoryName }
         if (selectedCategory == null) {
@@ -111,60 +125,53 @@ class AddTransactionFragment : AppCompatActivity() {
             return
         }
 
-        val transactionType : TransactionType
-        = if(binding.spinnerTransactionType.selectedItem.toString()=="Dépense")
-            TransactionType.EXPENSE
-        else
-            TransactionType.INCOME
-
         val date = binding.dateEditText.text.toString().trim()
 
-        val transaction = Transaction(title = title, amount = amount, date = date, type = transactionType, categoryId = selectedCategory.id)
+        val transaction = Transaction(
+            title = title,
+            amount = amount,
+            date = date,
+            type = currentTransactionType,
+            categoryId = selectedCategory.id
+        )
         transactionViewModel.insert(transaction)
-
         Toast.makeText(this, "Transaction added", Toast.LENGTH_SHORT).show()
-        finish() // Close the activity and go back to the main screen
+        val tabLayout: TabLayout = findViewById(R.id.tabs)
+        tabLayout.getTabAt(0)?.select()
+        finish()
     }
 
     private fun createCategoryDialog() {
-        val builder = AlertDialog.Builder(this)
-        val inflater = LayoutInflater.from(this)
-        val dialogView = inflater.inflate(R.layout.dialog_add_category, null)
-        val categoryNameEditText = dialogView.findViewById<EditText>(R.id.editTextNewCategoryName)
-        val btnSaveCategory = dialogView.findViewById<Button>(R.id.btnSaveCategory)
-        val btnCancelCategory = dialogView.findViewById<Button>(R.id.btnCancelCategory)
-
-        builder.setView(dialogView)
-            .setTitle(R.string.add_category)
-
-        val dialog = builder.create()
-
-        btnSaveCategory.setOnClickListener {
-            val newCategoryName = categoryNameEditText.text.toString().trim()
-            if (newCategoryName.isNotEmpty()) {
-                val newCategory = Category(categoryName = newCategoryName)
-                transactionViewModel.insertCategory(newCategory)
-                // Refresh the spinner
+        val dialogFragment = CreateCategoryDialogFragment()
+        dialogFragment.listener = object : CreateCategoryDialogFragment.OnCategoryCreatedListener {
+            override fun onCategoryCreated(category: Category) {
+                transactionViewModel.insertCategory(category)
                 refreshCategorySpinner()
-                dialog.dismiss()
-            } else {
-                Toast.makeText(this, "Category name cannot be empty", Toast.LENGTH_SHORT).show()
             }
         }
-
-        btnCancelCategory.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
+        dialogFragment.show(supportFragmentManager, "CreateCategoryDialog")
     }
 
     private fun refreshCategorySpinner() {
         transactionViewModel.allCategories.observe(this) { categories ->
-            val categoryNames = categories.map { it.categoryName }
+            val filteredCategories = categories.filter {
+                when (currentTransactionType) {
+                    TransactionType.EXPENSE -> it.type == TransactionType.EXPENSE
+                    TransactionType.INCOME -> it.type == TransactionType.INCOME
+                }
+            }
+            val categoryNames = filteredCategories.map { it.categoryName }
             categoryAdapter.clear()
             categoryAdapter.addAll(categoryNames)
             categoryAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun observeErrorMessage() {
+        transactionViewModel.errorMessage.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

@@ -1,14 +1,18 @@
 package inf8402.polyargent.viewmodel
 
 import android.app.Application
+import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import inf8402.polyargent.model.transaction.Category
 import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.model.transaction.TransactionDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TransactionViewModel(application: Application) : AndroidViewModel(application) {
     private val transactionDao = TransactionDatabase.getDatabase(application, viewModelScope).transactionDao()
@@ -18,6 +22,8 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     val allCategories: LiveData<List<Category>> = categoryDao.getAllCategories()
     val allIncomes: LiveData<List<Transaction>> = transactionDao.getAllIncomes()
     val allExpenses: LiveData<List<Transaction>> = transactionDao.getAllExpenses()
+    val errorMessage = MutableLiveData<String?>()
+    private val _categoryAdded = MutableLiveData<Boolean>()
 
     fun getIncomeTransactionsByDay(date: String): LiveData<List<Transaction>> {
         return transactionDao.getIncomeTransactionsByDay(date)
@@ -43,8 +49,21 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         transactionDao.delete(transaction)
     }
 
-    fun insertCategory(category: Category) = viewModelScope.launch(Dispatchers.IO) {
-        categoryDao.insert(category)
+    fun insertCategory(category: Category) {
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    categoryDao.insert(category)
+                }
+                _categoryAdded.postValue(true)
+            } catch (e: SQLiteConstraintException) {
+                Log.e("CategoryViewModel", "Error adding category: ${e.message}")
+                errorMessage.postValue("Une catégorie avec ce nom et ce type existe déjà.")
+            } catch (e: Exception) {
+                Log.e("CategoryViewModel", "Error adding category: ${e.message}")
+                errorMessage.postValue("Une erreur est survenue.")
+            }
+        }
     }
 
     suspend fun getCategoryName(categoryId: Int): String? {
