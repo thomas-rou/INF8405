@@ -9,10 +9,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Date
 
-@Database(entities = [Transaction::class, Category::class], version = 2)
+@Database(entities = [Transaction::class, Category::class, Account::class], version = 2)
 abstract class TransactionDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun accountDao(): AccountDao
 
     companion object {
         @Volatile
@@ -40,6 +41,7 @@ abstract class TransactionDatabase : RoomDatabase() {
             INSTANCE?.let { database ->
                 scope.launch {
                     populateDatabase(database.categoryDao())
+                    populateDBAccount(database.accountDao())
                 }
             }
         }
@@ -52,6 +54,9 @@ abstract class TransactionDatabase : RoomDatabase() {
             categoryDao.insert(Category(categoryName = "Loyer", type = TransactionType.EXPENSE, icon = "ic_house", colorHex = "#EEC000"))
             categoryDao.insert(Category(categoryName = "Épiceries", type = TransactionType.EXPENSE, icon = "ic_shopping_basket", colorHex = "#EEC000"))
             categoryDao.insert(Category(categoryName = "Loisirs", type = TransactionType.EXPENSE, icon = "ic_dribble", colorHex = "#EEC000"))
+        }
+        suspend fun populateDBAccount(accountDao: AccountDao) {
+            accountDao.insert(Account(id = 1, balance = "0.00 $"))
         }
     }
 

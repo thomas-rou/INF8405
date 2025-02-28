@@ -1,7 +1,5 @@
 package inf8402.polyargent
 
-import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -14,12 +12,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
-import inf8402.polyargent.model.DateTabViewModel
-import inf8402.polyargent.model.PieChartViewModel
-import com.github.mikephil.charting.charts.PieChart
-import com.google.android.material.tabs.TabItem
+import inf8402.polyargent.model.home.DateTabViewModel
 import com.google.android.material.tabs.TabLayout
+import inf8402.polyargent.model.transaction.Account
 import inf8402.polyargent.model.transaction.TimeFrequency
+import inf8402.polyargent.model.transaction.TransactionDatabase
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.screens.ReportScreen
 import inf8402.polyargent.ui.fragments.CategoryFragment
@@ -28,10 +25,11 @@ import inf8402.polyargent.ui.screens.homePageSetup
 import inf8402.polyargent.ui.screens.reportPageSetup
 import inf8402.polyargent.viewmodel.ReportViewModel
 import inf8402.polyargent.viewmodel.TransactionViewModel
+import inf8402.polyargent.viewmodel.HomeViewModel
 import java.util.TimeZone
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity() : AppCompatActivity() {
     var currentTransactionTab : Int = 0
     private val dateTab = DateTabViewModel()
     var frequency : TimeFrequency = TimeFrequency.WEEKLY
@@ -42,14 +40,20 @@ class MainActivity : AppCompatActivity() {
     val transactionViewModel: TransactionViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
-
     val reportViewModel: ReportViewModel by viewModels {
+        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+    }
+    val homeViewModel: HomeViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
 
     fun manageBalanceChange() {
         val totalAmount = findViewById<TextView>(R.id.totalAmount)
         val totalAmountModify = findViewById<ImageView>(R.id.totalAmountModify)
+
+        homeViewModel.getTotalAmount().observe(this@MainActivity as LifecycleOwner) { balance ->
+            totalAmount.text = balance ?: "0.00 $"
+        }
 
         totalAmountModify.setOnClickListener {
             showEditAmountDialog(totalAmount)
@@ -66,6 +70,7 @@ class MainActivity : AppCompatActivity() {
             .setView(editText)
             .setPositiveButton("Update") { _, _ ->
                 totalAmount.text = "${editText.text} $"
+                homeViewModel.setTotalAmount(totalAmount.text as String)
             }
             .setNegativeButton("Cancel", null)
             .create()
