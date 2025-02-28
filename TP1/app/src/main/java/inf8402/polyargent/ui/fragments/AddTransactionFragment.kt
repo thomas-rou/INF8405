@@ -136,8 +136,8 @@ class AddTransactionFragment : AppCompatActivity() {
         )
         transactionViewModel.insert(transaction)
         Toast.makeText(this, "Transaction added", Toast.LENGTH_SHORT).show()
-        val tabLayout: TabLayout = findViewById(R.id.tabs)
-        tabLayout.getTabAt(0)?.select()
+//        val tabLayout: TabLayout = findViewById(R.id.tabs)
+//        tabLayout.getTabAt(0)?.select()
         finish()
     }
 

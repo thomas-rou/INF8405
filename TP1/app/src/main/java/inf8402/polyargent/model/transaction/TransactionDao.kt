@@ -29,10 +29,14 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' AND date = :date ORDER BY date DESC")
     fun getExpenseTransactionsByDay(date: String): LiveData<List<Transaction>>
 
-    @Query("SELECT * FROM transactions WHERE type = 'INCOME' AND date BETWEEN :startDate AND :endDate ORDER BY date DESC")
+    @Query("SELECT * FROM transactions WHERE type = 'INCOME' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) " +
+            "BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2)) " +
+            "AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2)) ORDER BY date DESC")
     fun getIncomeTransactionsBDateInterval(startDate: String, endDate: String): LiveData<List<Transaction>>
 
-    @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate ORDER BY date DESC")
+    @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) " +
+            "BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2)) " +
+            "AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2)) ORDER BY date DESC")
     fun getExpenseTransactionsByDateInterval(startDate: String, endDate: String): LiveData<List<Transaction>>
 
     @Query("""

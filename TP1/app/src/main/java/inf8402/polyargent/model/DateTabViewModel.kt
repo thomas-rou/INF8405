@@ -23,6 +23,7 @@ class DateTabViewModel() {
         calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
         val startOfWeek = dateFormat.format(calendar.time)
         calendar.add(Calendar.WEEK_OF_MONTH, 1)
+        calendar.add(Calendar.DAY_OF_WEEK, -1)
         val endOfWeek = dateFormat.format(calendar.time)
         return "$startOfWeek - $endOfWeek"
     }
