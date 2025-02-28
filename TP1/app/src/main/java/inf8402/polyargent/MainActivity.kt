@@ -6,9 +6,12 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import inf8402.polyargent.model.DateTabViewModel
@@ -44,7 +47,33 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
 
-     fun manageSelectedDateRange() {
+    fun manageBalanceChange() {
+        val totalAmount = findViewById<TextView>(R.id.totalAmount)
+        val totalAmountModify = findViewById<ImageView>(R.id.totalAmountModify)
+
+        totalAmountModify.setOnClickListener {
+            showEditAmountDialog(totalAmount)
+        }
+    }
+
+    private fun showEditAmountDialog(totalAmount: TextView) {
+        val editText = EditText(this)
+        editText.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+        editText.setText(totalAmount.text.toString().removeSuffix(" $"))
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Edit Amount")
+            .setView(editText)
+            .setPositiveButton("Update") { _, _ ->
+                totalAmount.text = "${editText.text} $"
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
+    fun manageSelectedDateRange() {
         val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
         val dateRangeText: TextView = findViewById(R.id.date_range_text)
         val prevDate: TextView = findViewById(R.id.previous)

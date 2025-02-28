@@ -92,6 +92,7 @@ fun MainActivity.homePageSetup(activity: MainActivity) {
     pieChartView.setupPieChart(pieChart)
     manageSelectedTab(activity)
     manageSelectedDateRange()
+    manageBalanceChange()
 
     adapter = TransactionScreen(
         onDeleteClick = { transaction ->
