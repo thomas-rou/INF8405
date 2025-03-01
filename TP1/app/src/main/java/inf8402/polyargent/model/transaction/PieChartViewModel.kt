@@ -1,6 +1,8 @@
 package inf8402.polyargent.model.transaction
 
+import android.graphics.Color
 import android.graphics.Typeface
+import androidx.core.graphics.toColorInt
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -11,12 +13,14 @@ class PieChartViewModel {
 
     fun setupPieChart(pieChart: PieChart, expenses: List<CategoryReport>) {
         val entries = ArrayList<PieEntry>()
+        var colors = ArrayList<Int>()
         for (expense in expenses) {
             entries.add(PieEntry(expense.percentage.toFloat(), ""))
+            colors.add(Color.parseColor(expense.colorHex))
         }
 
         val dataSet = PieDataSet(entries, "Expenses by Category")
-        dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+        dataSet.colors = colors
         val data = PieData(dataSet)
         pieChart.data = data
         dataSet.sliceSpace = 4f
