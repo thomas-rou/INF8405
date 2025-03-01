@@ -12,11 +12,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
-import inf8402.polyargent.model.home.DateTabViewModel
+import androidx.lifecycle.lifecycleScope
+import com.github.mikephil.charting.charts.PieChart
+import inf8402.polyargent.model.transaction.DateTabViewModel
 import com.google.android.material.tabs.TabLayout
-import inf8402.polyargent.model.transaction.Account
 import inf8402.polyargent.model.transaction.TimeFrequency
-import inf8402.polyargent.model.transaction.TransactionDatabase
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.screens.ReportScreen
 import inf8402.polyargent.ui.fragments.CategoryFragment
@@ -26,6 +26,7 @@ import inf8402.polyargent.ui.screens.reportPageSetup
 import inf8402.polyargent.viewmodel.ReportViewModel
 import inf8402.polyargent.viewmodel.TransactionViewModel
 import inf8402.polyargent.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 import java.util.TimeZone
 
 
@@ -45,6 +46,10 @@ class MainActivity() : AppCompatActivity() {
     }
     val homeViewModel: HomeViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+    }
+
+    fun getTransactionsTotal() {
+
     }
 
     fun manageBalanceChange() {
@@ -110,25 +115,40 @@ class MainActivity() : AppCompatActivity() {
     }
 
     private fun filterTransactionsByDate(tabPos: Int?, date: String) {
+        val pieChart: PieChart = findViewById(R.id.chart)
+        pieChart.centerText = "0.0 $"
+        val dates = dateTab.extractDates(date)
         if (tabPos == 0) {
             if (currentTransactionTab == 0) {
-                transactionViewModel.getExpenseTransactionsByDay(dateTab.extractDates(date)[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                transactionViewModel.getExpenseTransactionsByDay(dates[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
                     adapter.submitList(transactionsGot)
                 }
+                homeViewModel.getExpensesTotalAmount(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { total ->
+                    if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
+                }
             } else {
-                transactionViewModel.getIncomeTransactionsByDay(dateTab.extractDates(date)[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                transactionViewModel.getIncomeTransactionsByDay(dates[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
                     adapter.submitList(transactionsGot)
+                }
+                homeViewModel.getIncomesTotalAmount(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { total ->
+                    if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
                 }
             }
         }
         else {
             if (currentTransactionTab == 0) {
-                transactionViewModel.getExpenseTransactionsByDateInterval(dateTab.extractDates(date)[0], dateTab.extractDates(date)[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                transactionViewModel.getExpenseTransactionsByDateInterval(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
                     adapter.submitList(transactionsGot)
                 }
+                homeViewModel.getExpensesTotalAmount(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { total ->
+                    if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
+                }
             } else {
-                transactionViewModel.getIncomeTransactionsBDateInterval(dateTab.extractDates(date)[0], dateTab.extractDates(date)[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
+                transactionViewModel.getIncomeTransactionsBDateInterval(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
                     adapter.submitList(transactionsGot)
+                }
+                homeViewModel.getIncomesTotalAmount(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { total ->
+                    if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
                 }
             }
         }

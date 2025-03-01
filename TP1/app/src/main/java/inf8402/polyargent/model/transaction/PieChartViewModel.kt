@@ -1,4 +1,4 @@
-package inf8402.polyargent.model.home
+package inf8402.polyargent.model.transaction
 
 import android.graphics.Typeface
 import com.github.mikephil.charting.charts.PieChart
@@ -15,7 +15,7 @@ class PieChartViewModel {
         dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
         dataSet.sliceSpace = 4f
         pieChart.data = PieData(dataSet)
-        pieChart.centerText = "1000.00 \$"
+        pieChart.centerText = "0.00 \$"
         pieChart.setCenterTextSize(25f)
         pieChart.setCenterTextTypeface(Typeface.DEFAULT_BOLD)
         pieChart.holeRadius = 65f

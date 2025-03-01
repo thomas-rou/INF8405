@@ -15,8 +15,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import inf8402.polyargent.MainActivity
 import inf8402.polyargent.R
-import inf8402.polyargent.model.home.DateTabViewModel
-import inf8402.polyargent.model.home.PieChartViewModel
+import inf8402.polyargent.model.transaction.DateTabViewModel
+import inf8402.polyargent.model.transaction.PieChartViewModel
 import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.fragments.AddTransactionFragment

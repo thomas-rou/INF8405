@@ -1,4 +1,4 @@
-package inf8402.polyargent.model.home;
+package inf8402.polyargent.model.transaction;
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
