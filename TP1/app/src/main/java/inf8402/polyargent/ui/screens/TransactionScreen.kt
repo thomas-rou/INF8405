@@ -10,13 +10,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.mikephil.charting.charts.PieChart
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import inf8402.polyargent.MainActivity
 import inf8402.polyargent.R
 import inf8402.polyargent.model.transaction.DateTabViewModel
-import inf8402.polyargent.model.transaction.PieChartViewModel
 import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.fragments.AddTransactionFragment

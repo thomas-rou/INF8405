@@ -3,14 +3,12 @@ package inf8402.polyargent.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import inf8402.polyargent.model.transaction.Account
 import inf8402.polyargent.model.transaction.CategoryReport
 import inf8402.polyargent.model.transaction.TransactionDatabase
-import kotlinx.coroutines.withContext
 
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -35,11 +33,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         return transactionDao.getIncomesTotalAmountByDates(startDate, endDate)
     }
 
-    fun getIncomeTransactionsByDateIntervalGroupByCategory(startDate: String, endDate: String): LiveData<List<CategoryReport>> {
-        return transactionDao.getExpenseTransactionsByDateRange(startDate, endDate, "INCOME")
+    fun getIncomeTransactionsByDateRange(startDate: String, endDate: String): LiveData<List<CategoryReport>> {
+        return transactionDao.getTransactionsByDateRange(startDate, endDate, "INCOME")
     }
 
-    fun getExpenseTransactionsByDateIntervalGroupByCategory(startDate: String, endDate: String): LiveData<List<CategoryReport>> {
-        return transactionDao.getExpenseTransactionsByDateRange(startDate, endDate, "EXPENSE")
+    fun getExpenseTransactionsByDateRange(startDate: String, endDate: String): LiveData<List<CategoryReport>> {
+        return transactionDao.getTransactionsByDateRange(startDate, endDate, "EXPENSE")
     }
 }

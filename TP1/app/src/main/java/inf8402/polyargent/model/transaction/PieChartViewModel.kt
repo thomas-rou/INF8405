@@ -20,7 +20,6 @@ class PieChartViewModel {
         val data = PieData(dataSet)
         pieChart.data = data
         dataSet.sliceSpace = 4f
-        pieChart.centerText = "0.00 \$"
         pieChart.setCenterTextSize(25f)
         pieChart.setCenterTextTypeface(Typeface.DEFAULT_BOLD)
         pieChart.holeRadius = 65f

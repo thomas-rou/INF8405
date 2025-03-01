@@ -12,7 +12,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.charts.PieChart
 import inf8402.polyargent.model.transaction.DateTabViewModel
 import com.google.android.material.tabs.TabLayout
@@ -27,7 +26,6 @@ import inf8402.polyargent.ui.screens.reportPageSetup
 import inf8402.polyargent.viewmodel.ReportViewModel
 import inf8402.polyargent.viewmodel.TransactionViewModel
 import inf8402.polyargent.viewmodel.HomeViewModel
-import kotlinx.coroutines.launch
 import java.util.TimeZone
 
 
@@ -122,9 +120,9 @@ class MainActivity() : AppCompatActivity() {
                     adapter.submitList(transactionsGot)
                 }
                 homeViewModel.getExpensesTotalAmount(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { total ->
-                    if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
+                    if (total != null) pieChart.centerText = "$total \$"
                 }
-                homeViewModel.getExpenseTransactionsByDateIntervalGroupByCategory(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { transactions ->
+                homeViewModel.getExpenseTransactionsByDateRange(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { transactions ->
                     pieChartView.setupPieChart(pieChart, transactions)
                 }
             } else {
@@ -132,9 +130,9 @@ class MainActivity() : AppCompatActivity() {
                     adapter.submitList(transactionsGot)
                 }
                 homeViewModel.getIncomesTotalAmount(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { total ->
-                    if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
+                    if (total != null) pieChart.centerText = "$total \$"
                 }
-                homeViewModel.getIncomeTransactionsByDateIntervalGroupByCategory(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { transactions ->
+                homeViewModel.getIncomeTransactionsByDateRange(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { transactions ->
                     pieChartView.setupPieChart(pieChart, transactions)
                 }
             }
@@ -145,9 +143,9 @@ class MainActivity() : AppCompatActivity() {
                     adapter.submitList(transactionsGot)
                 }
                 homeViewModel.getExpensesTotalAmount(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { total ->
-                    if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
+                    if (total != null) pieChart.centerText = "$total \$"
                 }
-                homeViewModel.getExpenseTransactionsByDateIntervalGroupByCategory(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactions ->
+                homeViewModel.getExpenseTransactionsByDateRange(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactions ->
                     pieChartView.setupPieChart(pieChart, transactions)
                 }
             } else {
@@ -155,9 +153,9 @@ class MainActivity() : AppCompatActivity() {
                     adapter.submitList(transactionsGot)
                 }
                 homeViewModel.getIncomesTotalAmount(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { total ->
-                    if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
+                    if (total != null) pieChart.centerText = "$total \$"
                 }
-                homeViewModel.getIncomeTransactionsByDateIntervalGroupByCategory(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactions ->
+                homeViewModel.getIncomeTransactionsByDateRange(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactions ->
                     pieChartView.setupPieChart(pieChart, transactions)
                 }
             }
