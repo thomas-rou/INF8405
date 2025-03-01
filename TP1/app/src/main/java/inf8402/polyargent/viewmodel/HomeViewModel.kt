@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import inf8402.polyargent.model.transaction.Account
+import inf8402.polyargent.model.transaction.CategoryReport
 import inf8402.polyargent.model.transaction.TransactionDatabase
 import kotlinx.coroutines.withContext
 
@@ -32,5 +33,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getIncomesTotalAmount(startDate: String, endDate: String): LiveData<Int> {
         return transactionDao.getIncomesTotalAmountByDates(startDate, endDate)
+    }
+
+    fun getIncomeTransactionsByDateIntervalGroupByCategory(startDate: String, endDate: String): LiveData<List<CategoryReport>> {
+        return transactionDao.getExpenseTransactionsByDateRange(startDate, endDate, "INCOME")
+    }
+
+    fun getExpenseTransactionsByDateIntervalGroupByCategory(startDate: String, endDate: String): LiveData<List<CategoryReport>> {
+        return transactionDao.getExpenseTransactionsByDateRange(startDate, endDate, "EXPENSE")
     }
 }

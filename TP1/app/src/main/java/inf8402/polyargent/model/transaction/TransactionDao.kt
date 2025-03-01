@@ -94,4 +94,28 @@ BETWEEN :startDate AND :endDate
             "BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2)) " +
             "AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2))")
     fun getExpensesTotalAmountByDates(startDate: String, endDate: String): LiveData<Int>
+
+    @Query("""
+    SELECT c.categoryName as categoryName, 
+           (SUM(t.amount) / grandTotal.totalAmount) * 100 as percentage,
+           SUM(t.amount) as totalAmount,
+           c.icon as icon,
+           c.colorHex as colorHex
+           
+    FROM transactions t 
+    JOIN categories c ON t.categoryId = c.id 
+    CROSS JOIN (SELECT SUM(amount) as totalAmount 
+                FROM transactions 
+                WHERE type =:type AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) 
+BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2))
+AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2))) 
+as grandTotal
+    WHERE t.type = 'EXPENSE' AND strftime('%Y-%m-%d', substr(t.date, 7, 4) || '-' || substr(t.date, 4, 2) || '-' || substr(t.date, 1, 2)) 
+BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2))
+AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2)) 
+    GROUP BY c.categoryName, grandTotal.totalAmount 
+    ORDER BY totalAmount DESC
+""")
+    fun getExpenseTransactionsByDateRange(startDate: String, endDate: String, type: String): LiveData<List<CategoryReport>>
+
 }

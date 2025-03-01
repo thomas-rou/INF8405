@@ -9,12 +9,17 @@ import com.github.mikephil.charting.utils.ColorTemplate
 
 class PieChartViewModel {
 
-    fun setupPieChart(pieChart: PieChart) {
-        val entries = listOf(PieEntry(40f), PieEntry(60f))
-        val dataSet = PieDataSet(entries, "")
+    fun setupPieChart(pieChart: PieChart, expenses: List<CategoryReport>) {
+        val entries = ArrayList<PieEntry>()
+        for (expense in expenses) {
+            entries.add(PieEntry(expense.percentage.toFloat(), ""))
+        }
+
+        val dataSet = PieDataSet(entries, "Expenses by Category")
         dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+        val data = PieData(dataSet)
+        pieChart.data = data
         dataSet.sliceSpace = 4f
-        pieChart.data = PieData(dataSet)
         pieChart.centerText = "0.00 \$"
         pieChart.setCenterTextSize(25f)
         pieChart.setCenterTextTypeface(Typeface.DEFAULT_BOLD)
@@ -26,4 +31,5 @@ class PieChartViewModel {
         legend.isEnabled = false
         pieChart.description.isEnabled = false
     }
+
 }

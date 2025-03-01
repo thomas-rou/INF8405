@@ -86,9 +86,6 @@ class TransactionScreen(
 
 fun MainActivity.homePageSetup(activity: MainActivity) {
     setContentView(R.layout.main_page)
-    val pieChart: PieChart = findViewById(R.id.chart)
-    val pieChartView = PieChartViewModel()
-    pieChartView.setupPieChart(pieChart)
     manageSelectedTab(activity)
     manageSelectedDateRange()
     manageBalanceChange()

@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.charts.PieChart
 import inf8402.polyargent.model.transaction.DateTabViewModel
 import com.google.android.material.tabs.TabLayout
+import inf8402.polyargent.model.transaction.PieChartViewModel
 import inf8402.polyargent.model.transaction.TimeFrequency
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.screens.ReportScreen
@@ -33,6 +34,7 @@ import java.util.TimeZone
 class MainActivity() : AppCompatActivity() {
     var currentTransactionTab : Int = 0
     private val dateTab = DateTabViewModel()
+    val pieChartView = PieChartViewModel()
     var frequency : TimeFrequency = TimeFrequency.WEEKLY
     var type : TransactionType = TransactionType.EXPENSE
     lateinit var adapter: TransactionScreen
@@ -46,10 +48,6 @@ class MainActivity() : AppCompatActivity() {
     }
     val homeViewModel: HomeViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-    }
-
-    fun getTransactionsTotal() {
-
     }
 
     fun manageBalanceChange() {
@@ -126,12 +124,18 @@ class MainActivity() : AppCompatActivity() {
                 homeViewModel.getExpensesTotalAmount(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { total ->
                     if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
                 }
+                homeViewModel.getExpenseTransactionsByDateIntervalGroupByCategory(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { transactions ->
+                    pieChartView.setupPieChart(pieChart, transactions)
+                }
             } else {
                 transactionViewModel.getIncomeTransactionsByDay(dates[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
                     adapter.submitList(transactionsGot)
                 }
                 homeViewModel.getIncomesTotalAmount(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { total ->
                     if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
+                }
+                homeViewModel.getIncomeTransactionsByDateIntervalGroupByCategory(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { transactions ->
+                    pieChartView.setupPieChart(pieChart, transactions)
                 }
             }
         }
@@ -143,12 +147,18 @@ class MainActivity() : AppCompatActivity() {
                 homeViewModel.getExpensesTotalAmount(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { total ->
                     if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
                 }
+                homeViewModel.getExpenseTransactionsByDateIntervalGroupByCategory(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactions ->
+                    pieChartView.setupPieChart(pieChart, transactions)
+                }
             } else {
                 transactionViewModel.getIncomeTransactionsBDateInterval(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
                     adapter.submitList(transactionsGot)
                 }
                 homeViewModel.getIncomesTotalAmount(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { total ->
                     if (total != null) pieChart.centerText = "$total \$"; pieChart.invalidate()
+                }
+                homeViewModel.getIncomeTransactionsByDateIntervalGroupByCategory(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactions ->
+                    pieChartView.setupPieChart(pieChart, transactions)
                 }
             }
         }
