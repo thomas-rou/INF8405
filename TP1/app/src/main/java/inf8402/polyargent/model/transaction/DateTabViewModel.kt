@@ -11,7 +11,7 @@ class DateTabViewModel() {
     fun getDateRangeForTab(position: Int): String {
         val calendar = baseDate.clone() as Calendar
         return when (position) {
-            0 -> "Today, ${dateFormat.format(calendar.time)}"
+            0 -> "${dateFormat.format(calendar.time)}"
             1 -> getWeekRange(calendar)
             2 -> getMonthRange(calendar)
             3 -> getYearRange(calendar)
@@ -53,7 +53,7 @@ class DateTabViewModel() {
 
     fun adjustBaseDate(currentTab : Int, intToAdd: Int) {
         when (currentTab) {
-            0 -> baseDate.add(Calendar.DAY_OF_YEAR, intToAdd)
+            0 -> baseDate.add(Calendar.DAY_OF_WEEK, intToAdd)
             1 -> baseDate.add(Calendar.WEEK_OF_MONTH, intToAdd)
             2 -> baseDate.add(Calendar.MONTH, intToAdd)
             3 -> baseDate.add(Calendar.YEAR, intToAdd)

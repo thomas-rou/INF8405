@@ -116,10 +116,9 @@ fun MainActivity.setupTransactionScreen() {
 }
 
 fun MainActivity.manageSelectedTab(activity: MainActivity) {
-    val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
-    val dateRangeText: TextView = findViewById(R.id.date_range_text)
     val transactionTab : TabLayout = findViewById(R.id.tabs)
 
+    currentTransactionTab = 0
     transactionTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab?) {
             when (tab?.position) {
@@ -138,16 +137,6 @@ fun MainActivity.manageSelectedTab(activity: MainActivity) {
                 }
             }
             manageSelectedDateRange()
-        }
-        override fun onTabUnselected(tab: TabLayout.Tab?) {}
-        override fun onTabReselected(tab: TabLayout.Tab?) {}
-    })
-
-    tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-        override fun onTabSelected(tab: TabLayout.Tab?) {
-            val dateTab = DateTabViewModel()
-            val dateRange = dateTab.getDateRangeForTab(tab?.position ?: 0)
-            dateRangeText.text = dateRange
         }
         override fun onTabUnselected(tab: TabLayout.Tab?) {}
         override fun onTabReselected(tab: TabLayout.Tab?) {}
