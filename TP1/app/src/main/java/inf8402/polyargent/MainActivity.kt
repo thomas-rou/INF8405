@@ -31,7 +31,7 @@ import java.util.TimeZone
 
 class MainActivity() : AppCompatActivity() {
     var currentTransactionTab : Int = 0
-    private val dateTab = DateTabViewModel()
+    val dateTab = DateTabViewModel()
     val pieChartView = PieChartViewModel()
     var frequency : TimeFrequency = TimeFrequency.WEEKLY
     var type : TransactionType = TransactionType.EXPENSE
@@ -77,89 +77,6 @@ class MainActivity() : AppCompatActivity() {
             .create()
 
         dialog.show()
-    }
-
-    fun manageSelectedDateRange() {
-        val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
-        val dateRangeText: TextView = findViewById(R.id.date_range_text)
-        val prevDate: TextView = findViewById(R.id.previous)
-        val nextDate: TextView = findViewById(R.id.next)
-
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                dateRangeText.text = dateTab.getDateRangeForTab(tab?.position ?: 1)
-                filterTransactionsByDate(tab?.position, dateRangeText.text.toString())
-            }
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                dateRangeText.text = dateTab.getDateRangeForTab(tab?.position ?: 1)
-                filterTransactionsByDate(tab?.position, dateRangeText.text.toString())
-            }
-        })
-        tabLayout.getTabAt(1)?.select()
-        dateRangeText.text = dateTab.getDateRangeForTab(1)
-        filterTransactionsByDate(1, dateRangeText.text.toString())
-
-        prevDate.setOnClickListener {
-            dateTab.adjustBaseDate(tabLayout.selectedTabPosition, -1)
-            tabLayout.getTabAt(tabLayout.selectedTabPosition)?.select()
-        }
-        nextDate.setOnClickListener {
-            dateTab.adjustBaseDate(tabLayout.selectedTabPosition, 1)
-            tabLayout.getTabAt(tabLayout.selectedTabPosition)?.select()
-        }
-    }
-
-    private fun filterTransactionsByDate(tabPos: Int?, date: String) {
-        val pieChart: PieChart = findViewById(R.id.chart)
-        pieChart.centerText = "0.0 $"
-        val dates = dateTab.extractDates(date)
-        if (tabPos == 0) {
-            if (currentTransactionTab == 0) {
-                transactionViewModel.getExpenseTransactionsByDay(dates[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
-                    adapter.submitList(transactionsGot)
-                }
-                homeViewModel.getExpensesTotalAmount(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { total ->
-                    if (total != null) pieChart.centerText = "$total \$"
-                }
-                homeViewModel.getExpenseTransactionsByDateRange(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { transactions ->
-                    pieChartView.setupPieChart(pieChart, transactions)
-                }
-            } else {
-                transactionViewModel.getIncomeTransactionsByDay(dates[0]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
-                    adapter.submitList(transactionsGot)
-                }
-                homeViewModel.getIncomesTotalAmount(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { total ->
-                    if (total != null) pieChart.centerText = "$total \$"
-                }
-                homeViewModel.getIncomeTransactionsByDateRange(dates[0], dates[0]).observe(this@MainActivity as LifecycleOwner) { transactions ->
-                    pieChartView.setupPieChart(pieChart, transactions)
-                }
-            }
-        }
-        else {
-            if (currentTransactionTab == 0) {
-                transactionViewModel.getExpenseTransactionsByDateInterval(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
-                    adapter.submitList(transactionsGot)
-                }
-                homeViewModel.getExpensesTotalAmount(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { total ->
-                    if (total != null) pieChart.centerText = "$total \$"
-                }
-                homeViewModel.getExpenseTransactionsByDateRange(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactions ->
-                    pieChartView.setupPieChart(pieChart, transactions)
-                }
-            } else {
-                transactionViewModel.getIncomeTransactionsBDateInterval(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactionsGot ->
-                    adapter.submitList(transactionsGot)
-                }
-                homeViewModel.getIncomesTotalAmount(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { total ->
-                    if (total != null) pieChart.centerText = "$total \$"
-                }
-                homeViewModel.getIncomeTransactionsByDateRange(dates[0], dates[1]).observe(this@MainActivity as LifecycleOwner) { transactions ->
-                    pieChartView.setupPieChart(pieChart, transactions)
-                }
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
