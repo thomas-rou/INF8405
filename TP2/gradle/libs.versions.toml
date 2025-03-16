@@ -13,6 +13,7 @@ playServicesMaps = "18.1.0"
 constraintlayout = "2.1.4"
 playServicesMapsVersion = "19.0.0"
 secretsGradlePlugin = "2.0.1"
+playServicesLocation = "21.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26,6 +27,7 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 play-services-maps-v1900 = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMapsVersion" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
