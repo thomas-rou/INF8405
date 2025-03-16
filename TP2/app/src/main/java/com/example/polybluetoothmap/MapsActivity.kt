@@ -22,10 +22,19 @@ import android.provider.Settings
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1
-    private val BLUETOOTH_PERMISSION_REQUEST_CODE = 2
+    enum class ThemeMode {
+        LIGHT,
+        DARK
+    }
+
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    public val currentThemeMode = ThemeMode.LIGHT
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+        private const val BLUETOOTH_PERMISSION_REQUEST_CODE = 2
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
