@@ -1,6 +1,12 @@
 package com.example.polybluetoothmap
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.polybluetoothmap.databinding.ActivityMapsBinding
 import com.google.android.gms.location.LocationServices
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.provider.Settings
 
@@ -29,23 +36,72 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var bluetoothAdapter: BluetoothAdapter
     public val currentThemeMode = ThemeMode.LIGHT
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private const val BLUETOOTH_PERMISSION_REQUEST_CODE = 2
     }
 
+    private val bluetoothScanner = object : BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
+                    Toast.makeText(context, "Bluetooth discovery started", Toast.LENGTH_SHORT).show()
+                }
 
+                BluetoothDevice.ACTION_FOUND -> {
+                    val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+
+
+                }
+
+                BluetoothAdapter.ACTION_DISCOVERY_FINISHED ->{
+                    Toast.makeText(context, "Bluetooth discovery finished", Toast.LENGTH_SHORT).show()
+                    bluetoothAdapter.startDiscovery()
+                }
+
+                BluetoothAdapter.ACTION_STATE_CHANGED ->{
+                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)) {
+                        BluetoothAdapter.STATE_ON -> {
+                            Toast.makeText(context, "Bluetooth is on", Toast.LENGTH_SHORT).show()
+                            bluetoothAdapter.startDiscovery()
+                        }
+                        BluetoothAdapter.STATE_OFF -> {
+                            Toast.makeText(context, "Bluetooth is off", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+            }
+
+        }
+    }
+
+
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMapsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        supportActionBar?.hide()
+
+        requestBluetoothPermission()
+        val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
+        bluetoothAdapter = bluetoothManager.adapter
+        registerReceiver(bluetoothScanner, IntentFilter(BluetoothDevice.ACTION_FOUND))
+        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
+        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED))
+        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        binding = ActivityMapsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        bluetoothAdapter.startDiscovery()
     }
 
     private fun isLocationPermissionGranted(): Boolean {
@@ -56,6 +112,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             this,
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
+                )
+    }
+
+    private fun isBluetoothPermissionGranted():Boolean{
+        return (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH)
+                == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT)
+                ==PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN)
+                ==PackageManager.PERMISSION_GRANTED
                 )
     }
 
@@ -80,6 +144,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         else{
             setLocationToCurrentPosition()
         }
+    }
+
+    private fun requestBluetoothPermission(){
+        if (!isBluetoothPermissionGranted()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.BLUETOOTH,
+                    android.Manifest.permission.BLUETOOTH_CONNECT,
+                    android.Manifest.permission.BLUETOOTH_SCAN),
+                BLUETOOTH_PERMISSION_REQUEST_CODE)
+    }
     }
 
     @SuppressLint("MissingPermission")
@@ -117,7 +192,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             setLocationToCurrentPosition()
         } else if (requestCode == BLUETOOTH_PERMISSION_REQUEST_CODE) {
-
+            if(!isBluetoothPermissionGranted()) {
+                Toast.makeText(this, "Bluetooth permissions is required", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
