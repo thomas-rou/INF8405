@@ -66,6 +66,7 @@ fun MapsActivity.trackedItemSetupView(){
 
     adapter = TrackedDeviceAdapter(deviceList,
         onItemClick = { device ->
+            selectedDeviceAddress = device.address
             showDeviceDetailsDialog(this, device)
         },
         onFavoriteClick = { device ->
@@ -109,6 +110,7 @@ fun MapsActivity.showDeviceDetailsDialog(context: Context, device: TrackedDevice
     val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_device_details, null)
     val tvDetails = dialogView.findViewById<TextView>(R.id.tvDeviceDetails)
     val btnClose = dialogView.findViewById<Button>(R.id.btnClose)
+    val directionBtn = dialogView.findViewById<Button>(R.id.directionBtn)
 
     val details = """
         Name: ${device.name ?: "Unknown"}
@@ -130,6 +132,11 @@ fun MapsActivity.showDeviceDetailsDialog(context: Context, device: TrackedDevice
         .create()
 
     btnClose.setOnClickListener {
+        dialog.dismiss()
+    }
+
+    directionBtn.setOnClickListener {
+        getDirectionToSelectedDevice()
         dialog.dismiss()
     }
 

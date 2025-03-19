@@ -45,11 +45,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     }
 
     public lateinit var recyclerView: RecyclerView
+    public lateinit var selectedDeviceAddress: String
     public lateinit var adapter: TrackedDeviceAdapter
     public var deviceList: MutableList<TrackedDevice> = mutableListOf()
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var locationProvider: FusedLocationProviderClient
+    internal lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var bluetoothAdapter: BluetoothAdapter
     val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels()
     private var currentThemeMode = ThemeMode.LIGHT
@@ -130,7 +131,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         trackedItemSetupView()
     }
 
-    private fun isLocationPermissionGranted(): Boolean {
+    fun isLocationPermissionGranted(): Boolean {
         return (ActivityCompat.checkSelfPermission(
             this,
             android.Manifest.permission.ACCESS_FINE_LOCATION

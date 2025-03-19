@@ -12,12 +12,28 @@
         android:textSize="16sp"
         android:textColor="@android:color/black" />
 
-    <Button
-        android:id="@+id/btnClose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Close"
-        android:layout_gravity="end"
-        android:layout_marginTop="16dp"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/directionBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="direction"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="16dp"/>
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Close"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+
 
 </LinearLayout>
