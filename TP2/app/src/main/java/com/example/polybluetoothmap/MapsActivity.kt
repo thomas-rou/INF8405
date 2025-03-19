@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
 import com.example.polybluetoothmap.ui.TrackedDeviceAdapter
 import com.example.polybluetoothmap.ui.trackedItemSetupView
+import com.example.polybluetoothmap.ui.updateDeviceListView
 import com.example.polybluetoothmap.viewmodel.TrackedDeviceViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
@@ -74,10 +75,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
                                 if (location != null) {
                                     val trackedDevice = TrackedDevice.fromBluetoothDevice(device, location.latitude, location.longitude)
                                     trackedDeviceViewModel.insert(trackedDevice)
-                                    val devices = trackedDeviceViewModel.getAll().value
-                                    deviceList.clear()
-                                    deviceList.addAll(devices ?: emptyList())
-                                    adapter.notifyDataSetChanged()
+                                    updateDeviceListView()
                                     return@addOnCompleteListener
                                 }
                             }

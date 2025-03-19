@@ -9,11 +9,16 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.polybluetoothmap.MapsActivity
 import com.example.polybluetoothmap.R
 import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 class TrackedDeviceAdapter(
     private val deviceList: MutableList<TrackedDevice>,
@@ -73,12 +78,29 @@ fun MapsActivity.trackedItemSetupView(){
         }
     )
     recyclerView.adapter = adapter
-        val devices = trackedDeviceViewModel.getAll().value
+
+    updateDeviceListView()
+}
+
+fun MapsActivity.updateDeviceListView() {
+    lifecycleScope.launch(Dispatchers.Main) {
+        val devices = fetchAllTrackedDevices()
         deviceList.clear()
         deviceList.addAll(devices ?: emptyList())
         adapter.notifyDataSetChanged()
+    }
+}
 
-
+suspend fun MapsActivity.fetchAllTrackedDevices(): List<TrackedDevice> {
+    return suspendCancellableCoroutine { continuation ->
+        val devices = trackedDeviceViewModel.getAll()
+        lateinit var observer: Observer<List<TrackedDevice>>
+        observer = Observer { trackedDevices ->
+            devices.removeObserver(observer)
+            continuation.resume(trackedDevices, onCancellation = null)
+        }
+        devices.observeForever(observer)
+    }
 }
 
 
