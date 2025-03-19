@@ -38,6 +38,7 @@ import com.example.polybluetoothmap.ui.updateDeviceListView
 import com.example.polybluetoothmap.viewmodel.TrackedDeviceViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -193,7 +194,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 val currentLatLng = LatLng(location.latitude, location.longitude)
-                mMap.addMarker(MarkerOptions().position(currentLatLng).title("current location"))
+                mMap.addMarker(MarkerOptions().position(currentLatLng).title("current location")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
             }
         }
     }
@@ -206,7 +208,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
                     val currentLatLng = LatLng(location.latitude, location.longitude)
-                    mMap.addMarker(MarkerOptions().position(currentLatLng).title("current location"))
+                    mMap.addMarker(MarkerOptions().position(currentLatLng).title("current location")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
                 } else {
                     Toast.makeText(this, "Unable to fetch current location", Toast.LENGTH_SHORT)
@@ -243,6 +246,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         mMap.setOnMarkerClickListener { clickedMarker ->
             val device = deviceList.find { it.address == clickedMarker.title }
             if (device != null) {
+                selectedDeviceAddress = device.address
                 showDeviceDetailsDialog(this, device)
             }
             false
