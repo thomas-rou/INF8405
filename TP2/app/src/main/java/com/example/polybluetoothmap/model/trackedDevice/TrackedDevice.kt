@@ -21,7 +21,7 @@ class Converters {
     }
 }
 
-@Entity(tableName = "tracked_devices")
+@Entity(tableName = "tracked_devices", indices = [Index(value = ["address"], unique = true)])
 data class TrackedDevice(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val latitude: Double,

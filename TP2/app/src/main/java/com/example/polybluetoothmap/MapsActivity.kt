@@ -74,7 +74,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
                                 if (location != null) {
                                     val trackedDevice = TrackedDevice.fromBluetoothDevice(device, location.latitude, location.longitude)
                                     trackedDeviceViewModel.insert(trackedDevice)
-                                    deviceList.add(trackedDevice)
+                                    val devices = trackedDeviceViewModel.getAll().value
+                                    deviceList.clear()
+                                    deviceList.addAll(devices ?: emptyList())
                                     adapter.notifyDataSetChanged()
                                     return@addOnCompleteListener
                                 }

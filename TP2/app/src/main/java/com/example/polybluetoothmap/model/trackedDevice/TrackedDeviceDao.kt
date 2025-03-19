@@ -1,5 +1,6 @@
 package com.example.polybluetoothmap.model.trackedDevice
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
@@ -8,10 +9,10 @@ interface TrackedDeviceDao {
     suspend fun insert(trackedDevice: TrackedDevice)
 
     @Query("SELECT * FROM tracked_devices")
-    suspend fun getAll(): List<TrackedDevice>
+    fun getAll(): LiveData<List<TrackedDevice>>
 
     @Query("SELECT * FROM tracked_devices WHERE address = :address")
-    suspend fun getByAddress(address: String): TrackedDevice?
+    fun getByAddress(address: String): LiveData<TrackedDevice?>
 
     @Update
     suspend fun update(trackedDevice: TrackedDevice)

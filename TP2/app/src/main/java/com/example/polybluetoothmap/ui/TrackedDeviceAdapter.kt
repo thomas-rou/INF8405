@@ -64,22 +64,21 @@ fun MapsActivity.trackedItemSetupView(){
         TrackedDevice(2, 45.6, -73.7, "Device B", "AA:BB:CC:DD:EE:FF", 2, 1, true,"Alias B", 0, listOf("UUID1", "UUID2"))
     )
 
-        trackedDeviceViewModel.getAll { devices ->
-            deviceList.clear()
-            deviceList.addAll(devices)
-            adapter.notifyDataSetChanged()
+    adapter = TrackedDeviceAdapter(deviceList,
+        onItemClick = { device ->
+            showDeviceDetailsDialog(this, device)
+        },
+        onFavoriteClick = { device ->
+            trackedDeviceViewModel.updateFavoriteStatus(device.address, !device.isFavorite)
         }
-
-        adapter = TrackedDeviceAdapter(deviceList,
-            onItemClick = { device ->
-               showDeviceDetailsDialog(this, device)
-            },
-            onFavoriteClick = { device ->
-                trackedDeviceViewModel.updateFavoriteStatus(device.address, !device.isFavorite)
-            }
-        )
-
+    )
     recyclerView.adapter = adapter
+        val devices = trackedDeviceViewModel.getAll().value
+        deviceList.clear()
+        deviceList.addAll(devices ?: emptyList())
+        adapter.notifyDataSetChanged()
+
+
 }
 
 

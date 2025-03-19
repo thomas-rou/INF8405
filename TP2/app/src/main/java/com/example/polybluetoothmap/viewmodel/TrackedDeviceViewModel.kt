@@ -2,6 +2,7 @@ package com.example.polybluetoothmap.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.polybluetoothmap.model.AppDatabase
 import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
@@ -23,16 +24,12 @@ class TrackedDeviceViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun getAll(callback: (List<TrackedDevice>) -> Unit) {
-        viewModelScope.launch {
-            callback(trackedDeviceDao.getAll())
-        }
+    fun getAll(): LiveData<List<TrackedDevice>> {
+        return trackedDeviceDao.getAll()
     }
 
-    fun getByAddress(address: String, callback: (TrackedDevice?) -> Unit) {
-        viewModelScope.launch {
-            callback(trackedDeviceDao.getByAddress(address))
-        }
+    fun getByAddress(address: String): LiveData<TrackedDevice?> {
+        return trackedDeviceDao.getByAddress(address)
     }
 
     fun delete(trackedDevice: TrackedDevice) {
