@@ -28,7 +28,10 @@ import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
+import com.example.polybluetoothmap.ui.TrackedDeviceAdapter
+import com.example.polybluetoothmap.ui.trackedItemSetupView
 import com.example.polybluetoothmap.viewmodel.TrackedDeviceViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
@@ -40,11 +43,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         DARK
     }
 
+    public lateinit var recyclerView: RecyclerView
+    public lateinit var adapter: TrackedDeviceAdapter
+    public lateinit var deviceList: MutableList<TrackedDevice>
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var bluetoothAdapter: BluetoothAdapter
-    private val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels {
+    val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels {
         ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     }
     private var currentThemeMode = ThemeMode.LIGHT
@@ -121,6 +127,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
 
         bluetoothAdapter.startDiscovery()
+        trackedItemSetupView()
     }
 
     private fun isLocationPermissionGranted(): Boolean {

@@ -24,6 +24,16 @@
         tools:context=".MapsActivity" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewTrackedDevices"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical" />
+
+
+
     <Button
         android:id="@+id/myButton"
         android:layout_width="wrap_content"
