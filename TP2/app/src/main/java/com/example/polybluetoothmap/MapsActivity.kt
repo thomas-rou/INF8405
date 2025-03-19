@@ -31,6 +31,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
 import com.example.polybluetoothmap.ui.TrackedDeviceAdapter
+import com.example.polybluetoothmap.ui.displayFindDeviceOnMap
+import com.example.polybluetoothmap.ui.showDeviceDetailsDialog
 import com.example.polybluetoothmap.ui.trackedItemSetupView
 import com.example.polybluetoothmap.ui.updateDeviceListView
 import com.example.polybluetoothmap.viewmodel.TrackedDeviceViewModel
@@ -48,7 +50,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     public lateinit var selectedDeviceAddress: String
     public lateinit var adapter: TrackedDeviceAdapter
     public var deviceList: MutableList<TrackedDevice> = mutableListOf()
-    private lateinit var mMap: GoogleMap
+    lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     internal lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var bluetoothAdapter: BluetoothAdapter
@@ -84,6 +86,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED ->{
                     bluetoothAdapter.startDiscovery()
+                    updateCurrentPositionMarker()
                 }
 
                 BluetoothAdapter.ACTION_STATE_CHANGED ->{
@@ -185,6 +188,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     }
 
     @SuppressLint("MissingPermission")
+    private fun updateCurrentPositionMarker(){
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                mMap.addMarker(MarkerOptions().position(currentLatLng).title("current location"))
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     private fun setLocationToCurrentPosition(){
         if (isLocationPermissionGranted()) {
             mMap.isMyLocationEnabled = true
@@ -226,6 +240,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        mMap.setOnMarkerClickListener { clickedMarker ->
+            val device = deviceList.find { it.address == clickedMarker.title }
+            if (device != null) {
+                showDeviceDetailsDialog(this, device)
+            }
+            false
+            }
         requestLocationPermission()
     }
 

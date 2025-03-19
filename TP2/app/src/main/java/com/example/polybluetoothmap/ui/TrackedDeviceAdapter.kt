@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.polybluetoothmap.MapsActivity
 import com.example.polybluetoothmap.R
 import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -77,6 +79,7 @@ fun MapsActivity.trackedItemSetupView(){
     recyclerView.adapter = adapter
 
     updateDeviceListView()
+
 }
 
 fun MapsActivity.updateDeviceListView() {
@@ -85,6 +88,9 @@ fun MapsActivity.updateDeviceListView() {
         deviceList.clear()
         deviceList.addAll(devices ?: emptyList())
         adapter.notifyDataSetChanged()
+        for (device in deviceList) {
+            displayFindDeviceOnMap(device)
+        }
     }
 }
 
@@ -142,3 +148,10 @@ fun MapsActivity.showDeviceDetailsDialog(context: Context, device: TrackedDevice
 
     dialog.show()
 }
+
+fun MapsActivity.displayFindDeviceOnMap(device: TrackedDevice){
+    val deviceLocation = LatLng(device.latitude, device.longitude)
+    mMap.addMarker(MarkerOptions().position(deviceLocation).title(device.address))
+
+}
+
