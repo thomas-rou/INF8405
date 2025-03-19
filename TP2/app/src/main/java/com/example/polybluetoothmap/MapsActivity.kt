@@ -46,15 +46,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
     public lateinit var recyclerView: RecyclerView
     public lateinit var adapter: TrackedDeviceAdapter
-    public lateinit var deviceList: MutableList<TrackedDevice>
+    public var deviceList: MutableList<TrackedDevice> = mutableListOf()
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var bluetoothAdapter: BluetoothAdapter
     val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels()
-//    val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels {
-//        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-//    }
     private var currentThemeMode = ThemeMode.LIGHT
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1

@@ -63,18 +63,14 @@ fun MapsActivity.trackedItemSetupView(){
     recyclerView = findViewById(R.id.recyclerViewTrackedDevices)
     recyclerView.layoutManager = LinearLayoutManager(this)
 
-    // Exemple de données (remplacer par Room)
-    deviceList = mutableListOf(
-        TrackedDevice(1, 45.5, -73.6, "Device A", "00:11:22:33:44:55", 1, 0, false,"Alias A", 0, null),
-        TrackedDevice(2, 45.6, -73.7, "Device B", "AA:BB:CC:DD:EE:FF", 2, 1, true,"Alias B", 0, listOf("UUID1", "UUID2"))
-    )
 
     adapter = TrackedDeviceAdapter(deviceList,
         onItemClick = { device ->
             showDeviceDetailsDialog(this, device)
         },
         onFavoriteClick = { device ->
-            trackedDeviceViewModel.updateFavoriteStatus(device.address, !device.isFavorite)
+            trackedDeviceViewModel.updateFavoriteStatus(device.address, device.isFavorite)
+//            trackedDeviceViewModel.update(device)
         }
     )
     recyclerView.adapter = adapter
@@ -97,9 +93,14 @@ suspend fun MapsActivity.fetchAllTrackedDevices(): List<TrackedDevice> {
         lateinit var observer: Observer<List<TrackedDevice>>
         observer = Observer { trackedDevices ->
             devices.removeObserver(observer)
-            continuation.resume(trackedDevices, onCancellation = null)
+            if (continuation.isActive) {
+                continuation.resume(trackedDevices, onCancellation = null)
+            }
         }
         devices.observeForever(observer)
+        continuation.invokeOnCancellation {
+            devices.removeObserver(observer)
+        }
     }
 }
 
