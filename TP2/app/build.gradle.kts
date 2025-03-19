@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.android) version "2.1.0"
+    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
@@ -48,6 +49,9 @@ android {
 }
 
 dependencies {
+
+
+    implementation(libs.gson)
     implementation(libs.play.services.maps.v1900)
     implementation(libs.androidx.core.ktx.v1120)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -58,6 +62,9 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.location)
+    implementation(libs.firebase.crashlytics.buildtools)
+    ksp(libs.androidx.room.compiler)
+//    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)

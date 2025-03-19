@@ -50,9 +50,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var bluetoothAdapter: BluetoothAdapter
-    val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels {
-        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-    }
+    val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels()
+//    val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels {
+//        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+//    }
     private var currentThemeMode = ThemeMode.LIGHT
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -73,6 +74,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
                                 if (location != null) {
                                     val trackedDevice = TrackedDevice.fromBluetoothDevice(device, location.latitude, location.longitude)
                                     trackedDeviceViewModel.insert(trackedDevice)
+                                    deviceList.add(trackedDevice)
+                                    adapter.notifyDataSetChanged()
                                     return@addOnCompleteListener
                                 }
                             }
