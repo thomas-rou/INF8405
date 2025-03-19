@@ -1,7 +1,11 @@
+package com.example.polybluetoothmap.model
+
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
+import com.example.polybluetoothmap.model.trackedDevice.TrackedDeviceDao
 
 @Database(entities = [TrackedDevice::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {

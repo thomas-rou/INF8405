@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.play.services.maps.v1900)
     implementation(libs.androidx.core.ktx.v1120)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.activity.ktx.v190)
     //implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

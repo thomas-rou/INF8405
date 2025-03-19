@@ -1,3 +1,5 @@
+package com.example.polybluetoothmap.model.trackedDevice
+
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import androidx.room.*
@@ -11,6 +13,7 @@ data class TrackedDevice(
     val address: String, // Adresse MAC unique
     val type: Int,
     val bondState: Int,
+    val isFavorite: Boolean = false,
     val alias: String?,
     val bluetoothClass: Int?,
     val uuids: List<String>?
@@ -21,11 +24,11 @@ data class TrackedDevice(
             return TrackedDevice(
                 latitude = latitude,
                 longitude = longitude,
-                name = device.name,
+                name = device.name?:"",
                 address = device.address,
                 type = device.type,
                 bondState = device.bondState,
-                alias = device.alias,
+                alias = device.alias?:"",
                 bluetoothClass = device.bluetoothClass?.deviceClass,
                 uuids = device.uuids?.map { it.toString() }
             )

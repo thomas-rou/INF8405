@@ -1,6 +1,6 @@
 package com.example.polybluetoothmap
 
-import android.Manifest
+import androidx.activity.viewModels
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -26,6 +25,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.provider.Settings
+import android.view.View
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.ViewModelProvider
+import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
+import com.example.polybluetoothmap.viewmodel.TrackedDeviceViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Priority
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -36,8 +42,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var bluetoothAdapter: BluetoothAdapter
-    public val currentThemeMode = ThemeMode.LIGHT
+    private val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels {
+        ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+    }
+    private var currentThemeMode = ThemeMode.LIGHT
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private const val BLUETOOTH_PERMISSION_REQUEST_CODE = 2
@@ -47,21 +57,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         @SuppressLint("MissingPermission", "NewApi")
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
-                    Toast.makeText(context, "Bluetooth discovery started", Toast.LENGTH_SHORT).show()
-                }
 
                 BluetoothDevice.ACTION_FOUND -> {
                     val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                     if (device != null){
-                        Toast.makeText(context, "Device found: ${device.name}, ${device.alias}, ${device.address}", Toast.LENGTH_SHORT).show()
+                        locationProvider.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val location = task.result
+                                if (location != null) {
+                                    val trackedDevice = TrackedDevice.fromBluetoothDevice(device, location.latitude, location.longitude)
+                                    trackedDeviceViewModel.insert(trackedDevice)
+                                    return@addOnCompleteListener
+                                }
+                            }
+                        }
                     }
-
 
                 }
 
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED ->{
-                    Toast.makeText(context, "Bluetooth discovery finished", Toast.LENGTH_SHORT).show()
                     bluetoothAdapter.startDiscovery()
                 }
 
@@ -103,6 +117,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        locationProvider = LocationServices.getFusedLocationProviderClient(this)
+
 
         bluetoothAdapter.startDiscovery()
     }
@@ -184,6 +200,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             finish()
         }
 
+    }
+
+    fun toggleTheme(view: View) {
+//        val parentView = view.parent as? ViewGroup
+        when (currentThemeMode) {
+            ThemeMode.LIGHT -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                currentThemeMode = ThemeMode.DARK
+            }
+            ThemeMode.DARK -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                currentThemeMode = ThemeMode.LIGHT
+            }
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
