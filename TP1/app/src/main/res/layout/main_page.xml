@@ -27,24 +27,43 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
-                android:text="BALANCE"
+                android:text="@string/balance"
                 android:textColor="@color/white"
                 app:layout_constraintTop_toTopOf="@+id/dashboard"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <TextView
-                android:id="@+id/totalAmount"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/totalAmountContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                android:text="1000.00 $"
-                android:textColor="@color/white"
-                android:textSize="20dp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textTotalAmount"/>
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/textTotalAmount">
+
+                <TextView
+                    android:id="@+id/totalAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:text="0.00 $"
+                    android:textColor="@color/white"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/totalAmountContainer"/>
+
+                <ImageView
+                    android:id="@+id/totalAmountModify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintStart_toEndOf="@+id/totalAmount"
+                    app:layout_constraintBottom_toBottomOf="@+id/totalAmount"
+                    android:src="@drawable/ic_pencil" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <!-- Onglets Dépenses et Revenus -->
             <com.google.android.material.tabs.TabLayout
@@ -58,11 +77,11 @@
                 app:tabIndicatorColor="@color/white"
                 app:tabIndicatorFullWidth="false">
                 <com.google.android.material.tabs.TabItem
-                    android:text="Dépenses"
+                    android:text="@string/expenses"
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"/>
                 <com.google.android.material.tabs.TabItem
-                    android:text="Revenus"
+                    android:text="@string/incoms"
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"/>
             </com.google.android.material.tabs.TabLayout>
@@ -98,27 +117,29 @@
                 app:tabIndicatorFullWidth="false"
                 app:layout_constraintTop_toBottomOf="@+id/dashboard">
                 <com.google.android.material.tabs.TabItem
-                    android:text="Jour"
+                    android:id="@+id/day"
+                    android:text="@string/day"
                     android:layout_height="0dp"
                     android:layout_width="0dp"/>
                 <com.google.android.material.tabs.TabItem
-                    android:text="Semaine"
+                    android:id="@+id/week"
+                    android:text="@string/week"
                     android:layout_height="0dp"
                     android:layout_width="0dp"/>
                 <com.google.android.material.tabs.TabItem
-                    android:text="Mois"
+                    android:id="@+id/month"
+                    android:text="@string/month"
                     android:layout_height="0dp"
                     android:layout_width="0dp"/>
                 <com.google.android.material.tabs.TabItem
-                    android:text="Année"
+                    android:id="@+id/year"
+                    android:text="@string/year"
                     android:layout_height="0dp"
                     android:layout_width="0dp"/>
             </com.google.android.material.tabs.TabLayout>
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -132,9 +153,10 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:gravity="start"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="25dp"
                     android:text="&lt;"
                     android:clickable="true"
+                    android:focusable="true"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
 
@@ -143,7 +165,7 @@
                     android:id="@+id/date_range_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Today, July 25"
+                    android:text=""
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -155,17 +177,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="25dp"
                     android:text="&gt;"
                     android:clickable="true"
+                    android:focusable="true"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -188,7 +209,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/yellow"
                     app:backgroundTint="@color/yellow"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp"
                     android:layout_marginTop="-60dp"
                     android:contentDescription="@string/add_expense"
@@ -204,7 +225,10 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/chart_dashboard" />
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintTop_toBottomOf="@+id/chart_dashboard"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

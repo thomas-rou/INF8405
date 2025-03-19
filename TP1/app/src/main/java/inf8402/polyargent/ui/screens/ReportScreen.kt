@@ -97,7 +97,7 @@ fun MainActivity.reportPageSetup(activity: MainActivity) {
     val tabLayout: TabLayout = findViewById(R.id.timePeriodReportTab)
     tabLayout.getTabAt(1)?.select()
 //    setupStackedBarChart(TimeFrequency.WEEKLY, TransactionType.EXPENSE)
-    setupStackedBarChart(frequency, type)
+    setupStackedBarChart(TimeFrequency.WEEKLY, TransactionType.EXPENSE)
     manageSelectedTabInReportView()
 }
 

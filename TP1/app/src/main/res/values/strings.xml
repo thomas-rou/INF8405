@@ -28,4 +28,11 @@
     <string name="income">Revenu</string>
     <string name="expense">Dépense</string>
     <string name="delete">Supprimer</string>
+    <string name="expenses">Dépenses</string>
+    <string name="incoms">Revenus</string>
+    <string name="balance">BALANCE</string>
+    <string name="day">Jour</string>
+    <string name="week">Semaine</string>
+    <string name="month">Mois</string>
+    <string name="year">Année</string>
 </resources>

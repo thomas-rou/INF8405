@@ -29,10 +29,14 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' AND date = :date ORDER BY date DESC")
     fun getExpenseTransactionsByDay(date: String): LiveData<List<Transaction>>
 
-    @Query("SELECT * FROM transactions WHERE type = 'INCOME' AND date BETWEEN :startDate AND :endDate ORDER BY date DESC")
+    @Query("SELECT * FROM transactions WHERE type = 'INCOME' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) " +
+            "BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2)) " +
+            "AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2)) ORDER BY date DESC")
     fun getIncomeTransactionsBDateInterval(startDate: String, endDate: String): LiveData<List<Transaction>>
 
-    @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate ORDER BY date DESC")
+    @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) " +
+            "BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2)) " +
+            "AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2)) ORDER BY date DESC")
     fun getExpenseTransactionsByDateInterval(startDate: String, endDate: String): LiveData<List<Transaction>>
 
     @Query("""
@@ -80,5 +84,38 @@ BETWEEN :startDate AND :endDate
 
     @Query("SELECT COUNT(*) FROM transactions WHERE categoryId = :categoryId")
     suspend fun getTransactionCountForCategory(categoryId: Int): Int
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE type = 'INCOME' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) " +
+            "BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2)) " +
+            "AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2))")
+    fun getIncomesTotalAmountByDates(startDate: String, endDate: String): LiveData<Int>
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) " +
+            "BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2)) " +
+            "AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2))")
+    fun getExpensesTotalAmountByDates(startDate: String, endDate: String): LiveData<Int>
+
+    @Query("""
+    SELECT c.categoryName as categoryName, 
+           (SUM(t.amount) / grandTotal.totalAmount) * 100 as percentage,
+           SUM(t.amount) as totalAmount,
+           c.icon as icon,
+           c.colorHex as colorHex
+           
+    FROM transactions t 
+    JOIN categories c ON t.categoryId = c.id 
+    CROSS JOIN (SELECT SUM(amount) as totalAmount 
+                FROM transactions 
+                WHERE type = :type AND strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) 
+BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2))
+AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2))) 
+as grandTotal
+    WHERE t.type = :type AND strftime('%Y-%m-%d', substr(t.date, 7, 4) || '-' || substr(t.date, 4, 2) || '-' || substr(t.date, 1, 2)) 
+BETWEEN strftime('%Y-%m-%d', substr(:startDate, 7, 4) || '-' || substr(:startDate, 4, 2) || '-' || substr(:startDate, 1, 2))
+AND strftime('%Y-%m-%d', substr(:endDate, 7, 4) || '-' || substr(:endDate, 4, 2) || '-' || substr(:endDate, 1, 2)) 
+    GROUP BY c.categoryName, grandTotal.totalAmount 
+    ORDER BY totalAmount DESC
+""")
+    fun getTransactionsByDateRange(startDate: String, endDate: String, type: String): LiveData<List<CategoryReport>>
 
 }

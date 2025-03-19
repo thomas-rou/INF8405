@@ -1,6 +1,5 @@
 package inf8402.polyargent.ui.screens
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -16,8 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import inf8402.polyargent.MainActivity
 import inf8402.polyargent.R
-import inf8402.polyargent.model.DateTabViewModel
-import inf8402.polyargent.model.PieChartViewModel
+import inf8402.polyargent.model.transaction.DateTabViewModel
 import inf8402.polyargent.model.transaction.Transaction
 import inf8402.polyargent.model.transaction.TransactionType
 import inf8402.polyargent.ui.fragments.AddTransactionFragment
@@ -87,10 +85,9 @@ class TransactionScreen(
 
 fun MainActivity.homePageSetup(activity: MainActivity) {
     setContentView(R.layout.main_page)
-    val pieChart: PieChart = findViewById(R.id.chart)
-    val pieChartView = PieChartViewModel()
-    pieChartView.setupPieChart(pieChart)
     manageSelectedTab(activity)
+    manageSelectedDateRange(activity)
+    manageBalanceChange()
 
     adapter = TransactionScreen(
         onDeleteClick = { transaction ->
@@ -120,10 +117,9 @@ fun MainActivity.setupTransactionScreen() {
 }
 
 fun MainActivity.manageSelectedTab(activity: MainActivity) {
-    val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
-    val dateRangeText: TextView = findViewById(R.id.date_range_text)
     val transactionTab : TabLayout = findViewById(R.id.tabs)
 
+    currentTransactionTab = 0
     transactionTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab?) {
             when (tab?.position) {
@@ -131,29 +127,102 @@ fun MainActivity.manageSelectedTab(activity: MainActivity) {
                     transactionViewModel.allExpenses.observe(activity as LifecycleOwner) { transactionsGot ->
                         adapter.submitList(transactionsGot)
                     }
-
+                    currentTransactionTab = 0
                 }
 
                 1 -> {
                     transactionViewModel.allIncomes.observe(activity as LifecycleOwner) { transactionsGot ->
                         adapter.submitList(transactionsGot)
                     }
-
+                    currentTransactionTab = 1
                 }
             }
-
+            manageSelectedDateRange(activity)
         }
         override fun onTabUnselected(tab: TabLayout.Tab?) {}
         override fun onTabReselected(tab: TabLayout.Tab?) {}
     })
+}
+
+fun MainActivity.manageSelectedDateRange(activity: MainActivity) {
+    val tabLayout: TabLayout = findViewById(R.id.tabTimePeriod)
+    val dateRangeText: TextView = findViewById(R.id.date_range_text)
+    val prevDate: TextView = findViewById(R.id.previous)
+    val nextDate: TextView = findViewById(R.id.next)
 
     tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab?) {
-            val dateTab = DateTabViewModel()
-            val dateRange = dateTab.getDateRangeForTab(tab?.position ?: 0)
-            dateRangeText.text = dateRange
+            dateRangeText.text = dateTab.getDateRangeForTab(tab?.position ?: 1)
+            filterTransactionsByDate(activity, tab?.position, dateRangeText.text.toString())
         }
         override fun onTabUnselected(tab: TabLayout.Tab?) {}
-        override fun onTabReselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {
+            dateRangeText.text = dateTab.getDateRangeForTab(tab?.position ?: 1)
+            filterTransactionsByDate(activity, tab?.position, dateRangeText.text.toString())
+        }
     })
+    tabLayout.getTabAt(1)?.select()
+    dateRangeText.text = dateTab.getDateRangeForTab(1)
+    filterTransactionsByDate(activity, 1, dateRangeText.text.toString())
+
+    prevDate.setOnClickListener {
+        dateTab.adjustBaseDate(tabLayout.selectedTabPosition, -1)
+        tabLayout.getTabAt(tabLayout.selectedTabPosition)?.select()
+    }
+    nextDate.setOnClickListener {
+        dateTab.adjustBaseDate(tabLayout.selectedTabPosition, 1)
+        tabLayout.getTabAt(tabLayout.selectedTabPosition)?.select()
+    }
+}
+
+fun MainActivity.filterTransactionsByDate(activity: MainActivity, tabPos: Int?, date: String) {
+    val pieChart: PieChart = findViewById(R.id.chart)
+    pieChart.centerText = "0.0 $"
+    val dates = dateTab.extractDates(date)
+    if (tabPos == 0) {
+        if (currentTransactionTab == 0) {
+            transactionViewModel.getExpenseTransactionsByDay(dates[0]).observe(activity as LifecycleOwner) { transactionsGot ->
+                adapter.submitList(transactionsGot)
+            }
+            homeViewModel.getExpensesTotalAmount(dates[0], dates[0]).observe(activity as LifecycleOwner) { total ->
+                if (total != null) pieChart.centerText = "$total \$"
+            }
+            homeViewModel.getExpenseTransactionsByDateRange(dates[0], dates[0]).observe(activity as LifecycleOwner) { transactions ->
+                pieChartView.setupPieChart(pieChart, transactions)
+            }
+        } else {
+            transactionViewModel.getIncomeTransactionsByDay(dates[0]).observe(activity as LifecycleOwner) { transactionsGot ->
+                adapter.submitList(transactionsGot)
+            }
+            homeViewModel.getIncomesTotalAmount(dates[0], dates[0]).observe(activity as LifecycleOwner) { total ->
+                if (total != null) pieChart.centerText = "$total \$"
+            }
+            homeViewModel.getIncomeTransactionsByDateRange(dates[0], dates[0]).observe(activity as LifecycleOwner) { transactions ->
+                pieChartView.setupPieChart(pieChart, transactions)
+            }
+        }
+    }
+    else {
+        if (currentTransactionTab == 0) {
+            transactionViewModel.getExpenseTransactionsByDateInterval(dates[0], dates[1]).observe(activity as LifecycleOwner) { transactionsGot ->
+                adapter.submitList(transactionsGot)
+            }
+            homeViewModel.getExpensesTotalAmount(dates[0], dates[1]).observe(activity as LifecycleOwner) { total ->
+                if (total != null) pieChart.centerText = "$total \$"
+            }
+            homeViewModel.getExpenseTransactionsByDateRange(dates[0], dates[1]).observe(activity as LifecycleOwner) { transactions ->
+                pieChartView.setupPieChart(pieChart, transactions)
+            }
+        } else {
+            transactionViewModel.getIncomeTransactionsBDateInterval(dates[0], dates[1]).observe(activity as LifecycleOwner) { transactionsGot ->
+                adapter.submitList(transactionsGot)
+            }
+            homeViewModel.getIncomesTotalAmount(dates[0], dates[1]).observe(activity as LifecycleOwner) { total ->
+                if (total != null) pieChart.centerText = "$total \$"
+            }
+            homeViewModel.getIncomeTransactionsByDateRange(dates[0], dates[1]).observe(activity as LifecycleOwner) { transactions ->
+                pieChartView.setupPieChart(pieChart, transactions)
+            }
+        }
+    }
 }
