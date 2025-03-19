@@ -47,13 +47,13 @@ abstract class TransactionDatabase : RoomDatabase() {
         }
 
         suspend fun populateDatabase(categoryDao: CategoryDao) {
-            categoryDao.insert(Category(categoryName = "Autres", type = TransactionType.EXPENSE, icon = "ic_circle_help", colorHex = "#EEC000"))
-            categoryDao.insert(Category(categoryName = "Autres", type = TransactionType.INCOME, icon = "ic_circle_help", colorHex = "#759F85"))
-            categoryDao.insert(Category(categoryName = "Salaire", type = TransactionType.INCOME, icon = "ic_wallet", colorHex = "#759F85"))
-            categoryDao.insert(Category(categoryName = "Bonus", type = TransactionType.INCOME, icon = "ic_badge_dollar_sign", colorHex = "#759F85"))
-            categoryDao.insert(Category(categoryName = "Loyer", type = TransactionType.EXPENSE, icon = "ic_house", colorHex = "#EEC000"))
-            categoryDao.insert(Category(categoryName = "Épiceries", type = TransactionType.EXPENSE, icon = "ic_shopping_basket", colorHex = "#EEC000"))
-            categoryDao.insert(Category(categoryName = "Loisirs", type = TransactionType.EXPENSE, icon = "ic_dribble", colorHex = "#EEC000"))
+            categoryDao.insert(Category(categoryName = "Autres", type = TransactionType.EXPENSE, icon = "ic_circle_help", colorHex = "#23C9DB"))
+            categoryDao.insert(Category(categoryName = "Autres", type = TransactionType.INCOME, icon = "ic_circle_help", colorHex = "#2FC4CC"))
+            categoryDao.insert(Category(categoryName = "Salaire", type = TransactionType.INCOME, icon = "ic_wallet", colorHex = "#2EBD15"))
+            categoryDao.insert(Category(categoryName = "Bonus", type = TransactionType.INCOME, icon = "ic_badge_dollar_sign", colorHex = "#D66D18"))
+            categoryDao.insert(Category(categoryName = "Loyer", type = TransactionType.EXPENSE, icon = "ic_house", colorHex = "#BA2D61"))
+            categoryDao.insert(Category(categoryName = "Épiceries", type = TransactionType.EXPENSE, icon = "ic_shopping_basket", colorHex = "#44C43D"))
+            categoryDao.insert(Category(categoryName = "Loisirs", type = TransactionType.EXPENSE, icon = "ic_dribble", colorHex = "#D6B822"))
         }
         suspend fun populateDBAccount(accountDao: AccountDao) {
             accountDao.insert(Account(id = 1, balance = "0.00 $"))
