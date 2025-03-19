@@ -1,9 +1,12 @@
 package com.example.polybluetoothmap.ui
 
 
+import android.app.AlertDialog
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -69,9 +72,7 @@ fun MapsActivity.trackedItemSetupView(){
 
         adapter = TrackedDeviceAdapter(deviceList,
             onItemClick = { device ->
-//                val intent = Intent(this, DeviceDetailActivity::class.java)
-//                intent.putExtra("trackedDevice", device)
-//                startActivity(intent)
+               showDeviceDetailsDialog(this, device)
             },
             onFavoriteClick = { device ->
                 trackedDeviceViewModel.updateFavoriteStatus(device.address, !device.isFavorite)
@@ -79,4 +80,36 @@ fun MapsActivity.trackedItemSetupView(){
         )
 
     recyclerView.adapter = adapter
+}
+
+
+fun MapsActivity.showDeviceDetailsDialog(context: Context, device: TrackedDevice) {
+    val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_device_details, null)
+    val tvDetails = dialogView.findViewById<TextView>(R.id.tvDeviceDetails)
+    val btnClose = dialogView.findViewById<Button>(R.id.btnClose)
+
+    val details = """
+        Name: ${device.name ?: "Unknown"}
+        Alias: ${device.alias ?: "None"}
+        MAC Address: ${device.address}
+        Latitude: ${device.latitude}
+        Longitude: ${device.longitude}
+        Type: ${device.type}
+        Bond State: ${device.bondState}
+        Bluetooth Class: ${device.bluetoothClass ?: "N/A"}
+        UUIDs: ${device.uuids?.joinToString() ?: "N/A"}
+    """.trimIndent()
+
+    tvDetails.text = details
+
+    val dialog = AlertDialog.Builder(context)
+        .setView(dialogView)
+        .setCancelable(true)
+        .create()
+
+    btnClose.setOnClickListener {
+        dialog.dismiss()
+    }
+
+    dialog.show()
 }

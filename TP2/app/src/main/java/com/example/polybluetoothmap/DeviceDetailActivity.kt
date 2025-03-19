@@ -1,6 +1,5 @@
 package com.example.polybluetoothmap
 
-import android.os.Build
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +9,7 @@ class DeviceDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_device_detail)
+        setContentView(R.layout.dialog_device_details)
 
 //        val device = intent.getParcelableExtra<TrackedDevice>("trackedDevice")
         val device = TrackedDevice(1, 45.5, -73.6, "Device A", "00:11:22:33:44:55", 1, 0, false,"Alias A", 0, null)
