@@ -44,7 +44,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     }
 
     private val bluetoothScanner = object : BroadcastReceiver() {
-        @SuppressLint("MissingPermission")
+        @SuppressLint("MissingPermission", "NewApi")
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
@@ -53,6 +53,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
                 BluetoothDevice.ACTION_FOUND -> {
                     val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                    if (device != null){
+                        Toast.makeText(context, "Device found: ${device.name}, ${device.alias}, ${device.address}", Toast.LENGTH_SHORT).show()
+                    }
 
 
                 }
