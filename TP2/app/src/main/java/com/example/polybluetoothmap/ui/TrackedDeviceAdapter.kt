@@ -3,12 +3,14 @@ package com.example.polybluetoothmap.ui
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -117,6 +119,7 @@ fun MapsActivity.showDeviceDetailsDialog(context: Context, device: TrackedDevice
     val tvDetails = dialogView.findViewById<TextView>(R.id.tvDeviceDetails)
     val btnClose = dialogView.findViewById<Button>(R.id.btnClose)
     val directionBtn = dialogView.findViewById<Button>(R.id.directionBtn)
+    val shareBtn = dialogView.findViewById<Button>(R.id.btnShare)
 
     val details = """
         Name: ${device.name ?: "Unknown"}
@@ -146,6 +149,11 @@ fun MapsActivity.showDeviceDetailsDialog(context: Context, device: TrackedDevice
         dialog.dismiss()
     }
 
+    shareBtn.setOnClickListener {
+        shareInformation(dialogView)
+        dialog.dismiss()
+    }
+
     dialog.show()
 }
 
@@ -153,5 +161,23 @@ fun MapsActivity.displayFindDeviceOnMap(device: TrackedDevice){
     val deviceLocation = LatLng(device.latitude, device.longitude)
     mMap.addMarker(MarkerOptions().position(deviceLocation).title(device.address))
 
+}
+
+fun MapsActivity.shareInformation(view: View){
+    val currentDevice: TrackedDevice? = deviceList.find { device -> device.address == selectedDeviceAddress }
+    if (currentDevice != null) {
+        val tvDetails = view.findViewById<TextView>(R.id.tvDeviceDetails)
+        val infoToShare = tvDetails.text.toString()
+
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, infoToShare)
+            type = "text/plain"
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share Device Info"))
+    }
+    else {
+        Toast.makeText(this, "No device selected!", Toast.LENGTH_SHORT).show()
+    }
 }
 

@@ -36,3 +36,4 @@ fun MapsActivity.getDirectionToSelectedDevice() {
         Toast.makeText(this, "Location permission is required", Toast.LENGTH_SHORT).show()
     }
 }
+
