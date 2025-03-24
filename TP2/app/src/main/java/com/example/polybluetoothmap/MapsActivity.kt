@@ -172,9 +172,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
                     LOCATION_PERMISSION_REQUEST_CODE
                 )
         }
-        else{
-            setLocationToCurrentPosition()
-        }
+        // else{
+        //     setLocationToCurrentPosition()
+        // }
     }
 
     private fun requestBluetoothPermission(){
@@ -256,7 +256,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            setLocationToCurrentPosition()
+            //setLocationToCurrentPosition()
         } else if (requestCode == BLUETOOTH_PERMISSION_REQUEST_CODE) {
             if(!isBluetoothPermissionGranted()) {
                 Toast.makeText(this, "Bluetooth permissions is required", Toast.LENGTH_SHORT).show()
