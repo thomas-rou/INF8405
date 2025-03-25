@@ -1,16 +1,9 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.PolyBluetoothMap" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-    </style>
+<resources>
+    <color name="purple_200">#BB86FC</color> <!-- Lighter Purple -->
+    <color name="purple_500">#3700B3</color> <!-- Dark Purple -->
+    <color name="purple_700">#6200EE</color> <!-- Deep Purple -->
+    <color name="teal_200">#03DAC5</color> <!-- Same -->
+    <color name="teal_700">#018786</color> <!-- Same -->
+    <color name="black">#121212</color> <!-- Dark Background -->
+    <color name="white">#FFFFFF</color> <!-- Keep for contrast -->
 </resources>
