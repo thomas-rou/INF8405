@@ -40,6 +40,7 @@ import com.example.polybluetoothmap.ui.displayFindDeviceOnMap
 import com.example.polybluetoothmap.ui.showDeviceDetailsDialog
 import com.example.polybluetoothmap.ui.trackedItemSetupView
 import com.example.polybluetoothmap.ui.updateDeviceListView
+import com.example.polybluetoothmap.ui.ThemeManager
 import com.example.polybluetoothmap.viewmodel.TrackedDeviceViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
@@ -47,11 +48,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MapStyleOptions
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
-
-    enum class ThemeMode {
-        LIGHT,
-        DARK
-    }
 
     public lateinit var recyclerView: RecyclerView
     public lateinit var selectedDeviceAddress: String
@@ -61,8 +57,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     private lateinit var binding: ActivityMapsBinding
     internal lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var bluetoothAdapter: BluetoothAdapter
+    private lateinit var themeManager: ThemeManager
     val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels()
-    private var currentThemeMode = ThemeMode.LIGHT
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private const val BLUETOOTH_PERMISSION_REQUEST_CODE = 2
@@ -118,15 +114,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val prefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-        val isDarkMode = prefs.getBoolean("isDarkMode", false)
-
-        currentThemeMode = if (isDarkMode) ThemeMode.DARK else ThemeMode.LIGHT
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
-            else AppCompatDelegate.MODE_NIGHT_NO
-        )
-
         supportActionBar?.hide()
 
         requestBluetoothPermission()
@@ -144,6 +131,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
+
+        themeManager = ThemeManager(this)
 
 
         bluetoothAdapter.startDiscovery()
@@ -263,18 +252,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     }
 
     fun toggleTheme(view: View) {
-        val isDarkMode = currentThemeMode == ThemeMode.LIGHT
-        saveThemePreference(isDarkMode)
-
-        if (isDarkMode) {
-            setMapStyle(R.raw.dark_map_style)  // Apply instantly
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            currentThemeMode = ThemeMode.DARK
-        } else {
-            setMapStyle(R.raw.default_map_style)  // Apply instantly
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            currentThemeMode = ThemeMode.LIGHT
-        }
+        themeManager.toggleTheme()
+        themeManager.applyMapStyle(mMap)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -289,11 +268,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             }
         requestLocationPermission()
 
-        if (currentThemeMode == ThemeMode.DARK) {
-            setMapStyle(R.raw.dark_map_style)
-        } else {
-            setMapStyle(R.raw.default_map_style)
-        }
+        themeManager.applyMapStyle(mMap)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -306,25 +281,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-    }
-
-    private fun setMapStyle(styleResId: Int) {
-        try {
-            val success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, styleResId))
-            if (!success) {
-                Toast.makeText(this, "Map style parsing failed.", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Resources.NotFoundException) {
-            Toast.makeText(this, "Can't find map style: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun saveThemePreference(isDarkMode: Boolean) {
-        val prefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-        with(prefs.edit()) {
-            putBoolean("isDarkMode", isDarkMode)
-            apply()
         }
     }
 }
