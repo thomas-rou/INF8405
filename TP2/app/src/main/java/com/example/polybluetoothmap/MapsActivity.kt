@@ -40,6 +40,7 @@ import com.example.polybluetoothmap.ui.displayFindDeviceOnMap
 import com.example.polybluetoothmap.ui.showDeviceDetailsDialog
 import com.example.polybluetoothmap.ui.trackedItemSetupView
 import com.example.polybluetoothmap.ui.updateDeviceListView
+import com.example.polybluetoothmap.ui.SideMenuHelper
 import com.example.polybluetoothmap.ui.ThemeManager
 import com.example.polybluetoothmap.viewmodel.TrackedDeviceViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -58,6 +59,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     internal lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private lateinit var themeManager: ThemeManager
+    private lateinit var sideMenuHelper: SideMenuHelper
     val trackedDeviceViewModel: TrackedDeviceViewModel by viewModels()
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -138,7 +140,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         bluetoothAdapter.startDiscovery()
         trackedItemSetupView()
 
-        toggleSideMenu()
+        val btnToggleList = findViewById<ImageButton>(R.id.BtnToggleList)
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
+        val menuDrawer = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.menuDrawer)
+
+        sideMenuHelper = SideMenuHelper(drawerLayout, menuDrawer, btnToggleList)
     }
 
     fun isLocationPermissionGranted(): Boolean {
@@ -150,24 +156,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
                 )
-    }
-
-    private fun toggleSideMenu(){
-        val btnToggleList = findViewById<ImageButton>(R.id.BtnToggleList)
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
-        val menuDrawer = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.menuDrawer)
-
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-
-        btnToggleList.setOnClickListener {
-            if (drawerLayout.isDrawerOpen(menuDrawer)) {
-                drawerLayout.closeDrawer(menuDrawer)
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-            } else {
-                drawerLayout.openDrawer(menuDrawer)
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-            }
-        }
     }
 
     private fun isBluetoothPermissionGranted():Boolean{
