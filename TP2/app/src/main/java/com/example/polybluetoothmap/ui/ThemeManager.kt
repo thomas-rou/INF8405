@@ -1,5 +1,7 @@
 package com.example.polybluetoothmap.ui
 import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -50,10 +52,12 @@ class ThemeManager(private val context: Context) {
         try {
             val success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, styleResId))
             if (!success) {
-                // Handle error
+                Log.e("ThemeManager", "Failed to apply map style: $styleResId")
+                Toast.makeText(context, "Failed to load map style. Using default.", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            // Handle error
+            Log.e("ThemeManager", "Error applying map style", e)
+            Toast.makeText(context, "Error applying map style. Please try again.", Toast.LENGTH_SHORT).show()
         }
     }
 
