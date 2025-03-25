@@ -23,10 +23,15 @@ import com.example.polybluetoothmap.databinding.ActivityMapsBinding
 import com.google.android.gms.location.LocationServices
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Resources
 import android.net.Uri
 import android.provider.Settings
 import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.polybluetoothmap.model.trackedDevice.TrackedDevice
@@ -39,6 +44,7 @@ import com.example.polybluetoothmap.viewmodel.TrackedDeviceViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.MapStyleOptions
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -112,6 +118,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val prefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val isDarkMode = prefs.getBoolean("isDarkMode", false)
+
+        currentThemeMode = if (isDarkMode) ThemeMode.DARK else ThemeMode.LIGHT
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
         supportActionBar?.hide()
 
         requestBluetoothPermission()
@@ -133,6 +148,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
         bluetoothAdapter.startDiscovery()
         trackedItemSetupView()
+
+        toggleSideMenu()
     }
 
     fun isLocationPermissionGranted(): Boolean {
@@ -144,6 +161,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
                 )
+    }
+
+    private fun toggleSideMenu(){
+        val btnToggleList = findViewById<ImageButton>(R.id.BtnToggleList)
+        val drawerLayout = findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawerLayout)
+        val menuDrawer = findViewById<ScrollView>(R.id.menuDrawer)
+
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
+        btnToggleList.setOnClickListener {
+            if (drawerLayout.isDrawerOpen(menuDrawer)) {
+                drawerLayout.closeDrawer(menuDrawer)
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+            } else {
+                drawerLayout.openDrawer(menuDrawer)
+            }
+        }
     }
 
     private fun isBluetoothPermissionGranted():Boolean{
@@ -228,17 +262,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
     }
 
     fun toggleTheme(view: View) {
-//        val parentView = view.parent as? ViewGroup
-        when (currentThemeMode) {
-            ThemeMode.LIGHT -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                currentThemeMode = ThemeMode.DARK
-            }
-            ThemeMode.DARK -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                currentThemeMode = ThemeMode.LIGHT
-            }
+        val isDarkMode = currentThemeMode == ThemeMode.LIGHT
+        saveThemePreference(isDarkMode)
+
+        if (isDarkMode) {
+            setMapStyle(R.raw.dark_map_style)  // Apply instantly
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            currentThemeMode = ThemeMode.DARK
+        } else {
+            setMapStyle(R.raw.default_map_style)  // Apply instantly
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            currentThemeMode = ThemeMode.LIGHT
         }
+
+        recreate()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -252,6 +289,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             false
             }
         requestLocationPermission()
+
+        if (currentThemeMode == ThemeMode.DARK) {
+            setMapStyle(R.raw.dark_map_style)
+        } else {
+            setMapStyle(R.raw.default_map_style)
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -267,4 +310,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         }
     }
 
+    private fun setMapStyle(styleResId: Int) {
+        try {
+            val success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, styleResId))
+            if (!success) {
+                Toast.makeText(this, "Map style parsing failed.", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Resources.NotFoundException) {
+            Toast.makeText(this, "Can't find map style: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveThemePreference(isDarkMode: Boolean) {
+        val prefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        with(prefs.edit()) {
+            putBoolean("isDarkMode", isDarkMode)
+            apply()
+        }
+    }
 }
