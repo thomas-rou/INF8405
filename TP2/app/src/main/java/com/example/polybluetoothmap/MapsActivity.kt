@@ -165,8 +165,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
 
     private fun toggleSideMenu(){
         val btnToggleList = findViewById<ImageButton>(R.id.BtnToggleList)
-        val drawerLayout = findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawerLayout)
-        val menuDrawer = findViewById<ScrollView>(R.id.menuDrawer)
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
+        val menuDrawer = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.menuDrawer)
 
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
