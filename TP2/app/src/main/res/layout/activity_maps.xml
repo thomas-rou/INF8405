@@ -37,7 +37,8 @@
                 android:id="@+id/recyclerViewTrackedDevices"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"/>
+                android:scrollbars="vertical"
+                android:layout_marginTop="32dp"/>
         </ScrollView>
     </androidx.drawerlayout.widget.DrawerLayout>
 
@@ -54,10 +55,9 @@
 
     <ImageButton
         android:id="@+id/BtnToggleList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/list_24px"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/list_24px"
         android:contentDescription="@string/toggle_device_list"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
