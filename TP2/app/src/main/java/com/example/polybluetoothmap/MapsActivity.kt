@@ -173,9 +173,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
         btnToggleList.setOnClickListener {
             if (drawerLayout.isDrawerOpen(menuDrawer)) {
                 drawerLayout.closeDrawer(menuDrawer)
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             } else {
                 drawerLayout.openDrawer(menuDrawer)
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
             }
         }
     }
@@ -274,8 +275,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnR
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             currentThemeMode = ThemeMode.LIGHT
         }
-
-        recreate()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
