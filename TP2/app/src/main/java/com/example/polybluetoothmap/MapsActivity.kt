@@ -95,7 +95,6 @@ class MapsActivity :
                         }
                         BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
                             bluetoothAdapter.startDiscovery()
-                            updateCurrentPositionMarker()
                         }
                         BluetoothAdapter.ACTION_STATE_CHANGED -> {
                             when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)) {
@@ -204,9 +203,9 @@ class MapsActivity :
                     LOCATION_PERMISSION_REQUEST_CODE
             )
         }
-        // else{
-        //     setLocationToCurrentPosition()
-        // }
+         else{
+             setLocationToCurrentPosition()
+         }
     }
 
     private fun requestBluetoothPermission() {
@@ -260,16 +259,6 @@ class MapsActivity :
                     .addOnSuccessListener { location ->
                         if (location != null) {
                             val currentLatLng = LatLng(location.latitude, location.longitude)
-                            mMap.addMarker(
-                                    MarkerOptions()
-                                            .position(currentLatLng)
-                                            .title("current location")
-                                            .icon(
-                                                    BitmapDescriptorFactory.defaultMarker(
-                                                            BitmapDescriptorFactory.HUE_YELLOW
-                                                    )
-                                            )
-                            )
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
                         } else {
                             Toast.makeText(
@@ -320,7 +309,7 @@ class MapsActivity :
             grantResults: IntArray
     ) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            // setLocationToCurrentPosition()
+             setLocationToCurrentPosition()
         } else if (requestCode == BLUETOOTH_PERMISSION_REQUEST_CODE) {
             if (!isBluetoothPermissionGranted()) {
                 Toast.makeText(this, "Bluetooth permissions is required", Toast.LENGTH_SHORT).show()
