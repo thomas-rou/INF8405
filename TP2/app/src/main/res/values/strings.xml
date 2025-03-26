@@ -3,4 +3,12 @@
     <string name="title_activity_maps">Poly Bluetooth Map</string>
     <string name="app_logo_description">Logo de l\'application</string>
     <string name="app_name_string">PolyBluetoothMap</string>
+    <string name="toggle_device_list">Toggle device list</string>
+    <string name="swap_theme">Swap theme</string>
+    <string name="close_button_content_description">Close button</string>
+    <string name="share_button_content_description">Share button</string>
+    <string name="direction_button_content_description">Direction button</string>
+    <string name="close_caption">Close</string>
+    <string name="share_caption">Share</string>
+    <string name="direction_caption">Direction</string>
 </resources>

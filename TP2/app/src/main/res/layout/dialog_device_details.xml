@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -10,39 +11,87 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:textColor="@android:color/black" />
+        android:textColor="?attr/colorOnSecondary" />
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:gravity="end">
+        android:gravity="center_horizontal">
 
-        <Button
-            android:id="@+id/directionBtn"
+        <!-- Direction Button with Icon -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="direction"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="16dp">
+            <Button
+                android:id="@+id/directionBtn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/location_on_24px"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/direction_button_content_description"/>
+            <TextView
+                android:id="@+id/directionCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/direction_caption"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSecondary" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/btnClose"
+        <!-- Share Button with Icon -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Close"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp">
+            <Button
+                android:id="@+id/btnShare"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/share_24px"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/share_button_content_description"/>
+            <TextView
+                android:id="@+id/shareCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/share_caption"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSecondary" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/btnShare"
+        <!-- Close Button with Icon -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Share"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp">
+            <Button
+                android:id="@+id/btnClose"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/close_24px"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/close_button_content_description"/>
+            <TextView
+                android:id="@+id/closeCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/close_caption"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSecondary" />
+        </LinearLayout>
 
     </LinearLayout>
-
-
 </LinearLayout>
