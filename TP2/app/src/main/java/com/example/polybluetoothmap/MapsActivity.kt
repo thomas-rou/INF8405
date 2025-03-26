@@ -120,12 +120,14 @@ class MapsActivity :
         supportActionBar?.hide()
 
         requestBluetoothPermission()
-        val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
-        bluetoothAdapter = bluetoothManager.adapter
-        registerReceiver(bluetoothScanner, IntentFilter(BluetoothDevice.ACTION_FOUND))
-        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
-        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED))
-        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
+
+        if (isBluetoothPermissionGranted()) {
+            requestLocationPermission()
+        }
+
+        if (isBluetoothPermissionGranted() && isLocationPermissionGranted()) {
+            startDeviceDiscovery()
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         binding = ActivityMapsBinding.inflate(layoutInflater)
@@ -136,7 +138,6 @@ class MapsActivity :
 
         themeManager = ThemeManager(this)
 
-        bluetoothAdapter.startDiscovery()
         trackedItemSetupView()
 
         val btnToggleList = findViewById<ImageButton>(R.id.BtnToggleList)
@@ -145,6 +146,17 @@ class MapsActivity :
                 findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.menuDrawer)
 
         sideMenuHelper = SideMenuHelper(drawerLayout, menuDrawer, btnToggleList)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startDeviceDiscovery(){
+        val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
+        bluetoothAdapter = bluetoothManager.adapter
+        registerReceiver(bluetoothScanner, IntentFilter(BluetoothDevice.ACTION_FOUND))
+        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
+        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED))
+        registerReceiver(bluetoothScanner, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
+        bluetoothAdapter.startDiscovery()
     }
 
     fun isLocationPermissionGranted(): Boolean {
@@ -203,9 +215,6 @@ class MapsActivity :
                     LOCATION_PERMISSION_REQUEST_CODE
             )
         }
-         else{
-             setLocationToCurrentPosition()
-         }
     }
 
     private fun requestBluetoothPermission() {
@@ -298,8 +307,9 @@ class MapsActivity :
             }
             false
         }
-        requestLocationPermission()
-
+        if (isLocationPermissionGranted()) {
+            setLocationToCurrentPosition()
+        }
         themeManager.applyMapStyle(mMap)
     }
 
@@ -310,10 +320,14 @@ class MapsActivity :
     ) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
              setLocationToCurrentPosition()
+             startDeviceDiscovery()
         } else if (requestCode == BLUETOOTH_PERMISSION_REQUEST_CODE) {
             if (!isBluetoothPermissionGranted()) {
                 Toast.makeText(this, "Bluetooth permissions is required", Toast.LENGTH_SHORT).show()
                 finish()
+            }
+            else{
+                requestLocationPermission()
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
