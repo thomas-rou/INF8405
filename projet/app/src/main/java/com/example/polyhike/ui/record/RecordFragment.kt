@@ -23,12 +23,12 @@ class RecordFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val recordViewModel =
-            ViewModelProvider(this).get(RecordViewModel::class.java)
+            ViewModelProvider(this)[RecordViewModel::class.java]
 
         _binding = FragmentRecordBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textDashboard
+        val textView: TextView = binding.textRecord
         recordViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
