@@ -44,10 +44,10 @@ import android.os.Build
 class MapsActivity :
         AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
 
-    public lateinit var recyclerView: RecyclerView
-    public lateinit var selectedDeviceAddress: String
-    public lateinit var adapter: TrackedDeviceAdapter
-    public var deviceList: MutableList<TrackedDevice> = mutableListOf()
+    lateinit var recyclerView: RecyclerView
+    lateinit var selectedDeviceAddress: String
+    lateinit var adapter: TrackedDeviceAdapter
+    var deviceList: MutableList<TrackedDevice> = mutableListOf()
     lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     internal lateinit var locationProvider: FusedLocationProviderClient
@@ -60,6 +60,7 @@ class MapsActivity :
         private const val BLUETOOTH_PERMISSION_REQUEST_CODE = 2
     }
 
+    // Bluetooth scanning and device discovery handling
     private val bluetoothScanner =
             object : BroadcastReceiver() {
                 @SuppressLint("MissingPermission", "NewApi")
@@ -113,10 +114,12 @@ class MapsActivity :
                 }
             }
 
+    // Activity's onCreate method, initializing components and requesting permissions
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Hide the action bar
         supportActionBar?.hide()
 
         requestBluetoothPermission()
@@ -125,6 +128,7 @@ class MapsActivity :
             requestLocationPermission()
         }
 
+        // Start device discovery if both Bluetooth and Location permissions are granted
         if (isBluetoothPermissionGranted() && isLocationPermissionGranted()) {
             startDeviceDiscovery()
         }
@@ -136,10 +140,12 @@ class MapsActivity :
         mapFragment.getMapAsync(this)
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
 
+        // Initialize theme manager and side menu helper
         themeManager = ThemeManager(this)
 
         trackedItemSetupView()
 
+        // Set up side menu
         val btnToggleList = findViewById<ImageButton>(R.id.BtnToggleList)
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
         val menuDrawer =
@@ -148,6 +154,7 @@ class MapsActivity :
         sideMenuHelper = SideMenuHelper(drawerLayout, menuDrawer, btnToggleList)
     }
 
+    // Starts the Bluetooth device discovery process
     @SuppressLint("MissingPermission")
     private fun startDeviceDiscovery(){
         val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
@@ -159,6 +166,7 @@ class MapsActivity :
         bluetoothAdapter.startDiscovery()
     }
 
+    // Checks if location permissions are granted
     fun isLocationPermissionGranted(): Boolean {
         return (ActivityCompat.checkSelfPermission(
                 this,
@@ -170,6 +178,7 @@ class MapsActivity :
                 ) == PackageManager.PERMISSION_GRANTED)
     }
 
+    // Checks if Bluetooth permissions are granted
     private fun isBluetoothPermissionGranted(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             return (ActivityCompat.checkSelfPermission(
@@ -196,6 +205,7 @@ class MapsActivity :
         }
     }
 
+    // Opens the app settings if permission is denied
     private fun openAppSettings() {
         val intent =
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -204,6 +214,7 @@ class MapsActivity :
         startActivity(intent)
     }
 
+    // Requests Location permission if not granted
     private fun requestLocationPermission() {
         if (!isLocationPermissionGranted()) {
             ActivityCompat.requestPermissions(
@@ -217,6 +228,7 @@ class MapsActivity :
         }
     }
 
+    // Requests Bluetooth permission if not granted
     private fun requestBluetoothPermission() {
         if (!isBluetoothPermissionGranted()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -239,6 +251,7 @@ class MapsActivity :
         }
     }
 
+    // Updates the marker for the current position on the map
     @SuppressLint("MissingPermission")
     private fun updateCurrentPositionMarker() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -259,6 +272,7 @@ class MapsActivity :
         }
     }
 
+    // Sets the map's camera to the current location
     @SuppressLint("MissingPermission")
     private fun setLocationToCurrentPosition() {
         if (isLocationPermissionGranted()) {
@@ -292,11 +306,13 @@ class MapsActivity :
         }
     }
 
+    // Toggles between light and dark theme
     fun toggleTheme(view: View) {
         themeManager.toggleTheme()
         themeManager.applyMapStyle(mMap)
     }
 
+    // Called when the map is ready to use
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.setOnMarkerClickListener { clickedMarker ->
@@ -313,6 +329,7 @@ class MapsActivity :
         themeManager.applyMapStyle(mMap)
     }
 
+    // Handles permission request results
     override fun onRequestPermissionsResult(
             requestCode: Int,
             permissions: Array<out String>,
