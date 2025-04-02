@@ -8,6 +8,6 @@ import java.util.Date
 data class Statistic(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val userId: Int, // Foreign Key from UserProfile
-    val date: Date,
+    val date: String,
     val value: Double
 )

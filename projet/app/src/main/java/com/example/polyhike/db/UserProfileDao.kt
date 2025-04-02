@@ -19,4 +19,7 @@ interface UserProfileDao {
 
     @Query("SELECT name FROM user_profiles WHERE id = :id")
     fun getUserNameById(id: Int): String
+
+    @Query("SELECT * FROM user_profiles WHERE name = :name AND password = :password")
+    fun getUserByNameAndPassword(name: String, password: String): UserProfile?
 }

@@ -11,7 +11,7 @@ data class Activity(
     val userId: Int, // Foreign Key from UserProfile
     val description: String,
     val itinerary: String, // TODO: change to map
-    val date: Date, // start date and time
+    val date: String, // start date and time
     val duration: Int,
     val totalDistance: Int,
     val totalSteps: Int,

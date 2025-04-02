@@ -13,7 +13,6 @@ import com.example.polyhike.model.Statistic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Date
 
 @Database(entities = [UserProfile::class, Statistic::class, Activity::class], version = 2)
 @TypeConverters(DateConverter::class)
@@ -54,7 +53,7 @@ abstract class PolyHikeDatabase : RoomDatabase() {
         }
 
         fun populateUserProfiles(userProfile: UserProfileDao) {
-            userProfile.insert(UserProfile(id = 1, "UserName", password = "pass", dateOfBirth = Date(), photo = "", friends = 2))
+            userProfile.insert(UserProfile(id = 1, "UserName", password = "pass", dateOfBirth = "01/01/2001", photoURI = "", friends = 2))
         }
     }
 }

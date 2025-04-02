@@ -9,7 +9,7 @@ data class UserProfile(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val password: String,
-    val dateOfBirth: Date, // TODO: change type ?
-    val photo: String, // TODO: change type
+    val dateOfBirth: String,
+    val photoURI: String,
     val friends: Int, // TODO: change to list
 )
