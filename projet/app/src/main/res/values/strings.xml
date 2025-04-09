@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">PolyHike</string>
+    <string name="title_home">Accueil</string>
+    <string name="title_record">Nouveau</string>
+    <string name="title_profile">Profile</string>
+</resources>

@@ -1,0 +1,59 @@
+package com.example.polyhike.db
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.polyhike.util.DateConverter
+import com.example.polyhike.model.UserProfile
+import com.example.polyhike.model.Activity
+import com.example.polyhike.model.Statistic
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+@Database(entities = [UserProfile::class, Statistic::class, Activity::class], version = 2)
+@TypeConverters(DateConverter::class)
+abstract class PolyHikeDatabase : RoomDatabase() {
+    abstract fun userProfileDao(): UserProfileDao
+    abstract fun statisticDao(): StatisticDao
+    abstract fun activityDao(): ActivityDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: PolyHikeDatabase? = null
+
+        fun getDatabase(context: Context, scope: CoroutineScope): PolyHikeDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    PolyHikeDatabase::class.java,
+                    "polyhike_database"
+                )
+                    .addCallback(AppDatabaseCallback(CoroutineScope(Dispatchers.IO)))
+                    .fallbackToDestructiveMigration()
+                    .build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
+
+    private class AppDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+            INSTANCE?.let { database ->
+                scope.launch {
+                    // TODO: remove or add...
+                    populateUserProfiles(database.userProfileDao())
+                }
+            }
+        }
+
+        fun populateUserProfiles(userProfile: UserProfileDao) {
+            userProfile.insert(UserProfile(id = 1, "UserName", password = "pass", dateOfBirth = "01/01/2001", photoURI = "", friends = 2))
+        }
+    }
+}
