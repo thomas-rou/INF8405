@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import com.example.polyhike.db.PolyHikeDatabase
 import com.example.polyhike.db.UserProfileDao
@@ -37,6 +38,8 @@ class LoginActivity : AppCompatActivity() {
                 val user = userProfileDao.getUserByNameAndPassword(name, password)
                 runOnUiThread {
                     if (user != null) {
+                        val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
+                        sharedPref.edit() { putInt("userId", user.id) }
                         Toast.makeText(applicationContext, "Connexion réussie", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@LoginActivity, NavManagerActivity::class.java)
                         startActivity(intent)
