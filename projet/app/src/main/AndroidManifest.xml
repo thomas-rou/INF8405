@@ -40,6 +40,9 @@
         <activity
             android:name=".NavManagerActivity">
         </activity>
+        <activity
+            android:name=".MapActivity">
+        </activity>
     </application>
 
 </manifest>
