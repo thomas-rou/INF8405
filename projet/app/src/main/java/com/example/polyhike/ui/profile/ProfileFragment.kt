@@ -11,35 +11,42 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.polyhike.databinding.FragmentProfileBinding
 import androidx.core.net.toUri
+import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
 class ProfileFragment : Fragment() {
-
     private var _binding: FragmentProfileBinding? = null
-
     private val binding get() = _binding!!
+
+    private lateinit var profileViewModel: ProfileViewModel
+
+    private lateinit var barChart: BarChart
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val profileViewModel =
-            ViewModelProvider(this)[ProfileViewModel::class.java]
-
+        profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textViewName: TextView = binding.tvName
+        val textViewName: TextView = binding.tvNameAge
         val textViewAddress: TextView = binding.tvAddress
-        val textViewAge: TextView = binding.tvAge
         val imageView: ImageView = binding.userImage
 
         profileViewModel.userProfile.observe(viewLifecycleOwner) {
-            textViewName.text = it?.name
+            textViewName.text = buildString {
+                append(it?.name)
+                append(", ")
+                append(profileViewModel.getAgeFromDateOfBirth(it?.dateOfBirth))
+                append(" ans")
+            }
             textViewAddress.text = "Montreal, Canada"  // TODO: set address dynamically
-            textViewAge.text = "${profileViewModel.getAgeFromDateOfBirth(it?.dateOfBirth)} ans"
             val uri = it?.photoURI?.toUri()
             if (uri != null) {
                 Glide.with(requireContext())
@@ -55,6 +62,25 @@ class ProfileFragment : Fragment() {
         profileViewModel.getUserProfile(userId)
 
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val days = arrayOf("Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di")
+        barChart = binding.barChart
+        barChart.setFitBars(true)
+        barChart.description.isEnabled = false
+        barChart.legend.isEnabled = false
+        barChart.axisLeft.setDrawGridLines(false)
+        barChart.axisRight.isEnabled = false
+        barChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        barChart.xAxis.setDrawGridLines(false)
+        barChart.xAxis.valueFormatter = IndexAxisValueFormatter(days)
+
+        profileViewModel.barData.observe(viewLifecycleOwner, Observer { barData ->
+            barChart.data = barData
+            barChart.invalidate()
+        })
     }
 
     override fun onDestroyView() {
