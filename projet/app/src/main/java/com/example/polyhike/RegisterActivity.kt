@@ -44,7 +44,7 @@ class RegisterActivity : AppCompatActivity() {
             val password = editTextPassword.text.toString().trim()
             val dateOfBirth = editTextDateOfBirth.text.toString().trim()
             if (validateInput(name, password, dateOfBirth) and validateDateFormat(dateOfBirth)) {
-                val newUser = UserProfile(0, name, password, dateOfBirth, "", 1)
+                val newUser = UserProfile(0, name, password, dateOfBirth, imageURI, 1)
                 lifecycleScope.launch(Dispatchers.IO) {
                     userProfileDao.insert(newUser)
                     val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
