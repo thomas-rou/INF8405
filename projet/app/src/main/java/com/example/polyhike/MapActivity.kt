@@ -46,9 +46,9 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnReq
     private var currentBearing = 0.0
     private var currentTemperature = 0.0
     private var averageSpeed = 0.0
+    private var recordedPath: MutableList<LatLng> = mutableListOf()
     private lateinit var mMap: GoogleMap
     private lateinit var locationProvider: FusedLocationProviderClient
-    private lateinit var recordedPath: MutableList<LatLng>
     private var pausePath: MutableList<LatLng> = mutableListOf()
     private var isRecording = false
     private var isHistoryShown = false
@@ -180,8 +180,6 @@ private fun configureButton(){
         isRecording = true
         startDate = Date()
         configureButton()
-        recordedPath = mutableListOf()
-
         locationRequest = com.google.android.gms.location.LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY, POSITION_UPDATE_TIME
         ).setMinUpdateIntervalMillis(POSITION_UPDATE_TIME_LOWER_BOUND)
