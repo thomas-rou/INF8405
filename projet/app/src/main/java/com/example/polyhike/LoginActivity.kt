@@ -44,6 +44,7 @@ class LoginActivity : AppCompatActivity() {
                         sharedPref.edit() { putInt("userId", user.id) }
                         Toast.makeText(applicationContext, "Connexion réussie", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@LoginActivity, NavManagerActivity::class.java)
+                        intent.putExtra("USER_ID", user.id)
                         startActivity(intent)
                     } else {
                         Toast.makeText(applicationContext, "Identifiants incorrects", Toast.LENGTH_SHORT).show()

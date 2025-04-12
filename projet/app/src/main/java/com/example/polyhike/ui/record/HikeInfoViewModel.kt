@@ -9,7 +9,6 @@ import com.example.polyhike.model.HikeInfo
 import kotlinx.coroutines.launch
 
 class HikeInfoViewModel(application: Application) : AndroidViewModel(application) {
-    var isHistoryMode = false
     var currentUserId: Int = -1
     lateinit var currentHike:HikeInfo
     private val hikeDao = PolyHikeDatabase.getDatabase(application, viewModelScope).hikeInfoDao()
@@ -18,8 +17,8 @@ class HikeInfoViewModel(application: Application) : AndroidViewModel(application
         hikeDao.insertHike(hikeInfo)
     }
 
-    fun getUserHikes(): LiveData<List<HikeInfo>> {
-        return hikeDao.getHikesForUser(currentUserId)
+    fun getUserHikes(userId: Int = currentUserId): LiveData<List<HikeInfo>> {
+        return hikeDao.getHikesForUser(userId)
     }
 
     fun getAllHikes(): LiveData<List<HikeInfo>> {

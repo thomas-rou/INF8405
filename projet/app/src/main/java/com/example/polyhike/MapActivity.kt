@@ -106,6 +106,7 @@ private fun configureButton(){
 
     buttonBackToHistory.setOnClickListener {
         val intent = Intent(this, NavManagerActivity::class.java)
+        intent.putExtra("USER_ID", hikeInfoViewModel.currentUserId)
         startActivity(intent)
     }
 
@@ -319,6 +320,7 @@ private fun configureButton(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         hikeInfoViewModel = ViewModelProvider(this)[HikeInfoViewModel::class.java]
+        hikeInfoViewModel.currentUserId = intent.getIntExtra("USER_ID", -1)
         supportActionBar?.hide()
         requestLocationPermission()
         setContentView(R.layout.map_activity)
