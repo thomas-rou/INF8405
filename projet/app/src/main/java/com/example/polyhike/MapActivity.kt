@@ -22,37 +22,69 @@ import com.google.android.gms.maps.model.MarkerOptions
 class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback  {
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+        private const val POSITION_UPDATE_TIME_LOWER_BOUND = 1000L
+        private const val POSITION_UPDATE_TIME_UPPER_BOUND = 10000L
+        private const val POSITION_UPDATE_TIME = 5000L
+
     }
     private lateinit var mMap: GoogleMap
     private lateinit var locationProvider: FusedLocationProviderClient
     private lateinit var recordedPath: MutableList<LatLng>
+    private var pausePath: MutableList<LatLng> = mutableListOf()
     private var isRecording = false
+    private var isHistoryShown = false
     private lateinit var locationCallback: com.google.android.gms.location.LocationCallback
     private lateinit var locationRequest: com.google.android.gms.location.LocationRequest
 
+@SuppressLint("UseCompatLoadingForDrawables")
 private fun configureButton(){
     val buttonStopHike = findViewById<ImageButton>(R.id.button_stop_hike)
     val buttonPauseHike = findViewById<ImageButton>(R.id.button_pause_hike)
     val buttonStartHike = findViewById<ImageButton>(R.id.button_start_hike)
-    buttonStopHike.setOnClickListener {
-        stopRecording()
-    }
-    buttonPauseHike.setOnClickListener {
-        pauseRecording()
+    if (!isHistoryShown){
+        buttonStopHike.setOnClickListener {
+            stopRecording()
         }
-    buttonStartHike.setOnClickListener {
-        startRecording()
+        buttonPauseHike.setOnClickListener {
+            pauseRecording()
+        }
+        buttonStartHike.setOnClickListener {
+            startRecording()
+        }
+        if (isRecording) {
+            buttonStopHike.isEnabled = true
+            buttonStopHike.background = getDrawable(R.mipmap.stop_hike)
+            buttonPauseHike.isEnabled = true
+            buttonPauseHike.background = getDrawable(R.mipmap.pause_hike)
+            buttonStartHike.isEnabled = false
+            buttonStartHike.background = getDrawable(R.mipmap.start_hike_disable)
+        } else {
+            buttonStopHike.isEnabled = false
+            buttonStopHike.background = getDrawable(R.mipmap.stop_hike_disable)
+            buttonPauseHike.isEnabled = false
+            buttonPauseHike.background = getDrawable(R.mipmap.pause_hike_disable)
+            buttonStartHike.isEnabled = true
+            buttonStartHike.background = getDrawable(R.mipmap.start_hike)
+        }
     }
-    if (isRecording) {
-        buttonStopHike.setEnabled(true)
-        buttonPauseHike.setEnabled(true)
-        buttonStartHike.setEnabled(false)
-    } else {
+    else{
         buttonStopHike.setEnabled(false)
+        buttonStopHike.visibility = View.GONE
         buttonPauseHike.setEnabled(false)
-        buttonStartHike.setEnabled(true)
+        buttonPauseHike.visibility = View.GONE
+        buttonStartHike.setEnabled(false)
+        buttonStartHike.visibility = View.GONE
     }
 }
+
+    private fun addMarker(latLng: LatLng, marker: Float, title: String) {
+        val markerOptions = MarkerOptions()
+            .position(latLng)
+            .icon(BitmapDescriptorFactory.defaultMarker(marker))
+            .title(title)
+        mMap.addMarker(markerOptions)
+
+    }
 
     private fun isLocationPermissionGranted(): Boolean {
         return (ActivityCompat.checkSelfPermission(
@@ -83,6 +115,9 @@ private fun configureButton(){
             locationProvider.removeLocationUpdates(locationCallback)
         }
         isRecording = false
+        configureButton()
+        pausePath.add(recordedPath.last())
+        drawDirection(android.graphics.Color.YELLOW)
     }
 
     private fun stopRecording() {
@@ -90,6 +125,9 @@ private fun configureButton(){
             locationProvider.removeLocationUpdates(locationCallback)
         }
         isRecording = false
+        configureButton()
+        drawDirection(android.graphics.Color.RED)
+        addMarker(recordedPath.last(), BitmapDescriptorFactory.HUE_RED, "End")
     }
 
     @SuppressLint("MissingPermission")
@@ -102,21 +140,22 @@ private fun configureButton(){
         if (isRecording) return // Already recording
 
         isRecording = true
+        configureButton()
         recordedPath = mutableListOf()
 
         locationRequest = com.google.android.gms.location.LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 5000L // every 5 seconds
-        ).setMinUpdateIntervalMillis(2000L)
-            .setMaxUpdateDelayMillis(10000L)
+            Priority.PRIORITY_HIGH_ACCURACY, POSITION_UPDATE_TIME
+        ).setMinUpdateIntervalMillis(POSITION_UPDATE_TIME_LOWER_BOUND)
+            .setMaxUpdateDelayMillis(POSITION_UPDATE_TIME_UPPER_BOUND)
             .build()
 
         locationCallback = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
+                super.onLocationResult(locationResult)
                 for (location in locationResult.locations) {
                     val latLng = LatLng(location.latitude, location.longitude)
                     recordedPath.add(latLng)
-                    // Optional: draw path
-                    drawPolyline()
+                    drawDirection(android.graphics.Color.GREEN)
                 }
             }
         }
@@ -124,16 +163,23 @@ private fun configureButton(){
         locationProvider.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
     }
 
-    private fun drawPolyline() {
+    private fun drawDirection(color: Int) {
         if (recordedPath.size < 2) return
 
         val polylineOptions = com.google.android.gms.maps.model.PolylineOptions()
             .addAll(recordedPath)
             .width(8f)
-            .color(android.graphics.Color.BLUE)
+            .color(color)
 
-        mMap.clear() // Clear old lines/markers if needed
+        mMap.clear()
+        addMarker(recordedPath.first(), BitmapDescriptorFactory.HUE_GREEN, "Start")
+        if(pausePath.isNotEmpty()){
+            for (latLng in pausePath) {
+                addMarker(latLng, BitmapDescriptorFactory.HUE_YELLOW, "Pause")
+            }
+        }
         mMap.addPolyline(polylineOptions)
+
 
 
     }
@@ -187,6 +233,16 @@ private fun configureButton(){
         mapFragment.getMapAsync(this)
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
         configureButton()
+        if(isHistoryShown)
+        {
+            // fetch recorded path from database
+            drawDirection(android.graphics.Color.RED)
+            addMarker(recordedPath.first(), BitmapDescriptorFactory.HUE_GREEN, "Start")
+            addMarker(recordedPath.last(), BitmapDescriptorFactory.HUE_RED, "End")
+            for (latLng in pausePath) {
+                addMarker(latLng, BitmapDescriptorFactory.HUE_YELLOW, "Pause")
+            }
+        }
 
     }
 
