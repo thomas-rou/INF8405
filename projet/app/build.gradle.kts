@@ -4,7 +4,6 @@ plugins {
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
     alias(libs.plugins.compose.compiler) version "2.0.0"
     id("kotlin-kapt")
-    id("com.google.gms.google-services")
 }
 
 android {
