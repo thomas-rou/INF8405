@@ -58,5 +58,11 @@
             android:layout_height="48dp"
             android:background="@mipmap/start_hike"
             android:contentDescription="démarrer le trajet" />
+        <ImageButton
+            android:id="@+id/BtnToggleList"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@mipmap/list_icon"
+            android:contentDescription="Hike info" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

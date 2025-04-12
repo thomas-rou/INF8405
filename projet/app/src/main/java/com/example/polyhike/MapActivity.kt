@@ -18,6 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import java.util.Date
 
 class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback  {
     companion object {
@@ -33,6 +34,8 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnReq
     private var pausePath: MutableList<LatLng> = mutableListOf()
     private var isRecording = false
     private var isHistoryShown = false
+    private lateinit var startDate: Date
+    private lateinit var endDate: Date
     private lateinit var locationCallback: com.google.android.gms.location.LocationCallback
     private lateinit var locationRequest: com.google.android.gms.location.LocationRequest
 
@@ -125,6 +128,7 @@ private fun configureButton(){
             locationProvider.removeLocationUpdates(locationCallback)
         }
         isRecording = false
+        endDate = Date()
         configureButton()
         drawDirection(android.graphics.Color.RED)
         addMarker(recordedPath.last(), BitmapDescriptorFactory.HUE_RED, "End")
@@ -140,6 +144,7 @@ private fun configureButton(){
         if (isRecording) return // Already recording
 
         isRecording = true
+        startDate = Date()
         configureButton()
         recordedPath = mutableListOf()
 
