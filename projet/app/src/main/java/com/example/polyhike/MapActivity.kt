@@ -3,6 +3,8 @@ package com.example.polyhike
 import android.content.pm.PackageManager
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -23,7 +25,34 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnReq
     }
     private lateinit var mMap: GoogleMap
     private lateinit var locationProvider: FusedLocationProviderClient
+    private lateinit var recordedPath: MutableList<LatLng>
+    private var isRecording = false
+    private lateinit var locationCallback: com.google.android.gms.location.LocationCallback
+    private lateinit var locationRequest: com.google.android.gms.location.LocationRequest
 
+private fun configureButton(){
+    val buttonStopHike = findViewById<ImageButton>(R.id.button_stop_hike)
+    val buttonPauseHike = findViewById<ImageButton>(R.id.button_pause_hike)
+    val buttonStartHike = findViewById<ImageButton>(R.id.button_start_hike)
+    buttonStopHike.setOnClickListener {
+        stopRecording()
+    }
+    buttonPauseHike.setOnClickListener {
+        pauseRecording()
+        }
+    buttonStartHike.setOnClickListener {
+        startRecording()
+    }
+    if (isRecording) {
+        buttonStopHike.setEnabled(true)
+        buttonPauseHike.setEnabled(true)
+        buttonStartHike.setEnabled(false)
+    } else {
+        buttonStopHike.setEnabled(false)
+        buttonPauseHike.setEnabled(false)
+        buttonStartHike.setEnabled(true)
+    }
+}
 
     private fun isLocationPermissionGranted(): Boolean {
         return (ActivityCompat.checkSelfPermission(
@@ -47,6 +76,66 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnReq
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         }
+    }
+
+    private fun pauseRecording() {
+        if (::locationCallback.isInitialized) {
+            locationProvider.removeLocationUpdates(locationCallback)
+        }
+        isRecording = false
+    }
+
+    private fun stopRecording() {
+        if (::locationCallback.isInitialized) {
+            locationProvider.removeLocationUpdates(locationCallback)
+        }
+        isRecording = false
+    }
+
+    @SuppressLint("MissingPermission")
+    fun startRecording() {
+        if (!isLocationPermissionGranted()) {
+            Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (isRecording) return // Already recording
+
+        isRecording = true
+        recordedPath = mutableListOf()
+
+        locationRequest = com.google.android.gms.location.LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY, 5000L // every 5 seconds
+        ).setMinUpdateIntervalMillis(2000L)
+            .setMaxUpdateDelayMillis(10000L)
+            .build()
+
+        locationCallback = object : com.google.android.gms.location.LocationCallback() {
+            override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
+                for (location in locationResult.locations) {
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    recordedPath.add(latLng)
+                    // Optional: draw path
+                    drawPolyline()
+                }
+            }
+        }
+
+        locationProvider.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
+    }
+
+    private fun drawPolyline() {
+        if (recordedPath.size < 2) return
+
+        val polylineOptions = com.google.android.gms.maps.model.PolylineOptions()
+            .addAll(recordedPath)
+            .width(8f)
+            .color(android.graphics.Color.BLUE)
+
+        mMap.clear() // Clear old lines/markers if needed
+        mMap.addPolyline(polylineOptions)
+
+
     }
 
     @SuppressLint("MissingPermission")
@@ -97,6 +186,8 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnReq
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
+        configureButton()
+
     }
 
     override fun onRequestPermissionsResult(
@@ -115,5 +206,6 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnReq
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
     }
+
 
 }
