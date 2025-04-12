@@ -3,6 +3,7 @@ package com.example.polyhike.ui.sensor
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.FrameLayout
@@ -16,22 +17,19 @@ class CompassView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
-    private val background: ImageView
+    private val rotatingGroup: View
     private val needle: ImageView
-    private val directionLabel: TextView
     private var lastAzimuth = 0f
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_compass, this, true)
-        background = findViewById(R.id.compassBackground)
+        rotatingGroup = findViewById(R.id.compassRotatingGroup)
         needle = findViewById(R.id.compass_nav_arrow)
-        directionLabel = findViewById(R.id.textCardinal)
     }
 
     fun updateAzimuth(degrees: Float) {
         val azimuth = Azimuth(degrees)
         rotateBackground(-azimuth.degrees) // rotation inverse
-        directionLabel.text = azimuth.cardinalDirection
     }
 
     private fun rotateBackground(toDegrees: Float) {
@@ -48,7 +46,7 @@ class CompassView @JvmOverloads constructor(
         animation.duration = 300
         animation.fillAfter = true
 
-        background.startAnimation(animation)
+        rotatingGroup.startAnimation(animation)
         lastAzimuth = correctedTo
     }
 }
