@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.polyhike.MapActivity
+import com.example.polyhike.NavManagerActivity
 import com.example.polyhike.databinding.FragmentRecordBinding
 import com.example.polyhike.model.HikeInfo
 import kotlinx.coroutines.Dispatchers
@@ -29,9 +30,11 @@ class RecordFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private var userId = -1
 
     private fun recordHike() {
         val intent = Intent(requireContext(), MapActivity::class.java)
+        intent.putExtra("USER_ID", userId)
         startActivity(intent)
     }
 
@@ -45,6 +48,8 @@ class RecordFragment : Fragment() {
 
         hikeInfoViewModel = ViewModelProvider(this)[HikeInfoViewModel::class.java]
 
+        userId  = (activity as? NavManagerActivity)?.userId?:-1
+
         _binding = FragmentRecordBinding.inflate(inflater, container, false)
         binding.hikeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -52,7 +57,6 @@ class RecordFragment : Fragment() {
         binding.recordHikeButton.setOnClickListener {
             recordHike()
         }
-
         lifecycleScope.launch(Dispatchers.Main) {
             val hikes = getAllHikeInfo()
             val adapter = HikeAdapter(hikes,
@@ -60,6 +64,7 @@ class RecordFragment : Fragment() {
                     val intent = Intent(requireContext(), MapActivity::class.java)
                     intent.putExtra("HIKE_ID", hikeItem.id)
                     intent.putExtra("HISTORY_MODE", true)
+                    intent.putExtra("USER_ID", userId)
                     startActivity(intent)
                 })
             binding.hikeRecyclerView.adapter = adapter
@@ -74,8 +79,9 @@ class RecordFragment : Fragment() {
     }
 
     private suspend fun getAllHikeInfo(): List<HikeInfo> {
+
         return suspendCancellableCoroutine { continuation ->
-            val allHikeInfo = hikeInfoViewModel.getUserHikes()
+            val allHikeInfo = hikeInfoViewModel.getUserHikes(userId)
             lateinit var observer: Observer<List<HikeInfo>>
             observer = Observer { gotHikes ->
                 allHikeInfo.removeObserver(observer)
