@@ -39,6 +39,13 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
+            android:id="@+id/button_back_to_history"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@mipmap/back_to_history_icon"
+            android:contentDescription="retour au volet historique"/>
+
+        <ImageButton
             android:id="@+id/button_stop_hike"
             android:layout_width="48dp"
             android:layout_height="48dp"
