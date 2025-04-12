@@ -21,4 +21,13 @@ class HikeInfoViewModel(application: Application) : AndroidViewModel(application
     fun getUserHikes(): LiveData<List<HikeInfo>> {
         return hikeDao.getHikesForUser(currentUserId)
     }
+
+    fun getAllHikes(): LiveData<List<HikeInfo>> {
+        return hikeDao.getAllHikes()
+    }
+
+    fun getHikeById(hikeId: Int): LiveData<HikeInfo> {
+        return hikeDao.getHikeById(hikeId)
+    }
+
 }

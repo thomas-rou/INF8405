@@ -15,4 +15,8 @@ interface HikeInfoDao {
 
     @Query("SELECT * FROM hikeInfo WHERE currentUserId = :userId")
     fun getHikesForUser(userId: Int): LiveData<List<HikeInfo>>
+    @Query("SELECT * FROM hikeInfo")
+    fun getAllHikes(): LiveData<List<HikeInfo>>
+    @Query("SELECT * FROM hikeInfo WHERE id = :hikeId")
+    fun getHikeById(hikeId: Int): LiveData<HikeInfo>
 }

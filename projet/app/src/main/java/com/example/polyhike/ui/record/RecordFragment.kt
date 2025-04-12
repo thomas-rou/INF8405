@@ -30,8 +30,7 @@ class RecordFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    fun recordHike() {
-        hikeInfoViewModel.isHistoryMode = false
+    private fun recordHike() {
         val intent = Intent(requireContext(), MapActivity::class.java)
         startActivity(intent)
     }
@@ -58,13 +57,12 @@ class RecordFragment : Fragment() {
             val hikes = getAllHikeInfo()
             val adapter = HikeAdapter(hikes,
                 onItemClick = { hikeItem ->
-                    hikeInfoViewModel.isHistoryMode = true
-                    hikeInfoViewModel.currentHike = hikeItem
                     val intent = Intent(requireContext(), MapActivity::class.java)
+                    intent.putExtra("HIKE_ID", hikeItem.id)
+                    intent.putExtra("HISTORY_MODE", true)
                     startActivity(intent)
                 })
             binding.hikeRecyclerView.adapter = adapter
-            Toast.makeText(requireContext(), "Hikes retrieved ${hikes.size}", Toast.LENGTH_SHORT).show()
         }
 
         return root

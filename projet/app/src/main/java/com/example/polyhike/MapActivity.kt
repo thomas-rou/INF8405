@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.polyhike.model.HikeInfo
 import com.example.polyhike.ui.record.HikeInfoViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -24,6 +25,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Date
 
 class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback  {
@@ -228,6 +231,9 @@ private fun configureButton(){
         val temperatureTextView = infoView.findViewById<TextView>(R.id.temperature)
         val distanceTextView = infoView.findViewById<TextView>(R.id.distance)
         val averageSpeedTextView = infoView.findViewById<TextView>(R.id.average_speed)
+
+        if(isHistoryShown)
+            speedTextView.visibility = View.GONE
         if (startDate != null ) {
             if(isHistoryShown)
                 averageSpeed = totalDistance / ((endDate!!.time - startDate!!.time) / 1000.0) * 3.6
@@ -322,8 +328,22 @@ private fun configureButton(){
         mapFragment.getMapAsync(this)
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
         configureButton()
+
+        isHistoryShown = intent.getBooleanExtra("HISTORY_MODE", false)
+        val hikeId = intent.getIntExtra("HIKE_ID", -1)
+
         if(isHistoryShown)
         {
+            displayPreviousHikeMap(hikeId)
+        }
+
+    }
+
+    private fun displayPreviousHikeMap(hikeId: Int){
+        lifecycleScope.launch(Dispatchers.Main) {
+            hikeInfoViewModel.getHikeById(hikeId).observe(this@MapActivity) { hike ->
+                hikeInfoViewModel.currentHike = hike
+
             startDate = hikeInfoViewModel.currentHike.startDate
             endDate = hikeInfoViewModel.currentHike.endDate
             totalDistance = hikeInfoViewModel.currentHike.totalDistance
@@ -333,17 +353,15 @@ private fun configureButton(){
             currentSpeed = hikeInfoViewModel.currentHike.currentSpeed
             currentTemperature = hikeInfoViewModel.currentHike.currentTemperature
             averageSpeed = hikeInfoViewModel.currentHike.averageSpeed
-
-            val speedTextView = findViewById<TextView>(R.id.speed)
-            speedTextView.visibility = View.GONE
+            configureButton()
             drawDirection(android.graphics.Color.RED)
             addMarker(recordedPath.first(), BitmapDescriptorFactory.HUE_GREEN, "Start")
             addMarker(recordedPath.last(), BitmapDescriptorFactory.HUE_RED, "End")
             for (latLng in pausePath) {
                 addMarker(latLng, BitmapDescriptorFactory.HUE_YELLOW, "Pause")
             }
+            }
         }
-
     }
 
     private fun saveToDatabase() {
