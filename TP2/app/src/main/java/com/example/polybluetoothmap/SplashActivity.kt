@@ -17,10 +17,18 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
     }
 
+    /**
+     * Called when the activity comes to the foreground (after being paused or stopped).
+     * It starts the timer to load the main page after the specified duration.
+     */
     override fun onResume() {
         super.onResume()
         loadMainPageAfterTimerExpires()
     }
+
+    /**
+     * Initiates a delayed transition to the MapsActivity after the specified splash screen duration.
+     */
     private fun loadMainPageAfterTimerExpires() {
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this, MapsActivity::class.java)

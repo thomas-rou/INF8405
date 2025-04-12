@@ -28,6 +28,7 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+        supportActionBar?.hide()
 
         userProfileDao = PolyHikeDatabase.getDatabase(this, lifecycleScope).userProfileDao()
         imageView = findViewById(R.id.imageViewSelectedPhoto)
