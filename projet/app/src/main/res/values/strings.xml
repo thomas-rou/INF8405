@@ -3,4 +3,5 @@
     <string name="title_home">Accueil</string>
     <string name="title_record">Nouveau</string>
     <string name="title_profile">Profile</string>
+    <string name="title_sensor">Capteurs</string>
 </resources>
