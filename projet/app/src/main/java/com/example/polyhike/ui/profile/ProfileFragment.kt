@@ -37,6 +37,8 @@ class ProfileFragment : Fragment() {
         val textViewName: TextView = binding.tvNameAge
         val textViewAddress: TextView = binding.tvAddress
         val imageView: ImageView = binding.userImage
+        val textViewSteps: TextView = binding.steps
+        val textViewDistance: TextView = binding.distance
 
         profileViewModel.userProfile.observe(viewLifecycleOwner) {
             textViewName.text = buildString {
@@ -53,10 +55,17 @@ class ProfileFragment : Fragment() {
                     .into(imageView)
             }
         }
+        profileViewModel.totalSteps.observe(viewLifecycleOwner) {
+            textViewSteps.text = it.toString()
+        }
+        profileViewModel.totalDistance.observe(viewLifecycleOwner) {
+            textViewDistance.text = it.toString()
+        }
         val sharedPref = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE)
         val userId = sharedPref.getInt("userId", -1)
         profileViewModel.getUserProfile(userId)
-
+        profileViewModel.getTotalStepsByUserId(userId)
+        profileViewModel.getTotalDistanceByUserId(userId)
         return root
     }
 

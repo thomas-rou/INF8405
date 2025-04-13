@@ -92,11 +92,11 @@ class HomeFragment : Fragment() {
             sharedPref.edit() { putInt("batteryInitialPct", batteryPercentage) }
             sharedPref.edit() { putInt("batteryInitialEnergy", batteryEnergy) }
             batteryPercentageUsed.text = "Pourcentage utilisé : 0%"
-            batteryEnergyUsed.text = "Energie utilisée : 0 mWh"
+            batteryEnergyUsed.text = "Energie : 0 mWh"
         } else {
             batteryPercentageUsed.text = "Pourcentage utilisé : ${batteryInitialPct - batteryPercentage}%"
 
-            batteryEnergyUsed.text = "Energie en cours d'utilisation : ${batteryEnergy} mWh"
+            batteryEnergyUsed.text = "Energie : ${batteryEnergy} mWh"
         }
     }
 

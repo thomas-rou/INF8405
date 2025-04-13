@@ -22,9 +22,14 @@ import androidx.core.graphics.toColorInt
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     private val userProfileDao = PolyHikeDatabase.getDatabase(application, viewModelScope).userProfileDao()
+    private val hikeInfoDao = PolyHikeDatabase.getDatabase(application, viewModelScope).hikeInfoDao()
 
     private val _userProfile = MutableLiveData<UserProfile?>()
     val userProfile: LiveData<UserProfile?> = _userProfile
+    private val _totalSteps = MutableLiveData<Int?>()
+    val totalSteps: LiveData<Int?> = _totalSteps
+    private val _totalDistance = MutableLiveData<Int?>()
+    val totalDistance: LiveData<Int?> = _totalDistance
 
     private val _barData = MutableLiveData<BarData>()
     val barData: LiveData<BarData> = _barData
@@ -42,6 +47,32 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 }
             } catch (e: Exception) {
                 Log.e("ProfileViewModel", "Error getting user profile: ${e.message}")
+            }
+        }
+    }
+
+    fun getTotalStepsByUserId(userId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val stepsTotal = hikeInfoDao.getTotalStepsBUserId(userId)
+                withContext(Dispatchers.Main) {
+                    _totalSteps.value = stepsTotal
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileViewModel", "Error getting user total steps: ${e.message}")
+            }
+        }
+    }
+
+    fun getTotalDistanceByUserId(userId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val distanceTotal = hikeInfoDao.getTotalDistancesBUserId(userId)
+                withContext(Dispatchers.Main) {
+                    _totalDistance.value = distanceTotal
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileViewModel", "Error getting user total distance: ${e.message}")
             }
         }
     }

@@ -17,6 +17,6 @@ data class Activity(
     val totalSteps: Int,
     val meanSpeed: Int,
     val meanAcceleration: Int,
-    val temperature: Int, // TODO: add other weather conditions?
+    val temperature: Int,
     val likedBy: Int,
 )
