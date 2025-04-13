@@ -11,8 +11,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.polyhike.R
+import com.example.polyhike.util.Azimuth
 import com.example.polyhike.util.CompassManager
 import com.example.polyhike.util.StepCounterManager
+import kotlin.math.roundToInt
 
 // TODO: add conditionnal activation of sensors => e.g. N/A if sensors not available.
 
@@ -54,7 +56,8 @@ class SensorFragment : Fragment() {
         }
 
         viewModel.sensorUiState.observe(viewLifecycleOwner) { state ->
-            textAzimuth.text = "Nord: ${state.azimuth.toInt()}°"
+            val az = Azimuth(state.azimuth)
+            textAzimuth.text = "Direction: ${az.cardinalDirection} (${state.azimuth.roundToInt()}°)"
             textSteps.text = "Pas: ${state.stepCount}"
             textSpeed.text = "Vitesse: ${"%.1f".format(state.speed)} km/h"
             textTemp.text = "Température: ${state.temperature?.toString() ?: "--"} °C"
