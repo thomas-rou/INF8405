@@ -20,6 +20,8 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        supportActionBar?.hide()
+
 
         userProfileDao = PolyHikeDatabase.getDatabase(this, lifecycleScope).userProfileDao()
 
@@ -42,6 +44,7 @@ class LoginActivity : AppCompatActivity() {
                         sharedPref.edit() { putInt("userId", user.id) }
                         Toast.makeText(applicationContext, "Connexion réussie", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@LoginActivity, NavManagerActivity::class.java)
+                        intent.putExtra("USER_ID", user.id)
                         startActivity(intent)
                     } else {
                         Toast.makeText(applicationContext, "Identifiants incorrects", Toast.LENGTH_SHORT).show()
