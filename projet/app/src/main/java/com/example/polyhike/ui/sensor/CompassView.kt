@@ -4,11 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
+import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.TextView
 import com.example.polyhike.R
 import com.example.polyhike.util.Azimuth
 
@@ -29,24 +27,23 @@ class CompassView @JvmOverloads constructor(
 
     fun updateAzimuth(degrees: Float) {
         val azimuth = Azimuth(degrees)
-        rotateBackground(-azimuth.degrees) // rotation inverse
+        rotateCompass(-azimuth.degrees) // rotation inverse
     }
 
-    private fun rotateBackground(toDegrees: Float) {
-        val fromDegrees = lastAzimuth
-        val diff = ((toDegrees - fromDegrees + 540) % 360) - 180
-        val correctedTo = fromDegrees + diff
+    private fun rotateCompass(toDegrees: Float) {
+        var diff = toDegrees - lastAzimuth
 
-        val animation = RotateAnimation(
-            fromDegrees,
-            correctedTo,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
-        )
-        animation.duration = 300
-        animation.fillAfter = true
+        // Normaliser en [-180, 180]
+        diff = (diff + 540) % 360 - 180
 
-        rotatingGroup.startAnimation(animation)
-        lastAzimuth = correctedTo
+        val finalAzimuth = lastAzimuth + diff
+
+        rotatingGroup.animate()
+            .rotation(finalAzimuth)
+            .setDuration(300)
+            .setInterpolator(LinearInterpolator())
+            .start()
+
+        lastAzimuth = finalAzimuth
     }
 }
