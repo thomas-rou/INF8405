@@ -12,15 +12,13 @@ class StepCounterManager(
 ) : SensorEventListener {
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    private var initialStepCount: Int? = null
+    private val stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+    private var stepOffset: Float? = null
 
     fun start() {
-        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        if (sensor != null) {
-            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
-        } else {
-            // Capteur non dispo sur certains appareils
-            onStepCountUpdated(-1)
+        stepSensor?.let {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
         }
     }
 
@@ -29,13 +27,13 @@ class StepCounterManager(
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-            val totalSteps = event.values[0].toInt()
-            if (initialStepCount == null) {
-                initialStepCount = totalSteps
+        event?.values?.firstOrNull()?.let { totalSteps ->
+            if (stepOffset == null) {
+                stepOffset = totalSteps // point de référence
             }
-            val steps = totalSteps - (initialStepCount ?: totalSteps)
-            onStepCountUpdated(steps)
+
+            val stepsSinceStart = (totalSteps - stepOffset!!).toInt()
+            onStepCountUpdated(stepsSinceStart)
         }
     }
 
