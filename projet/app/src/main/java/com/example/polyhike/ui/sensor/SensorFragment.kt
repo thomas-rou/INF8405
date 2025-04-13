@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import com.example.polyhike.R
 import com.example.polyhike.util.AmbientTemperatureManager
 import com.example.polyhike.util.Azimuth
+import com.example.polyhike.util.ClockManager
 import com.example.polyhike.util.CompassManager
 import com.example.polyhike.util.LinearAccelerationManager
 import com.example.polyhike.util.StepCounterManager
@@ -24,12 +25,14 @@ class SensorFragment : Fragment() {
     private lateinit var stepCounterManager: StepCounterManager
     private lateinit var linearAccelerationManager: LinearAccelerationManager
     private lateinit var ambientTemperatureManager: AmbientTemperatureManager
+    private lateinit var clockManager: ClockManager
 
     private lateinit var textAzimuth: TextView
     private lateinit var textSteps: TextView
     private lateinit var textAcceleration: TextView
     private lateinit var textTemp: TextView
     private lateinit var compassView: CompassView
+    private lateinit var textClock: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +47,7 @@ class SensorFragment : Fragment() {
         textAcceleration= view.findViewById(R.id.textAcceleration)
         textTemp = view.findViewById(R.id.textTemperature)
         compassView = view.findViewById(R.id.compassView)
+        textClock = view.findViewById(R.id.textClock)
 
 
         // Compass
@@ -64,9 +68,14 @@ class SensorFragment : Fragment() {
             viewModel.updateTemperature(temperature)
         }
 
+        clockManager = ClockManager(textClock)
+        stepCounterManager.start()
+        clockManager.start()
+
         viewModel.sensorUiState.observe(viewLifecycleOwner) { state ->
             val az = Azimuth(state.azimuth)
-            textAzimuth.text = "Direction: ${az.cardinalDirection} (${state.azimuth.roundToInt()}°)"
+            val deg = (state.azimuth + 360f) % 360f
+            textAzimuth.text = "Direction: ${az.cardinalDirection} (${deg.roundToInt()}°)"
             textSteps.text = "Pas: ${state.stepCount}"
             textAcceleration.text = "Accélération: ${"%.2f".format(state.accelerationMagnitude)} m/s²"
             textTemp.text = "Température: ${state.temperature?.toString() ?: "--"} °C"
@@ -76,7 +85,6 @@ class SensorFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         compassManager.start()
-        stepCounterManager.start()
         linearAccelerationManager.start()
         ambientTemperatureManager.start()
     }
@@ -87,5 +95,6 @@ class SensorFragment : Fragment() {
         stepCounterManager.stop()
         linearAccelerationManager.stop()
         ambientTemperatureManager.stop()
+        clockManager.stop()
     }
 }
