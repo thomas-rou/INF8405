@@ -18,8 +18,10 @@ class SensorViewModel(application: Application) : AndroidViewModel(application) 
         _sensorUiState.value = _sensorUiState.value?.copy(stepCount = count)
     }
 
-    fun updateSpeed(speed: Float) {
-        _sensorUiState.value = _sensorUiState.value?.copy(speed = speed)
+    fun updateAcceleration(accelerationMagnitude: Float) {
+        _sensorUiState.value = _sensorUiState.value?.copy(
+            accelerationMagnitude = accelerationMagnitude
+        )
     }
 
     fun updateTemperature(temp: Float?) {

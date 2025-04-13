@@ -4,15 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.polyhike.R
+import com.example.polyhike.util.AmbientTemperatureManager
 import com.example.polyhike.util.Azimuth
 import com.example.polyhike.util.CompassManager
+import com.example.polyhike.util.LinearAccelerationManager
 import com.example.polyhike.util.StepCounterManager
 import kotlin.math.roundToInt
 
@@ -23,10 +22,12 @@ class SensorFragment : Fragment() {
     private val viewModel: SensorViewModel by viewModels()
     private lateinit var compassManager: CompassManager
     private lateinit var stepCounterManager: StepCounterManager
+    private lateinit var linearAccelerationManager: LinearAccelerationManager
+    private lateinit var ambientTemperatureManager: AmbientTemperatureManager
 
     private lateinit var textAzimuth: TextView
     private lateinit var textSteps: TextView
-    private lateinit var textSpeed: TextView
+    private lateinit var textAcceleration: TextView
     private lateinit var textTemp: TextView
     private lateinit var compassView: CompassView
 
@@ -40,7 +41,7 @@ class SensorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         textAzimuth = view.findViewById(R.id.textAzimuth)
         textSteps = view.findViewById(R.id.textSteps)
-        textSpeed = view.findViewById(R.id.textSpeed)
+        textAcceleration= view.findViewById(R.id.textAcceleration)
         textTemp = view.findViewById(R.id.textTemperature)
         compassView = view.findViewById(R.id.compassView)
 
@@ -55,11 +56,19 @@ class SensorFragment : Fragment() {
             viewModel.updateStepCount(steps)
         }
 
+        linearAccelerationManager = LinearAccelerationManager(requireContext()) { x, y, z, magnitude ->
+            viewModel.updateAcceleration(magnitude)
+        }
+
+        ambientTemperatureManager = AmbientTemperatureManager(requireContext()) { temperature ->
+            viewModel.updateTemperature(temperature)
+        }
+
         viewModel.sensorUiState.observe(viewLifecycleOwner) { state ->
             val az = Azimuth(state.azimuth)
             textAzimuth.text = "Direction: ${az.cardinalDirection} (${state.azimuth.roundToInt()}°)"
             textSteps.text = "Pas: ${state.stepCount}"
-            textSpeed.text = "Vitesse: ${"%.1f".format(state.speed)} km/h"
+            textAcceleration.text = "Accélération: ${"%.2f".format(state.accelerationMagnitude)} m/s²"
             textTemp.text = "Température: ${state.temperature?.toString() ?: "--"} °C"
         }
     }
@@ -68,11 +77,15 @@ class SensorFragment : Fragment() {
         super.onResume()
         compassManager.start()
         stepCounterManager.start()
+        linearAccelerationManager.start()
+        ambientTemperatureManager.start()
     }
 
     override fun onPause() {
         super.onPause()
         compassManager.stop()
         stepCounterManager.stop()
+        linearAccelerationManager.stop()
+        ambientTemperatureManager.stop()
     }
 }
