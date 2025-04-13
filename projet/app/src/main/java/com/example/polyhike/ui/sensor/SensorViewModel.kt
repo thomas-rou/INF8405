@@ -28,6 +28,10 @@ class SensorViewModel(application: Application) : AndroidViewModel(application) 
         _sensorUiState.value = _sensorUiState.value?.copy(temperature = temp)
     }
 
+    fun updateClock(time: String) {
+        _sensorUiState.value = _sensorUiState.value?.copy(clock = time)
+    }
+
     fun updateAmbientPressure(pressure: Float?) {
         _sensorUiState.value = _sensorUiState.value?.copy(ambientPressure = pressure)
     }
