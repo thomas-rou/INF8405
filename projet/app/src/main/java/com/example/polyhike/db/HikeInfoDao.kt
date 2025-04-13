@@ -21,8 +21,8 @@ interface HikeInfoDao {
     fun getHikeById(hikeId: Int): LiveData<HikeInfo>
 
     @Query("SELECT SUM(totalSteps) FROM hikeInfo WHERE currentUserId = :userId")
-    fun getTotalStepsBUserId(userId: Int): Int
+    fun getTotalStepsBUserId(userId: Int): Int?
 
     @Query("SELECT SUM(totalDistance) FROM hikeInfo WHERE currentUserId = :userId")
-    fun getTotalDistancesBUserId(userId: Int): Int
+    fun getTotalDistancesBUserId(userId: Int): Int?
 }

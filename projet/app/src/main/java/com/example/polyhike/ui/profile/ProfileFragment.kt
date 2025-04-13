@@ -56,10 +56,12 @@ class ProfileFragment : Fragment() {
             }
         }
         profileViewModel.totalSteps.observe(viewLifecycleOwner) {
-            textViewSteps.text = it.toString()
+            if (it != null) textViewSteps.text = it.toString()
+            else textViewSteps.text = "0"
         }
         profileViewModel.totalDistance.observe(viewLifecycleOwner) {
-            textViewDistance.text = it.toString()
+            if (it != null) textViewDistance.text = (it / 1000).toString()
+            else textViewDistance.text = "0"
         }
         val sharedPref = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE)
         val userId = sharedPref.getInt("userId", -1)

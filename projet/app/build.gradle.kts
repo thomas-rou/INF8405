@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.material)
     implementation ("androidx.lifecycle:lifecycle-process:2.6.1")
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation ("com.google.firebase:firebase-storage-ktx")
     implementation("com.google.firebase:firebase-analytics")
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation ("com.google.android.gms:play-services-location:21.0.1")
