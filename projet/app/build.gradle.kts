@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
     alias(libs.plugins.compose.compiler) version "2.0.0"
+    id("kotlin-kapt")
 }
 
 android {
@@ -68,10 +69,18 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
     implementation ("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:v2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("com.google.android.material:material:1.6.1")
+    implementation ("com.github.bumptech.glide:glide:4.13.2")
+    kapt ("com.github.bumptech.glide:compiler:4.13.2")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

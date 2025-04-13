@@ -1,5 +1,6 @@
 package com.example.polyhike
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -17,6 +18,7 @@ import kotlinx.coroutines.withContext
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.core.content.edit
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var userProfileDao: UserProfileDao
@@ -42,9 +44,11 @@ class RegisterActivity : AppCompatActivity() {
             val password = editTextPassword.text.toString().trim()
             val dateOfBirth = editTextDateOfBirth.text.toString().trim()
             if (validateInput(name, password, dateOfBirth) and validateDateFormat(dateOfBirth)) {
-                val newUser = UserProfile(0, name, password, dateOfBirth, "", 1)
+                val newUser = UserProfile(0, name, password, dateOfBirth, imageURI, 1)
                 lifecycleScope.launch(Dispatchers.IO) {
                     userProfileDao.insert(newUser)
+                    val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
+                    sharedPref.edit() { putInt("userId", newUser.id) }
                     withContext(Dispatchers.Main) {
                         Toast.makeText(applicationContext, "Inscription réussie", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@RegisterActivity, NavManagerActivity::class.java)
