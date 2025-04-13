@@ -27,4 +27,13 @@ class SensorViewModel(application: Application) : AndroidViewModel(application) 
     fun updateTemperature(temp: Float?) {
         _sensorUiState.value = _sensorUiState.value?.copy(temperature = temp)
     }
+
+    fun updateAmbientPressure(pressure: Float?) {
+        _sensorUiState.value = _sensorUiState.value?.copy(ambientPressure = pressure)
+    }
+
+    fun updateEstimatedAltitude(altitude: Float?) {
+        _sensorUiState.value = _sensorUiState.value?.copy(estimatedAltitude = altitude)
+    }
+
 }

@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.polyhike.R
+import com.example.polyhike.util.AmbientPressureManager
 import com.example.polyhike.util.AmbientTemperatureManager
 import com.example.polyhike.util.Azimuth
 import com.example.polyhike.util.ClockManager
@@ -26,6 +27,7 @@ class SensorFragment : Fragment() {
     private lateinit var linearAccelerationManager: LinearAccelerationManager
     private lateinit var ambientTemperatureManager: AmbientTemperatureManager
     private lateinit var clockManager: ClockManager
+    private lateinit var ambientPressureManager: AmbientPressureManager
 
     private lateinit var textAzimuth: TextView
     private lateinit var textSteps: TextView
@@ -33,6 +35,8 @@ class SensorFragment : Fragment() {
     private lateinit var textTemp: TextView
     private lateinit var compassView: CompassView
     private lateinit var textClock: TextView
+    private lateinit var textPressure: TextView
+    private lateinit var textAltitude: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +52,8 @@ class SensorFragment : Fragment() {
         textTemp = view.findViewById(R.id.textTemperature)
         compassView = view.findViewById(R.id.compassView)
         textClock = view.findViewById(R.id.textClock)
+        textPressure = view.findViewById(R.id.textPressure)
+        textAltitude = view.findViewById(R.id.textAltitude)
 
 
         // Compass
@@ -69,6 +75,12 @@ class SensorFragment : Fragment() {
         }
 
         clockManager = ClockManager(textClock)
+
+        ambientPressureManager = AmbientPressureManager(requireContext()) { pressure, altitude ->
+            viewModel.updateAmbientPressure(pressure)
+            viewModel.updateEstimatedAltitude(altitude)
+        }
+
         stepCounterManager.start()
         clockManager.start()
 
@@ -79,6 +91,8 @@ class SensorFragment : Fragment() {
             textSteps.text = "Pas: ${state.stepCount}"
             textAcceleration.text = "Accélération: ${"%.2f".format(state.accelerationMagnitude)} m/s²"
             textTemp.text = "Température: ${state.temperature?.toString() ?: "--"} °C"
+            textPressure.text = "Pression: ${state.ambientPressure?.let { "%.2f hPa".format(it) } ?: "--"}"
+            textAltitude.text = "Altitude: ${state.estimatedAltitude?.let { "%.1f m".format(it) } ?: "--"}"
         }
     }
 
@@ -87,6 +101,7 @@ class SensorFragment : Fragment() {
         compassManager.start()
         linearAccelerationManager.start()
         ambientTemperatureManager.start()
+        ambientPressureManager.start()
     }
 
     override fun onPause() {
@@ -96,5 +111,6 @@ class SensorFragment : Fragment() {
         linearAccelerationManager.stop()
         ambientTemperatureManager.stop()
         clockManager.stop()
+        ambientPressureManager.stop()
     }
 }
