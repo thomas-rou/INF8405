@@ -66,7 +66,7 @@ class HomeFragment : Fragment() {
             val batteryPct = ((level / scale.toFloat()) * 100f).toInt()
             val voltage: Int = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0) //mV
             val capacity: Long = getBatteryCapacity() //mAh
-            val batteryEnergy: Int = (voltage * capacity / 1000000000).toInt()
+            val batteryEnergy: Int = (voltage * capacity / 1000000).toInt() //Wh
 
             setNewBatteryUsage(batteryPct, batteryEnergy)
         } else {
@@ -92,11 +92,11 @@ class HomeFragment : Fragment() {
             sharedPref.edit() { putInt("batteryInitialPct", batteryPercentage) }
             sharedPref.edit() { putInt("batteryInitialEnergy", batteryEnergy) }
             batteryPercentageUsed.text = "Pourcentage utilisé : 0%"
-            batteryEnergyUsed.text = "Energie utilisée : 0 kWh"
+            batteryEnergyUsed.text = "Energie utilisée : 0 Wh"
         } else {
             batteryPercentageUsed.text = "Pourcentage utilisé : ${batteryInitialPct - batteryPercentage}%"
 
-            batteryEnergyUsed.text = "Energie utilisée : ${batteryInitialEnergy - batteryEnergy} kWh"
+            batteryEnergyUsed.text = "Energie utilisée : ${batteryInitialEnergy - batteryEnergy} Wh"
         }
     }
 
@@ -105,9 +105,9 @@ class HomeFragment : Fragment() {
             val downlink: TextView = binding.downlink
             val uplink: TextView = binding.uplink
             val rxBytes: Long = TrafficStats.getTotalRxBytes()
-            downlink.text = "Downlink : ${rxBytes / (1024)} Ko"
+            if (rxBytes >= 0) downlink.text = "Downlink : ${rxBytes} o/s"
             val txBytes: Long = TrafficStats.getTotalTxBytes()
-            uplink.text = "Uplink : ${txBytes / (1024)} Ko"
+            if (txBytes >= 0) uplink.text = "Uplink : ${txBytes} o/s"
             mHandler.postDelayed(mRunnable, 1000)
         }
     }
