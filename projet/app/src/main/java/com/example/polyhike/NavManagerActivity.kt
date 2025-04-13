@@ -1,6 +1,8 @@
 package com.example.polyhike
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -12,9 +14,12 @@ import com.example.polyhike.databinding.ActivityNavManagerBinding
 class NavManagerActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityNavManagerBinding
+    var userId = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
+        userId = intent.getIntExtra("USER_ID", -1)
 
         binding = ActivityNavManagerBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -32,4 +37,5 @@ class NavManagerActivity: AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
+
 }

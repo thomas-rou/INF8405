@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "113500427555",
+    "project_id": "polyhike-a836c",
+    "storage_bucket": "polyhike-a836c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113500427555:android:920d8fa2212a78ac206896",
+        "android_client_info": {
+          "package_name": "com.example.polyhike"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_2WvZMltoJSCgYJEA8bL3LNA2EDsdAug"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
