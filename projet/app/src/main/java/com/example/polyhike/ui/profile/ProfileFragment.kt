@@ -34,7 +34,6 @@ class ProfileFragment : Fragment() {
         profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
         val textViewName: TextView = binding.tvNameAge
         val textViewAddress: TextView = binding.tvAddress
         val imageView: ImageView = binding.userImage
@@ -55,10 +54,8 @@ class ProfileFragment : Fragment() {
                     .into(imageView)
             }
         }
-
         val sharedPref = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE)
         val userId = sharedPref.getInt("userId", -1)
-
         profileViewModel.getUserProfile(userId)
 
         return root

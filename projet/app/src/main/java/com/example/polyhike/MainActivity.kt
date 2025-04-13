@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.Manifest
-
+import androidx.lifecycle.ProcessLifecycleOwner
+import com.example.polyhike.lifecycle.AppLifecycleObserver
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
 
+        ProcessLifecycleOwner.get().lifecycle.addObserver(AppLifecycleObserver(applicationContext))
 
         val buttonLogin = findViewById<Button>(R.id.buttonLogin)
         buttonLogin.setOnClickListener {

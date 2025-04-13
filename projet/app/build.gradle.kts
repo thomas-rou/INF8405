@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)
+    implementation ("androidx.lifecycle:lifecycle-process:2.6.1")
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")

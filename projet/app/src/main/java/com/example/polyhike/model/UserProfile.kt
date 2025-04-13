@@ -11,5 +11,5 @@ data class UserProfile(
     val password: String,
     val dateOfBirth: String,
     val photoURI: String,
-    val friends: Int, // TODO: change to list
+    val friends: Int,
 )
