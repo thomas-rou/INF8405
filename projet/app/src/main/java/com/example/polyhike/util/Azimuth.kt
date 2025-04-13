@@ -1,7 +1,5 @@
 package com.example.polyhike.util
 
-import kotlin.math.roundToInt
-
 private data class SemiClosedFloatRange(val fromInclusive: Float, val toExclusive: Float)
 
 private operator fun SemiClosedFloatRange.contains(value: Float): Boolean =

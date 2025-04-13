@@ -1,22 +1,30 @@
 package com.example.polyhike.util
 
 
+import android.app.Activity
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
+import android.view.Surface
+import java.lang.Math.toDegrees
+
+private const val AZIMUTH = 0
 
 class CompassManager(
-    context: Context,
-    private val onAzimuthChanged: (Float, Float) -> Unit
+    private val context: Context,
+    private val onAzimuthChanged: (Float) -> Unit
 ) : SensorEventListener {
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
 
-    private var smoothedAzimuth = 0f
-    private val alpha = 0.1f
+    private val rotationMatrix = FloatArray(9)
+    private val remappedMatrix = FloatArray(9)
+    private val orientation = FloatArray(3)
+
 
     fun start() {
         rotationVectorSensor?.let {
@@ -31,26 +39,42 @@ class CompassManager(
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type != Sensor.TYPE_ROTATION_VECTOR) return
 
-        val rotationMatrix = FloatArray(9)
+        // Calculer la matrice de rotation
         SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
 
-        val adjustedRotationMatrix = FloatArray(9)
-        SensorManager.remapCoordinateSystem(
-            rotationMatrix,
-            SensorManager.AXIS_X, SensorManager.AXIS_Z, // X vers la droite, Z vers le haut
-            adjustedRotationMatrix
-        )
+        // Adapter à la rotation de l’écran
+        val displayRotation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            context.display?.rotation ?: Surface.ROTATION_0
+        } else {
+            @Suppress("DEPRECATION")
+            (context as? Activity)?.windowManager?.defaultDisplay?.rotation ?: Surface.ROTATION_0
+        }
 
-        val orientation = FloatArray(3)
-        SensorManager.getOrientation(adjustedRotationMatrix, orientation)
+        when (displayRotation) {
+            Surface.ROTATION_90 -> SensorManager.remapCoordinateSystem(
+                rotationMatrix,
+                SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, remappedMatrix
+            )
+            Surface.ROTATION_180 -> SensorManager.remapCoordinateSystem(
+                rotationMatrix,
+                SensorManager.AXIS_MINUS_X, SensorManager.AXIS_MINUS_Y, remappedMatrix
+            )
+            Surface.ROTATION_270 -> SensorManager.remapCoordinateSystem(
+                rotationMatrix,
+                SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_X, remappedMatrix
+            )
+            else -> SensorManager.remapCoordinateSystem(
+                rotationMatrix,
+                SensorManager.AXIS_X, SensorManager.AXIS_Y, remappedMatrix
+            )
+        }
 
-        val azimuthRad = orientation[0]
-        val rawAzimuth = Math.toDegrees(azimuthRad.toDouble()).toFloat()
-        val fixedAzimuth = (rawAzimuth + 360f) % 360f
+        SensorManager.getOrientation(remappedMatrix, orientation)
 
-        smoothedAzimuth = smoothedAzimuth * (1 - alpha) + fixedAzimuth * alpha
+        val azimuthRad = orientation[AZIMUTH]
+        val azimuthDeg = (toDegrees(azimuthRad.toDouble()) + 360) % 360
 
-        onAzimuthChanged(fixedAzimuth, rawAzimuth)
+        onAzimuthChanged(azimuthDeg.toFloat())
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}

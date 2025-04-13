@@ -55,44 +55,46 @@ class SensorFragment : Fragment() {
         textPressure = view.findViewById(R.id.textPressure)
         textAltitude = view.findViewById(R.id.textAltitude)
 
+        setupSensors()
 
-        // Compass
-        compassManager = CompassManager(requireContext()) { smoothedAzimuth, rawAzimuth ->
-            compassView.updateAzimuth(smoothedAzimuth)
-            viewModel.updateAzimuth(rawAzimuth)
+        viewModel.sensorUiState.observe(viewLifecycleOwner) { state ->
+            val az = Azimuth(state.azimuth)
+            compassView.updateAzimuth(state.azimuth)
+            textAzimuth.text = "Direction: ${az.cardinalDirection} (${state.azimuth.roundToInt()}°)"
+            textSteps.text = "Pas: ${state.stepCount}"
+            textAcceleration.text = "Accélération: ${"%.2f".format(state.accelerationMagnitude)} m/s²"
+            textTemp.text = "Température ambiante: ${state.temperature?.toString() ?: "--"} °C"
+            textClock.text = "Heure: ${state.clock}"
+            textPressure.text = "Pression: ${state.ambientPressure?.let { "%.2f hPa".format(it) } ?: "--"}"
+            textAltitude.text = "Altitude: ${state.estimatedAltitude?.let { "%.1f m".format(it) } ?: "--"}"
+        }
+    }
+
+    private fun setupSensors() {
+        compassManager = CompassManager(requireContext()) { azimuth ->
+            compassView.updateAzimuth(azimuth)
+            viewModel.updateAzimuth(azimuth)
         }
 
-        stepCounterManager = StepCounterManager(requireContext()) { steps ->
-            viewModel.updateStepCount(steps)
+        stepCounterManager = StepCounterManager(requireContext()) {
+            viewModel.updateStepCount(it)
         }
 
-        linearAccelerationManager = LinearAccelerationManager(requireContext()) { x, y, z, magnitude ->
+        linearAccelerationManager = LinearAccelerationManager(requireContext()) { _, _, _, magnitude ->
             viewModel.updateAcceleration(magnitude)
         }
 
-        ambientTemperatureManager = AmbientTemperatureManager(requireContext()) { temperature ->
-            viewModel.updateTemperature(temperature)
+        ambientTemperatureManager = AmbientTemperatureManager(requireContext()) {
+            viewModel.updateTemperature(it)
         }
-
-        clockManager = ClockManager(textClock)
 
         ambientPressureManager = AmbientPressureManager(requireContext()) { pressure, altitude ->
             viewModel.updateAmbientPressure(pressure)
             viewModel.updateEstimatedAltitude(altitude)
         }
 
-        stepCounterManager.start()
-        clockManager.start()
-
-        viewModel.sensorUiState.observe(viewLifecycleOwner) { state ->
-            val az = Azimuth(state.azimuth)
-            val deg = (state.azimuth + 360f) % 360f
-            textAzimuth.text = "Direction: ${az.cardinalDirection} (${deg.roundToInt()}°)"
-            textSteps.text = "Pas: ${state.stepCount}"
-            textAcceleration.text = "Accélération: ${"%.2f".format(state.accelerationMagnitude)} m/s²"
-            textTemp.text = "Température: ${state.temperature?.toString() ?: "--"} °C"
-            textPressure.text = "Pression: ${state.ambientPressure?.let { "%.2f hPa".format(it) } ?: "--"}"
-            textAltitude.text = "Altitude: ${state.estimatedAltitude?.let { "%.1f m".format(it) } ?: "--"}"
+        clockManager = ClockManager {
+            viewModel.updateClock(it)
         }
     }
 
@@ -102,6 +104,8 @@ class SensorFragment : Fragment() {
         linearAccelerationManager.start()
         ambientTemperatureManager.start()
         ambientPressureManager.start()
+        stepCounterManager.start()
+        clockManager.start()
     }
 
     override fun onPause() {

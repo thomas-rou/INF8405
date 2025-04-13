@@ -4,11 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.example.polyhike.R
-import com.example.polyhike.util.Azimuth
 
 class CompassView @JvmOverloads constructor(
     context: Context,
@@ -17,7 +15,6 @@ class CompassView @JvmOverloads constructor(
 
     private val rotatingGroup: View
     private val needle: ImageView
-    private var lastAzimuth = 0f
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_compass, this, true)
@@ -26,24 +23,11 @@ class CompassView @JvmOverloads constructor(
     }
 
     fun updateAzimuth(degrees: Float) {
-        val azimuth = Azimuth(degrees)
-        rotateCompass(-azimuth.degrees) // rotation inverse
+        val rotation = -degrees  // Inverse car on tourne le fond, pas l'aiguille
+        rotateCompass(rotation)
     }
 
-    private fun rotateCompass(toDegrees: Float) {
-        var diff = toDegrees - lastAzimuth
-
-        // Normaliser en [-180, 180]
-        diff = (diff + 540) % 360 - 180
-
-        val finalAzimuth = lastAzimuth + diff
-
-        rotatingGroup.animate()
-            .rotation(finalAzimuth)
-            .setDuration(300)
-            .setInterpolator(LinearInterpolator())
-            .start()
-
-        lastAzimuth = finalAzimuth
+    private fun rotateCompass(toRotation: Float) {
+        rotatingGroup.rotation = toRotation
     }
 }
