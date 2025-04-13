@@ -17,8 +17,10 @@ class StepCounterManager(
     private var stepOffset: Float? = null
 
     fun start() {
-        stepSensor?.let {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+        if (stepSensor != null) {
+            sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI)
+        } else {
+            onStepCountUpdated(-1) // Indique qu'aucun capteur n'est disponible
         }
     }
 

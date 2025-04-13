@@ -60,13 +60,13 @@ class SensorFragment : Fragment() {
         viewModel.sensorUiState.observe(viewLifecycleOwner) { state ->
             val az = Azimuth(state.azimuth)
             compassView.updateAzimuth(state.azimuth)
-            textAzimuth.text = "Direction: ${az.cardinalDirection} (${state.azimuth.roundToInt()}°)"
-            textSteps.text = "Pas: ${state.stepCount}"
-            textAcceleration.text = "Accélération: ${"%.2f".format(state.accelerationMagnitude)} m/s²"
-            textTemp.text = "Température ambiante: ${state.temperature?.toString() ?: "--"} °C"
+            textAzimuth.text = if (state.azimuth == -1f) "Direction: N/A" else "Direction: ${az.cardinalDirection} (${state.azimuth.roundToInt()}°)"
+            textSteps.text = if (state.stepCount == -1) "Pas: N/A" else "Pas: ${state.stepCount}"
+            textAcceleration.text = if (state.accelerationMagnitude == -1f) "Accélération: N/A" else "Accélération: ${"%.2f".format(state.accelerationMagnitude)} m/s²"
+            textTemp.text = "Température ambiante: ${state.temperature?.toString() ?: "N/A"} °C"
             textClock.text = "Heure: ${state.clock}"
-            textPressure.text = "Pression: ${state.ambientPressure?.let { "%.2f hPa".format(it) } ?: "--"}"
-            textAltitude.text = "Altitude: ${state.estimatedAltitude?.let { "%.1f m".format(it) } ?: "--"}"
+            textPressure.text = "Pression: ${state.ambientPressure?.let { "%.2f hPa".format(it) } ?: "N/A"}"
+            textAltitude.text = "Altitude: ${state.estimatedAltitude?.let { "%.1f m".format(it) } ?: "N/A"}"
         }
     }
 

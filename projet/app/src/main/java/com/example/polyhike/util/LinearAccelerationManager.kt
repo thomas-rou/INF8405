@@ -18,8 +18,10 @@ class LinearAccelerationManager(
     private val NOISE_THRESHOLD = 0.5f
 
     fun start() {
-        linearAccelerationSensor?.let {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+        if (linearAccelerationSensor != null) {
+            sensorManager.registerListener(this, linearAccelerationSensor, SensorManager.SENSOR_DELAY_UI)
+        } else {
+            onAcceleration(0f, 0f, 0f, -1f)
         }
     }
 

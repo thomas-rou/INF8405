@@ -27,8 +27,10 @@ class CompassManager(
 
 
     fun start() {
-        rotationVectorSensor?.let {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+        if (rotationVectorSensor != null){
+            sensorManager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI)
+        } else {
+            onAzimuthChanged(-1f)
         }
     }
 
