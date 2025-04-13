@@ -31,13 +31,6 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     private val _totalDistance = MutableLiveData<Int?>()
     val totalDistance: LiveData<Int?> = _totalDistance
 
-    private val _barData = MutableLiveData<BarData>()
-    val barData: LiveData<BarData> = _barData
-
-    init {
-        setupChartData()
-    }
-
     fun getUserProfile(userId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -93,22 +86,4 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         return age
     }
 
-    fun setupChartData() {
-        // TODO: replace
-        val entries = arrayListOf<BarEntry>()
-        entries.add(BarEntry(0f, 1000f))
-        entries.add(BarEntry(1f, 2000f))
-        entries.add(BarEntry(2f, 3000f))
-        entries.add(BarEntry(3f, 4000f))
-        entries.add(BarEntry(4f, 5000f))
-        entries.add(BarEntry(5f, 6000f))
-        entries.add(BarEntry(6f, 7000f))
-
-        val dataSet = BarDataSet(entries, "Nombre de pas par jour")
-        dataSet.color = "#E5E5E5".toColorInt()
-        val barData = BarData(dataSet)
-        barData.barWidth = 0.5f
-
-        _barData.value = barData
-    }
 }

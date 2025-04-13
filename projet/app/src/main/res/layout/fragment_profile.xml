@@ -11,7 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/grad"
-        android:paddingBottom="20dp">
+        android:paddingBottom="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="20dp">
 
         <RelativeLayout
             android:id="@+id/imgUser"
@@ -23,8 +25,8 @@
 
             <ImageView
                 android:id="@+id/userImage"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
                 android:layout_margin="9dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/circle"
@@ -35,39 +37,41 @@
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/tv_name_age"
+            android:id="@+id/tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imgUser"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15sp"
+            android:layout_marginBottom="10dp"
             android:fontFamily="sans-serif-light"
-            android:text="abc xyz"
+            android:text="UserX"
             android:textColor="@color/black"
             android:textSize="32sp" />
 
+        <TextView
+            android:id="@+id/tv_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_name"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="sans-serif-light"
+            android:text="30 ans"
+            android:textColor="@color/black"
+            android:textSize="25sp" />
 
         <TextView
             android:id="@+id/tv_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_name_age"
+            android:layout_below="@+id/tv_age"
             android:layout_centerHorizontal="true"
             android:fontFamily="sans-serif"
-            android:text="ville, pays"
+            android:text="Montreal, Canada"
             android:textAllCaps="true"
             android:textColor="@color/purple_700"
             android:textSize="14sp" />
-
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="15dp"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_settings" />
 
     </RelativeLayout>
 
@@ -151,40 +155,4 @@
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/linlay1">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="70dp"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Nombre de pas : Rapport de la semaine"
-                    android:textColor="@color/purple_700"
-                    android:textSize="20sp" />
-
-                <com.github.mikephil.charting.charts.BarChart
-                    android:id="@+id/barChart"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </LinearLayout>
-        </LinearLayout>
-    </RelativeLayout>
 </RelativeLayout>
