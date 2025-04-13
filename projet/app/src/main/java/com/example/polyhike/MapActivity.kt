@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.polyhike.model.HikeInfo
 import com.example.polyhike.ui.record.HikeInfoViewModel
+import com.example.polyhike.util.HikeSensorSession
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -206,11 +207,8 @@ private fun configureButton(){
                     // Speed (m/s to km/h)
                     currentSpeed = location.speed * 3.6
                     currentBearing = location.bearing.toDouble()
-                    // TODO: use sensor
-                    currentTemperature = 15 + (Math.random() * 10)
-                    // TODO: use sensor
-                    totalSteps += 1
-
+                    currentTemperature = HikeSensorSession.currentTemperature
+                    totalSteps += HikeSensorSession.totalSteps
                     recordedPath.add(latLng)
                     drawDirection(android.graphics.Color.GREEN)
                 }
@@ -230,6 +228,8 @@ private fun configureButton(){
         val temperatureTextView = infoView.findViewById<TextView>(R.id.temperature)
         val distanceTextView = infoView.findViewById<TextView>(R.id.distance)
         val averageSpeedTextView = infoView.findViewById<TextView>(R.id.average_speed)
+        val liveSteps = HikeSensorSession.totalSteps
+        val liveTemp = HikeSensorSession.currentTemperature
 
         if(isHistoryShown)
             speedTextView.visibility = View.GONE
@@ -243,8 +243,8 @@ private fun configureButton(){
         startDateTextView.text = "Date de début : ${startDate?.toString()?: "Non démarré"}"
         endDateTextView.text = "Date de fin : ${endDate?.toString()?: "Non terminé"}"
         speedTextView.text = "Vitesse : ${String.format("%.2f", currentSpeed)} km/h"
-        stepsTextView.text = "Nombre de pas : $totalSteps"
-        temperatureTextView.text = "Température : ${String.format("%.1f", currentTemperature)}°C"
+        stepsTextView.text = "Nombre de pas : ${if (liveSteps == -1) "N/A" else liveSteps}"
+        temperatureTextView.text = "Température : ${if (liveTemp == -1.0) "N/A" else String.format("%.1f", liveTemp)}°C"
         distanceTextView.text = "Distance parcourue : ${String.format("%.2f", totalDistance / 1000)} km"
         averageSpeedTextView.text = "Vitesse moyenne : ${String.format("%.2f", averageSpeed)} km/h"
 
@@ -332,11 +332,18 @@ private fun configureButton(){
         isHistoryShown = intent.getBooleanExtra("HISTORY_MODE", false)
         val hikeId = intent.getIntExtra("HIKE_ID", -1)
 
+        HikeSensorSession.start(this)
+
         if(isHistoryShown)
         {
             displayPreviousHikeMap(hikeId)
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        HikeSensorSession.stop()
     }
 
     private fun displayPreviousHikeMap(hikeId: Int){
@@ -371,9 +378,9 @@ private fun configureButton(){
             endDate = endDate?: Date(),
             currentSpeed = currentSpeed,
             averageSpeed = averageSpeed,
-            totalSteps = totalSteps,
+            totalSteps = HikeSensorSession.totalSteps,
             totalDistance = totalDistance,
-            currentTemperature = currentTemperature,
+            currentTemperature = HikeSensorSession.currentTemperature,
             recordedPath = recordedPath,
             pausePath = pausePath
         )
