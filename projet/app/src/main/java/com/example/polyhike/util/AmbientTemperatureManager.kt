@@ -30,7 +30,13 @@ class AmbientTemperatureManager(
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_AMBIENT_TEMPERATURE) {
-            onTemperatureChanged(event.values[0])
+            val tempValue = event.values[0]
+            if (tempValue < -1000f) {
+                Log.w("AmbientTempManager", "Valeur invalide de température : $tempValue")
+                onTemperatureChanged(null)
+            } else {
+                onTemperatureChanged(tempValue)
+            }
         }
     }
 
