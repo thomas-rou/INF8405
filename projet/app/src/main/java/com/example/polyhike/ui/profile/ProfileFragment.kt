@@ -13,8 +13,10 @@ import com.example.polyhike.databinding.FragmentProfileBinding
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.example.polyhike.NavManagerActivity
 
 class ProfileFragment : Fragment() {
+    private var userId = -1
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
@@ -27,6 +29,7 @@ class ProfileFragment : Fragment() {
     ): View {
         profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        userId  = (activity as? NavManagerActivity)?.userId?:-1
         val root: View = binding.root
         val textViewName: TextView = binding.tvName
         val textViewAge: TextView = binding.tvAge
@@ -54,8 +57,6 @@ class ProfileFragment : Fragment() {
             if (it != null) textViewDistance.text = (it / 1000).toString()
             else textViewDistance.text = "0"
         }
-        val sharedPref = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE)
-        val userId = sharedPref.getInt("userId", -1)
         profileViewModel.getUserProfile(userId)
         profileViewModel.getTotalStepsByUserId(userId)
         profileViewModel.getTotalDistanceByUserId(userId)
