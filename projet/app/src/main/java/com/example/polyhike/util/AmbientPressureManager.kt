@@ -31,13 +31,14 @@ class AmbientPressureManager(
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_PRESSURE) {
-            val pressure = event.values[0]  // en hPa (hectopascals/millibar) --> bar
+            val pressure = event.values[0]  // en hPa (hectopascals/millibar)
             val altitude = calculateAltitude(pressure)
             onPressureAndAltitudeChanged(pressure, altitude)
         }
     }
 
     private fun calculateAltitude(pressure: Float): Float {
+        // formule barométrique simplifiée: pression niveau de la mer et température standard à 15 deg celcius
         val seaLevelPressure = 1013.25f // pression standard en hPa (millibar)
         return 44330f * (1f - (pressure / seaLevelPressure).toDouble().pow(1.0 / 5.255)).toFloat()
     }
