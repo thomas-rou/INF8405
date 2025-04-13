@@ -25,7 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 class RegisterActivity : AppCompatActivity() {
     private lateinit var userProfileDao: UserProfileDao
     private lateinit var imageView: ImageView
-    private lateinit var imageURI: String
+    private var imageURI: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

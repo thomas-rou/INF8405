@@ -46,10 +46,9 @@ class ProfileFragment : Fragment() {
                 append(" ans")
             }
             textViewAddress.text = "Montreal, Canada"  // TODO: set address dynamically
-            val uri = it?.photoURI?.toUri()
-            if (uri != null) {
+            if (it?.photoURI?.isNotEmpty() == true) {
                 Glide.with(requireContext())
-                    .load(uri)
+                    .load(it.photoURI.toUri())
                     .apply(RequestOptions.circleCropTransform())
                     .into(imageView)
             }
