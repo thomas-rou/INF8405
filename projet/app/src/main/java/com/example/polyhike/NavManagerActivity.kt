@@ -10,11 +10,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.polyhike.databinding.ActivityNavManagerBinding
+import com.example.polyhike.util.PermissionUtils
 
 class NavManagerActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityNavManagerBinding
     var userId = -1
+    private val ACTIVITY_PERMISSION_REQUEST_CODE = 42
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +38,9 @@ class NavManagerActivity: AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        if (!PermissionUtils.hasActivityRecognitionPermission(this)) {
+            PermissionUtils.requestActivityRecognition(this, ACTIVITY_PERMISSION_REQUEST_CODE)
+        }
     }
 
 }
