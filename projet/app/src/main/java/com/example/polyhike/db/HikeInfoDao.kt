@@ -19,4 +19,10 @@ interface HikeInfoDao {
     fun getAllHikes(): LiveData<List<HikeInfo>>
     @Query("SELECT * FROM hikeInfo WHERE id = :hikeId")
     fun getHikeById(hikeId: Int): LiveData<HikeInfo>
+
+    @Query("SELECT SUM(totalSteps) FROM hikeInfo WHERE currentUserId = :userId")
+    fun getTotalStepsBUserId(userId: Int): Int?
+
+    @Query("SELECT SUM(totalDistance) FROM hikeInfo WHERE currentUserId = :userId")
+    fun getTotalDistancesBUserId(userId: Int): Int?
 }

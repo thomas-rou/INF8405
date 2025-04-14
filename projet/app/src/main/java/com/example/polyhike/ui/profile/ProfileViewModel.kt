@@ -22,16 +22,14 @@ import androidx.core.graphics.toColorInt
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     private val userProfileDao = PolyHikeDatabase.getDatabase(application, viewModelScope).userProfileDao()
+    private val hikeInfoDao = PolyHikeDatabase.getDatabase(application, viewModelScope).hikeInfoDao()
 
     private val _userProfile = MutableLiveData<UserProfile?>()
     val userProfile: LiveData<UserProfile?> = _userProfile
-
-    private val _barData = MutableLiveData<BarData>()
-    val barData: LiveData<BarData> = _barData
-
-    init {
-        setupChartData()
-    }
+    private val _totalSteps = MutableLiveData<Int?>()
+    val totalSteps: LiveData<Int?> = _totalSteps
+    private val _totalDistance = MutableLiveData<Int?>()
+    val totalDistance: LiveData<Int?> = _totalDistance
 
     fun getUserProfile(userId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -42,6 +40,32 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 }
             } catch (e: Exception) {
                 Log.e("ProfileViewModel", "Error getting user profile: ${e.message}")
+            }
+        }
+    }
+
+    fun getTotalStepsByUserId(userId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val stepsTotal = hikeInfoDao.getTotalStepsBUserId(userId)
+                withContext(Dispatchers.Main) {
+                    _totalSteps.value = stepsTotal
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileViewModel", "Error getting user total steps: ${e.message}")
+            }
+        }
+    }
+
+    fun getTotalDistanceByUserId(userId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val distanceTotal = hikeInfoDao.getTotalDistancesBUserId(userId)
+                withContext(Dispatchers.Main) {
+                    _totalDistance.value = distanceTotal
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileViewModel", "Error getting user total distance: ${e.message}")
             }
         }
     }
@@ -62,22 +86,4 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         return age
     }
 
-    fun setupChartData() {
-        // TODO: replace
-        val entries = arrayListOf<BarEntry>()
-        entries.add(BarEntry(0f, 1000f))
-        entries.add(BarEntry(1f, 2000f))
-        entries.add(BarEntry(2f, 3000f))
-        entries.add(BarEntry(3f, 4000f))
-        entries.add(BarEntry(4f, 5000f))
-        entries.add(BarEntry(5f, 6000f))
-        entries.add(BarEntry(6f, 7000f))
-
-        val dataSet = BarDataSet(entries, "Nombre de pas par jour")
-        dataSet.color = "#E5E5E5".toColorInt()
-        val barData = BarData(dataSet)
-        barData.barWidth = 0.5f
-
-        _barData.value = barData
-    }
 }

@@ -444,6 +444,7 @@ private fun configureButton(){
         )
 
         hikeInfoViewModel.saveHike(hikeInfo)
+        hikeInfoViewModel.addHikeToFirestore(hikeInfo)
     }
 
     override fun onRequestPermissionsResult(

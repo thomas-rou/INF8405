@@ -24,15 +24,12 @@ class SplashActivity : AppCompatActivity() {
         loadMainPageAfterTimerExpires()
     }
 
-
     private fun loadMainPageAfterTimerExpires() {
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }, OPENNING_TIME)
-
-
     }
 
 }
