@@ -22,4 +22,10 @@
         android:name="com.example.polyhike.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/sensors_central"
+        android:name="com.example.polyhike.ui.sensor.SensorFragment"
+        android:label="@string/title_sensor"
+        tools:layout="@layout/fragment_sensor" />
 </navigation>

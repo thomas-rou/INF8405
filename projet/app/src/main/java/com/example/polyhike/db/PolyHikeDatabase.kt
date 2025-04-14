@@ -57,6 +57,7 @@ abstract class PolyHikeDatabase : RoomDatabase() {
                 )
                     .addCallback(AppDatabaseCallback(CoroutineScope(Dispatchers.IO)))
                     .fallbackToDestructiveMigration()
+                    .allowMainThreadQueries()
                     .build()
                 INSTANCE = instance
                 instance
@@ -69,14 +70,13 @@ abstract class PolyHikeDatabase : RoomDatabase() {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    // TODO: remove or add...
-                    populateUserProfiles(database.userProfileDao())
+                    populateDB(database)
                 }
             }
         }
 
-        fun populateUserProfiles(userProfile: UserProfileDao) {
-            userProfile.insert(UserProfile(id = 1, "UserName", password = "pass", dateOfBirth = "01/01/2001", photoURI = "", friends = 2))
+        fun populateDB(database: PolyHikeDatabase) {
+            database.userProfileDao().insert(UserProfile(id = 1, "UserName", password = "pass", dateOfBirth = "01/01/2001", photoURI = "", friends = 2))
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.polyhike
 import android.content.pm.PackageManager
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.polyhike.model.HikeInfo
 import com.example.polyhike.ui.record.HikeInfoViewModel
+import com.example.polyhike.util.HikeSensorSession
+import com.example.polyhike.util.HikeState
+import com.example.polyhike.util.PermissionUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -25,8 +29,10 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Tasks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback  {
@@ -35,7 +41,7 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnReq
         private const val POSITION_UPDATE_TIME_LOWER_BOUND = 1000L
         private const val POSITION_UPDATE_TIME_UPPER_BOUND = 10000L
         private const val POSITION_UPDATE_TIME = 5000L
-
+        private const val ACTIVITY_PERMISSION_REQUEST_CODE = 42
     }
 
     private lateinit var hikeInfoViewModel: HikeInfoViewModel
@@ -50,12 +56,12 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, ActivityCompat.OnReq
     private lateinit var mMap: GoogleMap
     private lateinit var locationProvider: FusedLocationProviderClient
     private var pausePath: MutableList<LatLng> = mutableListOf()
-    private var isRecording = false
     private var isHistoryShown = false
     private var startDate: Date? = null
     private var endDate: Date? = null
     private lateinit var locationCallback: com.google.android.gms.location.LocationCallback
     private lateinit var locationRequest: com.google.android.gms.location.LocationRequest
+    private var hikeState = HikeState.STOPPED
 
 @SuppressLint("UseCompatLoadingForDrawables")
 private fun configureButton(){
@@ -75,7 +81,7 @@ private fun configureButton(){
         buttonStartHike.setOnClickListener {
             startRecording()
         }
-        if (isRecording) {
+        if (hikeState == HikeState.RECORDING) {
             buttonStopHike.isEnabled = true
             buttonStopHike.background = getDrawable(R.mipmap.stop_hike)
             buttonPauseHike.isEnabled = true
@@ -146,25 +152,32 @@ private fun configureButton(){
     }
 
     private fun pauseRecording() {
-        if (::locationCallback.isInitialized) {
-            locationProvider.removeLocationUpdates(locationCallback)
-        }
-        isRecording = false
-        configureButton()
+        if (hikeState != HikeState.RECORDING) return
+
+        locationProvider.removeLocationUpdates(locationCallback)
+        HikeSensorSession.pauseStepCounter()
+
         pausePath.add(recordedPath.last())
+        hikeState = HikeState.PAUSED
+        configureButton()
         drawDirection(android.graphics.Color.YELLOW)
     }
 
     private fun stopRecording() {
-        if (::locationCallback.isInitialized) {
-            locationProvider.removeLocationUpdates(locationCallback)
-        }
-        isRecording = false
+        if (hikeState == HikeState.STOPPED) return
+
+        locationProvider.removeLocationUpdates(locationCallback)
+        HikeSensorSession.resetStepCounterManager()
+        HikeSensorSession.pauseStepCounter()
+
+        hikeState = HikeState.STOPPED
         endDate = Date()
         configureButton()
         drawDirection(android.graphics.Color.RED)
-        if (recordedPath.size >= 2)
+
+        if (recordedPath.size >= 2) {
             addMarker(recordedPath.last(), BitmapDescriptorFactory.HUE_RED, "End")
+        }
 
         saveToDatabase()
     }
@@ -176,11 +189,32 @@ private fun configureButton(){
             return
         }
 
-        if (isRecording) return // Already recording
+        if (hikeState == HikeState.RECORDING) return
 
-        isRecording = true
-        startDate = Date()
-        configureButton()
+        when (hikeState) {
+            HikeState.STOPPED -> {
+                HikeSensorSession.resetStepCounterManager()
+                HikeSensorSession.totalSteps = 0
+                totalSteps = 0
+                startDate = Date()
+                endDate = null
+                averageSpeed = 0.0
+                currentSpeed = 0.0
+                totalDistance = 0.0
+                currentBearing = 0.0
+                lastLocation = null
+                recordedPath.clear()
+                pausePath.clear()
+            }
+            HikeState.PAUSED -> {
+                // Reprise : ne pas reset, juste reprendre
+            }
+            else -> {}
+        }
+
+        HikeSensorSession.resumeStepCounter()
+        hikeState = HikeState.RECORDING
+
         locationRequest = com.google.android.gms.location.LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY, POSITION_UPDATE_TIME
         ).setMinUpdateIntervalMillis(POSITION_UPDATE_TIME_LOWER_BOUND)
@@ -202,14 +236,19 @@ private fun configureButton(){
                         )
                         totalDistance += results[0]
                     }
+
                     lastLocation = latLng
-                    // Speed (m/s to km/h)
                     currentSpeed = location.speed * 3.6
                     currentBearing = location.bearing.toDouble()
-                    // TODO: use sensor
-                    currentTemperature = 15 + (Math.random() * 10)
-                    // TODO: use sensor
-                    totalSteps += 1
+
+                    lifecycleScope.launch {
+                        if (HikeSensorSession.currentTemperature == -1.0) {
+                            HikeSensorSession.fetchTemperatureFallback(location.latitude, location.longitude)
+                        }
+                    }
+
+                    currentTemperature = HikeSensorSession.currentTemperature
+                    totalSteps = HikeSensorSession.totalSteps
 
                     recordedPath.add(latLng)
                     drawDirection(android.graphics.Color.GREEN)
@@ -218,6 +257,7 @@ private fun configureButton(){
         }
 
         locationProvider.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
+        configureButton()
     }
 
     @SuppressLint("SetTextI18n", "DefaultLocale")
@@ -230,13 +270,15 @@ private fun configureButton(){
         val temperatureTextView = infoView.findViewById<TextView>(R.id.temperature)
         val distanceTextView = infoView.findViewById<TextView>(R.id.distance)
         val averageSpeedTextView = infoView.findViewById<TextView>(R.id.average_speed)
+        val liveSteps = HikeSensorSession.totalSteps
+        val liveTemp = HikeSensorSession.currentTemperature
 
         if(isHistoryShown)
             speedTextView.visibility = View.GONE
         if (startDate != null ) {
             if(isHistoryShown)
                 averageSpeed = totalDistance / ((endDate!!.time - startDate!!.time) / 1000.0) * 3.6
-            else if (isRecording)
+            else if (hikeState == HikeState.RECORDING)
                 averageSpeed = totalDistance / ((Date().time - startDate!!.time) / 1000.0) * 3.6
         }
 
@@ -244,7 +286,7 @@ private fun configureButton(){
         endDateTextView.text = "Date de fin : ${endDate?.toString()?: "Non terminé"}"
         speedTextView.text = "Vitesse : ${String.format("%.2f", currentSpeed)} km/h"
         stepsTextView.text = "Nombre de pas : $totalSteps"
-        temperatureTextView.text = "Température : ${String.format("%.1f", currentTemperature)}°C"
+        temperatureTextView.text = "Température : ${currentTemperature}°C"
         distanceTextView.text = "Distance parcourue : ${String.format("%.2f", totalDistance / 1000)} km"
         averageSpeedTextView.text = "Vitesse moyenne : ${String.format("%.2f", averageSpeed)} km/h"
 
@@ -319,6 +361,7 @@ private fun configureButton(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        hikeState = HikeState.STOPPED
         hikeInfoViewModel = ViewModelProvider(this)[HikeInfoViewModel::class.java]
         hikeInfoViewModel.currentUserId = intent.getIntExtra("USER_ID", -1)
         supportActionBar?.hide()
@@ -332,11 +375,33 @@ private fun configureButton(){
         isHistoryShown = intent.getBooleanExtra("HISTORY_MODE", false)
         val hikeId = intent.getIntExtra("HIKE_ID", -1)
 
+        if (!PermissionUtils.hasActivityRecognitionPermission(this)) {
+            PermissionUtils.requestActivityRecognition(this, ACTIVITY_PERMISSION_REQUEST_CODE)
+        }
+        HikeSensorSession.start(this)
+        HikeSensorSession.resetStepCounterManager()
+        HikeSensorSession.pauseStepCounter() // Pause jusqu'au prochain start
+        HikeSensorSession.totalSteps = 0
+
+
+        lifecycleScope.launch {
+            if (HikeSensorSession.currentTemperature == -1.0) {
+                val lastLocation = getLastKnownLocation()
+                if (lastLocation != null) {
+                    HikeSensorSession.fetchTemperatureFallback(lastLocation.latitude, lastLocation.longitude)
+                }
+            }
+        }
+
         if(isHistoryShown)
         {
             displayPreviousHikeMap(hikeId)
         }
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        HikeSensorSession.stop()
     }
 
     private fun displayPreviousHikeMap(hikeId: Int){
@@ -371,14 +436,15 @@ private fun configureButton(){
             endDate = endDate?: Date(),
             currentSpeed = currentSpeed,
             averageSpeed = averageSpeed,
-            totalSteps = totalSteps,
+            totalSteps = HikeSensorSession.totalSteps,
             totalDistance = totalDistance,
-            currentTemperature = currentTemperature,
+            currentTemperature = HikeSensorSession.currentTemperature,
             recordedPath = recordedPath,
             pausePath = pausePath
         )
 
         hikeInfoViewModel.saveHike(hikeInfo)
+        hikeInfoViewModel.addHikeToFirestore(hikeInfo)
     }
 
     override fun onRequestPermissionsResult(
@@ -398,5 +464,15 @@ private fun configureButton(){
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private suspend fun getLastKnownLocation(): Location? = withContext(Dispatchers.IO) {
+        try {
+            val client = LocationServices.getFusedLocationProviderClient(this@MapActivity)
+            val locationTask = client.lastLocation
+            Tasks.await(locationTask)
+        } catch (e: Exception) {
+            null
+        }
+    }
 
 }

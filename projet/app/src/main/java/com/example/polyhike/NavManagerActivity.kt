@@ -10,11 +10,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.polyhike.databinding.ActivityNavManagerBinding
+import com.example.polyhike.util.PermissionUtils
 
 class NavManagerActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityNavManagerBinding
     var userId = -1
+    private val ACTIVITY_PERMISSION_REQUEST_CODE = 42
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +33,14 @@ class NavManagerActivity: AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_record, R.id.navigation_profile
+                R.id.navigation_home, R.id.navigation_record, R.id.navigation_profile, R.id.sensors_central
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        if (!PermissionUtils.hasActivityRecognitionPermission(this)) {
+            PermissionUtils.requestActivityRecognition(this, ACTIVITY_PERMISSION_REQUEST_CODE)
+        }
     }
 
 }

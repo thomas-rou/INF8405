@@ -1,5 +1,6 @@
 package com.example.polyhike
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -22,6 +23,8 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
 
+        val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
+        sharedPref.edit() { clear() }
 
         userProfileDao = PolyHikeDatabase.getDatabase(this, lifecycleScope).userProfileDao()
 
@@ -40,8 +43,6 @@ class LoginActivity : AppCompatActivity() {
                 val user = userProfileDao.getUserByNameAndPassword(name, password)
                 runOnUiThread {
                     if (user != null) {
-                        val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
-                        sharedPref.edit() { putInt("userId", user.id) }
                         Toast.makeText(applicationContext, "Connexion réussie", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@LoginActivity, NavManagerActivity::class.java)
                         intent.putExtra("USER_ID", user.id)

@@ -1,6 +1,5 @@
 package com.example.polyhike
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -14,23 +13,26 @@ import kotlinx.coroutines.launch
 import com.example.polyhike.db.UserProfileDao
 import com.example.polyhike.model.UserProfile
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.core.content.edit
-import com.example.polyhike.LoginActivity
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var userProfileDao: UserProfileDao
     private lateinit var imageView: ImageView
-    private lateinit var imageURI: String
+    private var imageURI: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
         supportActionBar?.hide()
+
+        val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
+        sharedPref.edit() { clear() }
 
         userProfileDao = PolyHikeDatabase.getDatabase(this, lifecycleScope).userProfileDao()
         imageView = findViewById(R.id.imageViewSelectedPhoto)
@@ -51,9 +53,8 @@ class RegisterActivity : AppCompatActivity() {
                     val newUser = UserProfile(0, name, password, dateOfBirth, imageURI, 1)
                     userProfileDao.insert(newUser)
                     val user = userProfileDao.getUserByNameAndPassword(name, password)
+                    addUserToFirestore(user)
                     runOnUiThread {
-                        val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
-                        if (user != null) sharedPref.edit() { putInt("userId", user.id) }
                         Toast.makeText(applicationContext, "Inscription réussie", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@RegisterActivity, NavManagerActivity::class.java)
                         if (user != null) intent.putExtra("USER_ID", user.id)
@@ -97,6 +98,22 @@ class RegisterActivity : AppCompatActivity() {
             imageView.setImageURI(selectedImageUri)
             imageURI = selectedImageUri.toString()
         }
+    }
+
+    fun addUserToFirestore(userProfile: UserProfile?) {
+        val db = Firebase.firestore
+        val user = hashMapOf(
+            "id" to userProfile?.id,
+            "name" to userProfile?.name,
+        )
+        db.collection("users")
+            .add(user)
+            .addOnSuccessListener { documentReference ->
+                println("DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                println("Error adding document: $e")
+            }
     }
 
     companion object {

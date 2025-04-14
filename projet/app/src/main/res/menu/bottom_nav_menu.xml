@@ -15,5 +15,8 @@
         android:id="@+id/navigation_profile"
         android:icon="@drawable/ic_account_circle_24dp"
         android:title="@string/title_profile" />
-
+    <item
+        android:id="@+id/sensors_central"
+        android:icon="@drawable/ic_sensors"
+        android:title="@string/title_sensor" />
 </menu>
