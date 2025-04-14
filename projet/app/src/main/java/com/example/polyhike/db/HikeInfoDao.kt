@@ -24,5 +24,5 @@ interface HikeInfoDao {
     fun getTotalStepsBUserId(userId: Int): Int?
 
     @Query("SELECT SUM(totalDistance) FROM hikeInfo WHERE currentUserId = :userId")
-    fun getTotalDistancesBUserId(userId: Int): Int?
+    fun getTotalDistancesBUserId(userId: Int): Float?
 }

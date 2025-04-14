@@ -28,8 +28,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     val userProfile: LiveData<UserProfile?> = _userProfile
     private val _totalSteps = MutableLiveData<Int?>()
     val totalSteps: LiveData<Int?> = _totalSteps
-    private val _totalDistance = MutableLiveData<Int?>()
-    val totalDistance: LiveData<Int?> = _totalDistance
+    private val _totalDistance = MutableLiveData<Float?>()
+    val totalDistance: LiveData<Float?> = _totalDistance
 
     fun getUserProfile(userId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
