@@ -26,6 +26,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val weatherKey = project.findProperty("WEATHER_API_KEY") as? String ?: ""
+        buildConfigField("String", "WEATHER_API_KEY", "\"$weatherKey\"")
     }
 
     buildTypes {
@@ -45,6 +47,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
         viewBinding = true
     }
