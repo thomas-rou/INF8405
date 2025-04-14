@@ -15,6 +15,10 @@ class StepCounterManager(
     private val stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
     private var stepOffset: Float? = null
+    private var stepsDuringPause: Float = 0f
+    private var stepsAtPauseStart: Float? = null
+    private var totalPauseSteps = 0f
+    private var isPaused = false
 
     fun start() {
         if (stepSensor != null) {
@@ -28,15 +32,48 @@ class StepCounterManager(
         sensorManager.unregisterListener(this)
     }
 
-    override fun onSensorChanged(event: SensorEvent?) {
-        event?.values?.firstOrNull()?.let { totalSteps ->
-            if (stepOffset == null) {
-                stepOffset = totalSteps // point de référence
-            }
+    fun pause() {
+        isPaused = true
+        stepsAtPauseStart = null
+    }
 
-            val stepsSinceStart = (totalSteps - stepOffset!!).toInt()
-            onStepCountUpdated(stepsSinceStart)
+    fun resume() {
+        isPaused = false
+        if (stepsAtPauseStart != null) {
+            totalPauseSteps += stepsDuringPause
         }
+        stepsDuringPause = 0f
+        stepsAtPauseStart = null
+    }
+
+
+    fun reset() {
+        stepOffset = null
+        stepsDuringPause = 0f
+        stepsAtPauseStart = null
+        totalPauseSteps = 0f
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        val rawSteps = event?.values?.firstOrNull() ?: return
+
+        if (stepOffset == null) {
+            stepOffset = rawSteps
+        }
+
+        val currentTotal = rawSteps - stepOffset!!
+
+        if (isPaused) {
+            if (stepsAtPauseStart == null) {
+                stepsAtPauseStart = currentTotal
+            } else {
+                stepsDuringPause = currentTotal - stepsAtPauseStart!!
+            }
+            return // don’t update steps while paused
+        }
+
+        val stepsToReport = (currentTotal - totalPauseSteps).toInt()
+        onStepCountUpdated(stepsToReport)
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
