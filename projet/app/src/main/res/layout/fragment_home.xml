@@ -45,12 +45,13 @@
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
             app:cardCornerRadius="10dp"
-            app:cardBackgroundColor="@color/grey">
+            app:cardBackgroundColor="?attr/colorAccent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
+                android:textColor="?attr/colorOnBackground"
                 android:gravity="center">
 
                 <TextView
@@ -60,6 +61,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="20dp"
+                    android:textColor="?attr/colorOnSecondary"
                     android:text="Pourcentage utilisé : 0%"
                     android:textAlignment="center"
                     android:textSize="25sp" />
@@ -71,6 +73,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="20dp"
+                    android:textColor="?attr/colorOnSecondary"
                     android:layout_marginBottom="20dp"
                     android:text="Energie : 0 mWh"
                     android:textAlignment="center"
@@ -96,7 +99,7 @@
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
             app:cardCornerRadius="10dp"
-            app:cardBackgroundColor="@color/grey">
+            app:cardBackgroundColor="?attr/colorAccent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -111,6 +114,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="20dp"
+                    android:textColor="?attr/colorOnSecondary"
                     android:text="Downlink : 0 o/s"
                     android:textAlignment="center"
                     android:textSize="25sp" />
@@ -123,6 +127,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp"
+                    android:textColor="?attr/colorOnSecondary"
                     android:text="Uplink : 0 o/s"
                     android:textAlignment="center"
                     android:textSize="25sp"/>
