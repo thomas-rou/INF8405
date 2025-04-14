@@ -9,8 +9,5 @@ import androidx.core.content.edit
 class AppLifecycleObserver(private val context: Context): LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded() {
-        val sharedPref = context.getSharedPreferences("session", Context.MODE_PRIVATE)
-        sharedPref.edit() { clear() }
-    }
+    fun onAppBackgrounded() {}
 }

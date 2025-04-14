@@ -31,6 +31,9 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
         supportActionBar?.hide()
 
+        val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
+        sharedPref.edit() { clear() }
+
         userProfileDao = PolyHikeDatabase.getDatabase(this, lifecycleScope).userProfileDao()
         imageView = findViewById(R.id.imageViewSelectedPhoto)
 
@@ -52,8 +55,6 @@ class RegisterActivity : AppCompatActivity() {
                     val user = userProfileDao.getUserByNameAndPassword(name, password)
                     addUserToFirestore(user)
                     runOnUiThread {
-                        val sharedPref = getSharedPreferences("session", MODE_PRIVATE)
-                        if (user != null) sharedPref.edit() { putInt("userId", user.id) }
                         Toast.makeText(applicationContext, "Inscription réussie", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@RegisterActivity, NavManagerActivity::class.java)
                         if (user != null) intent.putExtra("USER_ID", user.id)
