@@ -54,7 +54,7 @@ class ProfileFragment : Fragment() {
             else textViewSteps.text = "0"
         }
         profileViewModel.totalDistance.observe(viewLifecycleOwner) {
-            if (it != null) textViewDistance.text = (it / 1000).toString()
+            if (it != null) textViewDistance.text = "${String.format(" % .2f", it / 1000f)}"
             else textViewDistance.text = "0"
         }
         profileViewModel.getUserProfile(userId)

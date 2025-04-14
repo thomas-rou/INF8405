@@ -66,7 +66,7 @@ class HomeFragment : Fragment() {
             val batteryPct = ((level / scale.toFloat()) * 100f).toInt()
             val voltage: Int = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0) //mV
             val capacity: Long = getBatteryCapacity() //micro Ah
-            val batteryEnergy: Int = (voltage * capacity / 1000000).toInt() //mWh
+            val batteryEnergy: Int = ((voltage * capacity / 1000000)).toInt() //mWh
 
             setNewBatteryUsage(batteryPct, batteryEnergy)
         } else {
@@ -95,7 +95,6 @@ class HomeFragment : Fragment() {
             batteryEnergyUsed.text = "Energie : 0 mWh"
         } else {
             batteryPercentageUsed.text = "Pourcentage utilisé : ${batteryInitialPct - batteryPercentage}%"
-
             batteryEnergyUsed.text = "Energie : ${batteryEnergy} mWh"
         }
     }
